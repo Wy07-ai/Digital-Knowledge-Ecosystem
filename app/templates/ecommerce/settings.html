@@ -1,0 +1,40 @@
+{% extends "ecommerce/layout_ecommerce.html" %}
+{% block title %}Pengaturan E-Commerce{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight">Pengaturan E-Commerce</h1>
+    <p class="mt-1 text-muted">Simpan alamat dan metode pembayaran favorit untuk checkout berikutnya.</p>
+  </header>
+
+  <form method="post" action="{{ url_for('ecommerce.settings') }}" class="max-w-2xl rounded-xl border border-line bg-surface p-6 shadow-sm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="settings-address" class="block text-sm font-semibold">Alamat penerima</label>
+    <textarea id="settings-address" name="address" rows="4" maxlength="1000"
+              aria-invalid="{{ 'true' if errors.get('address') else 'false' }}"
+              aria-describedby="{{ 'settings-address-error' if errors.get('address') else 'settings-address-help' }}"
+              class="mt-1 w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">{{ values.address }}</textarea>
+    {% if errors.get('address') %}
+      <p id="settings-address-error" class="mt-1 text-sm font-medium text-red-700 dark:text-red-300">{{ errors.address }}</p>
+    {% else %}
+      <p id="settings-address-help" class="mt-1 text-sm text-muted">Alamat ini akan terisi otomatis di checkout. Maksimal 1.000 karakter.</p>
+    {% endif %}
+
+    <label for="settings-payment" class="mt-5 block text-sm font-semibold">Metode pembayaran favorit</label>
+    <select id="settings-payment" name="payment_method" required
+            aria-invalid="{{ 'true' if errors.get('payment_method') else 'false' }}"
+            aria-describedby="{{ 'settings-payment-error' if errors.get('payment_method') else 'settings-payment-help' }}"
+            class="mt-1 w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">
+      <option value="">Pilih metode pembayaran</option>
+      {% for value, label in payment_methods %}
+        <option value="{{ value }}" {% if values.payment_method == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    {% if errors.get('payment_method') %}
+      <p id="settings-payment-error" class="mt-1 text-sm font-medium text-red-700 dark:text-red-300">{{ errors.payment_method }}</p>
+    {% else %}
+      <p id="settings-payment-help" class="mt-1 text-sm text-muted">Metode ini akan terpilih otomatis di checkout dan tetap bisa diganti.</p>
+    {% endif %}
+
+    <button type="submit" class="btn ecom-button mt-6">Simpan pengaturan</button>
+  </form>
+{% endblock %}

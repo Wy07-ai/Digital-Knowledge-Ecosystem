@@ -33,14 +33,17 @@ class EcommerceTests(unittest.TestCase):
                 (3, "Template & Aset", "template-aset"),
             ),
         )
+        conn.execute(
+            "INSERT INTO courses (id, title, slug) VALUES (1, 'Kursus Dasar Python', 'kursus-python')"
+        )
         conn.executemany(
             "INSERT INTO products "
-            "(id, category_id, name, slug, description, price, product_type) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "(id, category_id, course_id, name, slug, description, price, product_type) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (
-                (1, 1, "Kursus Dasar Python", "kursus-python", "Belajar Python dari awal", 150000, "course"),
-                (2, 1, "Kursus SQL", "kursus-sql", "Belajar kueri basis data", 179000, "course"),
-                (3, 2, "E-Book Flask", "ebook-flask", "Panduan Flask untuk pemula", 79000, "ebook"),
+                (1, 1, 1, "Kursus Dasar Python", "kursus-python", "Belajar Python dari awal", 150000, "course"),
+                (2, 1, None, "Kursus SQL", "kursus-sql", "Belajar kueri basis data", 179000, "course"),
+                (3, 2, None, "E-Book Flask", "ebook-flask", "Panduan Flask untuk pemula", 79000, "ebook"),
             ),
         )
         conn.commit()
@@ -67,6 +70,17 @@ class EcommerceTests(unittest.TestCase):
     def token(self, client=None, path="/ecommerce/keranjang"):
         response = (client or self.client).get(path)
         return re.search(r'name="csrf_token" value="([^"]+)"', response.get_data(as_text=True)).group(1)
+
+    def save_ecommerce_settings(self, address="Jl. Melati No. 10, Bandung", payment="transfer"):
+        self.login()
+        token = self.token(path="/ecommerce/pengaturan")
+        return self.client.post(
+            "/ecommerce/pengaturan",
+            data={"csrf_token": token, "address": address, "payment_method": payment},
+        )
+
+    def add_course_to_cart(self, qty=1):
+        self.sql("INSERT INTO cart_items (user_id, product_id, qty) VALUES (1, 1, ?)", (qty,))
 
     def test_guest_can_filter_catalog_and_prices_use_rupiah_format(self):
         response = self.client.get(
@@ -127,7 +141,9 @@ class EcommerceTests(unittest.TestCase):
         self.login()
         response = self.client.get("/ecommerce/keranjang")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Keranjang masih kosong", response.get_data(as_text=True))
+        html = response.get_data(as_text=True)
+        self.assertIn("Keranjang masih kosong", html)
+        self.assertRegex(html, r'<button type="button" class="btn ecom-button" disabled')
 
     def test_member_add_update_remove_and_live_totals(self):
         self.login()
@@ -186,6 +202,85 @@ class EcommerceTests(unittest.TestCase):
         )
         self.assertEqual(urlsplit(updated.location).path, "/ecommerce/keranjang")
         self.assertEqual(self.sql("SELECT qty FROM cart_items WHERE id = ?", (item_id,))[0][0], 2)
+
+    def test_ecommerce_settings_prefill_checkout_and_checkout_creates_order(self):
+        self.add_course_to_cart(qty=2)
+        saved = self.save_ecommerce_settings(payment="e-wallet")
+        self.assertEqual(urlsplit(saved.location).path, "/ecommerce/pengaturan")
+
+        checkout = self.client.get("/ecommerce/checkout")
+        html = checkout.get_data(as_text=True)
+        self.assertEqual(checkout.status_code, 200)
+        self.assertIn("Jl. Melati No. 10, Bandung", html)
+        self.assertRegex(html, r'<input type="radio" name="payment_method" value="e-wallet"\s+checked')
+        self.assertIn("Rp 300.000", html)
+
+        token = re.search(r'name="csrf_token" value="([^"]+)"', html).group(1)
+        response = self.client.post(
+            "/ecommerce/checkout",
+            data={
+                "csrf_token": token,
+                "address": "Jl. Melati No. 10, Bandung",
+                "payment_method": "e-wallet",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRegex(urlsplit(response.location).path, r"/ecommerce/pesanan/DKE-\d{8}-0001")
+        order = self.sql("SELECT * FROM orders")
+        self.assertEqual(len(order), 1)
+        self.assertEqual(order[0][2], 1)
+        self.assertEqual(order[0][3:8], (300000, "paid", "e-wallet", "Demo Pengguna", "Jl. Melati No. 10, Bandung"))
+        self.assertEqual(self.sql("SELECT product_id, unit_price, qty FROM order_items"), [(1, 150000, 2)])
+        self.assertEqual(self.sql("SELECT user_id, course_id, source, order_id FROM enrollments"), [(1, 1, "order", order[0][0])])
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 0)
+        self.assertEqual(self.sql("SELECT module_key, message FROM notifications")[0][0], "ecommerce")
+        self.assertEqual(self.sql("SELECT action FROM activity_logs")[0][0], "checkout")
+        confirmation = self.client.get(response.location).get_data(as_text=True)
+        self.assertIn("Pesanan berhasil dibuat", confirmation)
+        self.assertIn("DKE-", confirmation)
+        self.assertEqual(self.client.get("/ecommerce/pesanan").status_code, 200)
+
+    def test_checkout_requires_address_and_a_supported_payment_method(self):
+        self.add_course_to_cart()
+        self.login()
+        token = self.token(path="/ecommerce/checkout")
+        response = self.client.post(
+            "/ecommerce/checkout",
+            data={"csrf_token": token, "address": "", "payment_method": "cash"},
+        )
+        self.assertEqual(response.status_code, 400)
+        html = response.get_data(as_text=True)
+        self.assertIn("Alamat wajib diisi", html)
+        self.assertIn("Pilih metode pembayaran simulasi", html)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 1)
+
+    def test_checkout_failure_rolls_back_order_enrollment_cart_notification_and_log(self):
+        self.add_course_to_cart(qty=2)
+        self.save_ecommerce_settings()
+        self.sql(
+            "CREATE TRIGGER fail_checkout_log BEFORE INSERT ON activity_logs "
+            "WHEN NEW.action = 'checkout' "
+            "BEGIN SELECT RAISE(ABORT, 'simulated activity log failure'); END"
+        )
+        token = self.token(path="/ecommerce/checkout")
+        response = self.client.post(
+            "/ecommerce/checkout",
+            data={
+                "csrf_token": token,
+                "address": "Jl. Melati No. 10, Bandung",
+                "payment_method": "transfer",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Pembayaran simulasi gagal diproses", response.get_data(as_text=True))
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM order_items")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM enrollments")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM notifications")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM activity_logs")[0][0], 0)
+        self.assertEqual(self.sql("SELECT product_id, qty FROM cart_items"), [(1, 2)])
 
 
 if __name__ == "__main__":

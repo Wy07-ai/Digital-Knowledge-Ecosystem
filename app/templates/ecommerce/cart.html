@@ -12,6 +12,10 @@
   <p data-cart-feedback class="sr-only" role="status" aria-live="polite"></p>
   <div class="ecommerce-empty" data-cart-empty {% if items %}hidden{% endif %}>
     {{ empty_state('Keranjang masih kosong', 'Produk yang kamu tambahkan akan muncul di sini.', 'Jelajahi katalog', url_for('ecommerce.index')) }}
+    <p class="-mt-6 pb-8 text-center text-sm text-muted">
+      <button type="button" class="btn ecom-button" disabled aria-describedby="empty-cart-checkout-note">Checkout</button>
+      <span id="empty-cart-checkout-note" class="mt-2 block">Tambahkan produk sebelum checkout.</span>
+    </p>
   </div>
 
   <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]" data-cart-content {% if not items %}hidden{% endif %}>
@@ -68,6 +72,9 @@
           <dd class="ecommerce-price font-bold" data-total>{{ total|rupiah }}</dd>
         </div>
       </dl>
+      {% if items %}
+        <a href="{{ url_for('ecommerce.checkout') }}" class="btn ecom-button mt-5 w-full">Lanjut ke checkout</a>
+      {% endif %}
     </aside>
   </div>
 {% endblock %}

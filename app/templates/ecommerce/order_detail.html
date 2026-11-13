@@ -1,0 +1,51 @@
+{% extends "ecommerce/layout_ecommerce.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Konfirmasi Pesanan{% endblock %}
+{% block module_content %}
+  <section class="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
+    <header class="bg-amber-100 px-6 py-8 text-center text-amber-950 dark:bg-amber-900 dark:text-amber-50">
+      <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/70 text-amber-800 dark:bg-black/20 dark:text-amber-100">
+        {{ icon('check', 'h-8 w-8') }}
+      </span>
+      <h1 class="mt-4 text-2xl font-bold">Pesanan berhasil dibuat</h1>
+      <p class="mt-1">Pembayaran simulasi berhasil dicatat.</p>
+    </header>
+    <div class="p-6 sm:p-8">
+      <dl class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm text-muted">Kode pesanan</dt>
+          <dd class="mt-1 font-bold">{{ order.order_code }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Metode pembayaran</dt>
+          <dd class="mt-1 font-semibold">{{ payment_label }}</dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="text-sm text-muted">Alamat penerima</dt>
+          <dd class="mt-1 whitespace-pre-line font-medium">{{ order.recipient_name }}<br>{{ order.address }}</dd>
+        </div>
+      </dl>
+
+      <h2 class="mt-7 border-t border-line pt-5 text-lg font-bold">Ringkasan item</h2>
+      <ul class="mt-2 divide-y divide-line">
+        {% for item in items %}
+          <li class="flex justify-between gap-4 py-3 text-sm">
+            <span>
+              <a href="{{ url_for('ecommerce.product', slug=item.slug) }}" class="font-semibold underline underline-offset-2">{{ item.name }}</a>
+              <span class="block text-muted">{{ item.qty }} × {{ item.unit_price|rupiah }}</span>
+            </span>
+            <span class="ecommerce-price flex-none font-bold">{{ (item.qty * item.unit_price)|rupiah }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="mt-2 flex justify-between border-t border-line pt-4">
+        <span class="font-bold">Total</span>
+        <span class="ecommerce-price text-lg font-bold">{{ order.total|rupiah }}</span>
+      </div>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a href="{{ url_for('ecommerce.orders') }}" class="btn ecom-button">Pesanan Saya</a>
+        <a href="{{ url_for('ecommerce.index') }}" class="btn btn-secondary">Kembali ke katalog</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}

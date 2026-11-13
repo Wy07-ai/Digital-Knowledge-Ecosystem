@@ -1,10 +1,11 @@
 """Katalog produk dan keranjang E-Commerce."""
 import sqlite3
+from datetime import datetime
 
-from flask import abort, flash, g, jsonify, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, g, jsonify, redirect, render_template, request, url_for
 
 from ..db import get_db
-from ..utils import csrf_valid, login_required, safe_next
+from ..utils import csrf_valid, login_required, log_activity, now_iso, notify, safe_next
 from . import bp
 
 MAX_CART_QTY = 99
@@ -20,6 +21,16 @@ SORT_OPTIONS = {
     "name": ("Nama A-Z", "p.name COLLATE NOCASE ASC"),
 }
 MSG_CSRF = "Formulir sudah kedaluwarsa. Muat ulang halaman, lalu coba lagi."
+PAYMENT_METHODS = (
+    ("transfer", "Transfer bank (simulasi)"),
+    ("e-wallet", "E-Wallet (simulasi)"),
+    ("kartu", "Kartu (simulasi)"),
+)
+SETTINGS_KEYS = {
+    "address": "shipping_address",
+    "payment": "preferred_payment_method",
+}
+MAX_ADDRESS_LENGTH = 1000
 
 
 @bp.app_template_filter("rupiah")
@@ -66,6 +77,52 @@ def _cart_totals(user_id):
         (user_id,),
     ).fetchone()
     return row["subtotal"], row["item_count"]
+
+
+def _ecommerce_settings(user_id):
+    rows = get_db().execute(
+        "SELECT setting_key, setting_value FROM module_settings "
+        "WHERE user_id = ? AND module_key = 'ecommerce' "
+        "AND setting_key IN (?, ?)",
+        (user_id, *SETTINGS_KEYS.values()),
+    ).fetchall()
+    values = {row["setting_key"]: row["setting_value"] or "" for row in rows}
+    return {
+        "address": values.get(SETTINGS_KEYS["address"], ""),
+        "payment_method": values.get(SETTINGS_KEYS["payment"], ""),
+    }
+
+
+def _save_ecommerce_settings(user_id, address, payment_method):
+    db = get_db()
+    db.executemany(
+        "INSERT INTO module_settings (user_id, module_key, setting_key, setting_value) "
+        "VALUES (?, 'ecommerce', ?, ?) "
+        "ON CONFLICT(user_id, module_key, setting_key) "
+        "DO UPDATE SET setting_value = excluded.setting_value",
+        (
+            (user_id, SETTINGS_KEYS["address"], address),
+            (user_id, SETTINGS_KEYS["payment"], payment_method),
+        ),
+    )
+    db.commit()
+
+
+def _payment_label(value):
+    return dict(PAYMENT_METHODS).get(value, "")
+
+
+def _new_order_code(db, order_date):
+    prefix = f"DKE-{order_date}-"
+    row = db.execute(
+        "SELECT COALESCE(MAX(CAST(substr(order_code, ?) AS INTEGER)), 0) "
+        "FROM orders WHERE order_code LIKE ?",
+        (len(prefix) + 1, prefix + "%"),
+    ).fetchone()
+    sequence = row[0] + 1
+    if sequence > 9999:
+        raise ValueError("Nomor pesanan hari ini sudah mencapai batas.")
+    return f"{prefix}{sequence:04d}"
 
 
 def _wants_json():
@@ -288,3 +345,242 @@ def remove_cart_item(item_id):
         )
     flash("Produk dihapus dari keranjang.", "success")
     return redirect(url_for("ecommerce.cart"))
+
+
+@bp.route("/checkout", methods=["GET", "POST"])
+@login_required
+def checkout():
+    db = get_db()
+    user_id = g.user["id"]
+    items = db.execute(
+        "SELECT ci.qty, p.id AS product_id, p.name, p.price, p.product_type, "
+        "p.course_id, p.is_active "
+        "FROM cart_items ci JOIN products p ON p.id = ci.product_id "
+        "WHERE ci.user_id = ? ORDER BY ci.added_at, ci.id",
+        (user_id,),
+    ).fetchall()
+    if not items:
+        flash("Keranjang masih kosong. Tambahkan produk sebelum checkout.", "warning")
+        return redirect(url_for("ecommerce.cart"))
+
+    subtotal = sum(item["price"] * item["qty"] for item in items)
+    settings = _ecommerce_settings(user_id)
+    address = request.form.get("address", settings["address"]).strip()
+    payment_method = request.form.get(
+        "payment_method", settings["payment_method"]
+    ).strip()
+    errors = {}
+    if request.method == "POST":
+        if not csrf_valid():
+            flash(MSG_CSRF, "error")
+            return redirect(url_for("ecommerce.checkout"))
+
+        if not address:
+            errors["address"] = "Alamat wajib diisi sebelum melakukan pembayaran."
+        elif len(address) > MAX_ADDRESS_LENGTH:
+            errors["address"] = f"Alamat maksimal {MAX_ADDRESS_LENGTH} karakter."
+        if payment_method not in dict(PAYMENT_METHODS):
+            errors["payment_method"] = "Pilih metode pembayaran simulasi."
+        if errors:
+            return render_template(
+                "ecommerce/checkout.html",
+                page_title="Checkout",
+                items=items,
+                subtotal=subtotal,
+                total=subtotal,
+                address=address,
+                payment_method=payment_method,
+                payment_methods=PAYMENT_METHODS,
+                errors=errors,
+            ), 400
+
+        try:
+            db.execute("BEGIN IMMEDIATE")
+            items = db.execute(
+                "SELECT ci.qty, p.id AS product_id, p.name, p.price, p.product_type, "
+                "p.course_id, p.is_active "
+                "FROM cart_items ci JOIN products p ON p.id = ci.product_id "
+                "WHERE ci.user_id = ? ORDER BY ci.added_at, ci.id",
+                (user_id,),
+            ).fetchall()
+            if not items:
+                db.rollback()
+                flash("Keranjang masih kosong. Tambahkan produk sebelum checkout.", "warning")
+                return redirect(url_for("ecommerce.cart"))
+            if any(not item["is_active"] for item in items):
+                db.rollback()
+                flash("Hapus produk yang sudah tidak tersedia sebelum checkout.", "error")
+                return redirect(url_for("ecommerce.cart"))
+            if any(
+                item["product_type"] == "course" and item["course_id"] is None
+                for item in items
+            ):
+                db.rollback()
+                flash(
+                    "Kursus di keranjang belum terhubung ke kelas. Hubungi administrator.",
+                    "error",
+                )
+                return redirect(url_for("ecommerce.cart"))
+            subtotal = sum(item["price"] * item["qty"] for item in items)
+            order_date = datetime.now().strftime("%Y%m%d")
+            order_code = _new_order_code(db, order_date)
+            created_at = now_iso()
+            cursor = db.execute(
+                "INSERT INTO orders "
+                "(order_code, user_id, total, status, payment_method, recipient_name, address, created_at) "
+                "VALUES (?, ?, ?, 'paid', ?, ?, ?, ?)",
+                (
+                    order_code,
+                    user_id,
+                    subtotal,
+                    payment_method,
+                    g.user["full_name"],
+                    address,
+                    created_at,
+                ),
+            )
+            order_id = cursor.lastrowid
+            db.executemany(
+                "INSERT INTO order_items (order_id, product_id, unit_price, qty) "
+                "VALUES (?, ?, ?, ?)",
+                (
+                    (order_id, item["product_id"], item["price"], item["qty"])
+                    for item in items
+                ),
+            )
+            for item in items:
+                if item["product_type"] == "course" and item["course_id"] is not None:
+                    db.execute(
+                        "INSERT OR IGNORE INTO enrollments "
+                        "(user_id, course_id, source, order_id, enrolled_at) "
+                        "VALUES (?, ?, 'order', ?, ?)",
+                        (user_id, item["course_id"], order_id, created_at),
+                    )
+            db.execute("DELETE FROM cart_items WHERE user_id = ?", (user_id,))
+            notify(
+                user_id,
+                "Pesanan berhasil dibuat",
+                f"Pesanan {order_code} sebesar {rupiah(subtotal)}",
+                link=url_for("ecommerce.order_detail", order_code=order_code),
+                module="ecommerce",
+                commit=False,
+            )
+            log_activity(
+                "ecommerce",
+                "checkout",
+                f"Pesanan {order_code} dibuat ({rupiah(subtotal)})",
+                user_id=user_id,
+                commit=False,
+            )
+            db.commit()
+        except Exception:
+            db.rollback()
+            current_app.logger.exception(
+                "Checkout gagal untuk user_id=%s", user_id
+            )
+            flash(
+                "Pembayaran simulasi gagal diproses. Keranjang Anda tetap tersimpan; silakan coba lagi.",
+                "error",
+            )
+            return redirect(url_for("ecommerce.checkout"))
+
+        flash(f"Pesanan {order_code} berhasil dibuat.", "success")
+        return redirect(url_for("ecommerce.order_detail", order_code=order_code))
+
+    return render_template(
+        "ecommerce/checkout.html",
+        page_title="Checkout",
+        items=items,
+        subtotal=subtotal,
+        total=subtotal,
+        address=address,
+        payment_method=payment_method,
+        payment_methods=PAYMENT_METHODS,
+        errors=errors,
+    )
+
+
+@bp.route("/pengaturan", methods=["GET", "POST"])
+@login_required
+def settings():
+    values = _ecommerce_settings(g.user["id"])
+    errors = {}
+    if request.method == "POST":
+        if not csrf_valid():
+            flash(MSG_CSRF, "error")
+            return redirect(url_for("ecommerce.settings"))
+        address = request.form.get("address", "").strip()
+        payment_method = request.form.get("payment_method", "").strip()
+        if len(address) > MAX_ADDRESS_LENGTH:
+            errors["address"] = f"Alamat maksimal {MAX_ADDRESS_LENGTH} karakter."
+        if payment_method not in dict(PAYMENT_METHODS):
+            errors["payment_method"] = "Pilih metode pembayaran favorit."
+        if errors:
+            return render_template(
+                "ecommerce/settings.html",
+                page_title="Pengaturan",
+                values={"address": address, "payment_method": payment_method},
+                payment_methods=PAYMENT_METHODS,
+                errors=errors,
+            ), 400
+        try:
+            _save_ecommerce_settings(g.user["id"], address, payment_method)
+        except sqlite3.Error:
+            get_db().rollback()
+            current_app.logger.exception(
+                "Gagal menyimpan pengaturan E-Commerce untuk user_id=%s",
+                g.user["id"],
+            )
+            flash("Pengaturan belum bisa disimpan. Coba lagi sebentar lagi.", "error")
+            return redirect(url_for("ecommerce.settings"))
+        flash("Pengaturan E-Commerce berhasil disimpan.", "success")
+        return redirect(url_for("ecommerce.settings"))
+
+    return render_template(
+        "ecommerce/settings.html",
+        page_title="Pengaturan",
+        values=values,
+        payment_methods=PAYMENT_METHODS,
+        errors=errors,
+    )
+
+
+@bp.route("/pesanan")
+@login_required
+def orders():
+    rows = get_db().execute(
+        "SELECT id, order_code, total, status, payment_method, created_at "
+        "FROM orders WHERE user_id = ? ORDER BY created_at DESC, id DESC",
+        (g.user["id"],),
+    ).fetchall()
+    return render_template(
+        "ecommerce/orders.html",
+        page_title="Pesanan Saya",
+        orders=rows,
+        payment_label=_payment_label,
+    )
+
+
+@bp.route("/pesanan/<order_code>")
+@login_required
+def order_detail(order_code):
+    db = get_db()
+    order = db.execute(
+        "SELECT * FROM orders WHERE order_code = ? AND user_id = ?",
+        (order_code, g.user["id"]),
+    ).fetchone()
+    if order is None:
+        abort(404)
+    items = db.execute(
+        "SELECT oi.unit_price, oi.qty, p.name, p.slug "
+        "FROM order_items oi JOIN products p ON p.id = oi.product_id "
+        "WHERE oi.order_id = ? ORDER BY oi.id",
+        (order["id"],),
+    ).fetchall()
+    return render_template(
+        "ecommerce/order_detail.html",
+        page_title="Konfirmasi Pesanan",
+        order=order,
+        items=items,
+        payment_label=_payment_label(order["payment_method"]),
+    )
