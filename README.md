@@ -13,10 +13,34 @@ autentikasi: **Information System, E-Commerce, E-Learning, E-Tutorial, Portal, F
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+python seed.py        # membuat instance/dke.db, 23 tabel, data contoh, dan akun demo
 python run.py
 ```
 
 Buka http://127.0.0.1:5000. Variabel opsional: `DKE_SECRET_KEY`, `FLASK_DEBUG`, `HOST`, `PORT`.
+
+## Database dan data contoh
+
+- `schema.sql` : 23 tabel sesuai Blueprint 3.3 (dapat dijalankan sendiri di SQLite).
+- `seed.py`    : membuat database dari awal dan mengisi data contoh berbahasa Indonesia.
+
+```bash
+python seed.py            # aman dijalankan ulang: tidak menggandakan data, tidak menimpa kata sandi
+python seed.py --reset    # hapus semua tabel lalu bangun ulang dari nol (data lama hilang)
+```
+
+Isi seed: kategori per modul, 6 produk (2 bertipe kursus, terhubung ke kursus lewat `course_id`),
+3 kursus (15 pelajaran, 3 kuis, 15 soal; 1 kursus gratis), 5 tutorial (22 langkah dengan snippet kode),
+10 artikel (2 featured), 5 thread dengan 18 balasan, serta data contoh untuk akun demo.
+Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris tiap tabel.
+
+| Akun  | Email            | Kata sandi bawaan |
+|-------|------------------|-------------------|
+| Demo  | demo@dke.test    | `Demo12345`       |
+| Admin | admin@dke.test   | `Admin12345!`     |
+
+Ubah kata sandi bawaan dengan variabel lingkungan `DKE_DEMO_PASSWORD` / `DKE_ADMIN_PASSWORD`
+sebelum seed pertama. Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten forum dan tidak bisa dipakai login.
 
 ## Halaman yang tersedia (Fase 0)
 
@@ -68,13 +92,13 @@ yang mewarisi `base.html`.
 - **`context_processor`** menyediakan `MODULES`, `current_module`, `accent`,
   `current_user`, dan `settings` ke semua template.
 
-## Catatan asumsi
+## Catatan skema
 
-Dokumen Blueprint tidak ikut terlampir saat skeleton dibuat, sehingga struktur folder dan nama
-kolom (`users`, `user_settings`, `activity_logs`, `notifications`) disusun dari Blok Konteks.
-Cocokkan dengan Blueprint 6.1 dan `schema.sql` (Prompt 2) bila ada perbedaan.
+Nama kolom `activity_logs` dan `notifications` di `app/utils.py` sudah disesuaikan dengan `schema.sql`
+(`module_key`, `message`, `link_url`). `notify()` menggabungkan `title` dan `body` menjadi satu `message`,
+karena Blueprint hanya mendefinisikan kolom `message`.
 
 ## Roadmap
 
-Fase 0 skeleton (selesai) → schema.sql + seed.py → Fase 1 fondasi tampilan dan autentikasi →
+Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi →
 Fase 2-5 modul → Fase 6 QA dan laporan.
