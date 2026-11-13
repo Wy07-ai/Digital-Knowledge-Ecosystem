@@ -133,7 +133,45 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 - Kata sandi: `werkzeug.security.generate_password_hash`; kredensial salah memberi pesan sama untuk email tak dikenal dan kata sandi salah.
 - `next` hanya diterima bila jalur lokal (`utils.safe_next` memakai `is_safe_next`, menolak URL absolut, `//`, backslash, karakter kontrol, dan halaman login/register/logout).
 - Form dilindungi token CSRF per sesi (`utils.csrf_token` / `csrf_valid`); tombol Keluar memakai POST.
-- Tes otomatis: `python -m unittest discover -s tests -v`. Skenario uji manual: `docs/UJI_MANUAL_AUTH.md`.
+- Tes otomatis: `python -m unittest discover -s tests -v` (autentikasi, Beranda, dan navigasi). Skenario uji manual: `docs/UJI_MANUAL_AUTH.md`.
+
+## Beranda dan navigasi 3 level (Fase 1, Prompt 6)
+
+**Beranda** (`/`, `app/main/routes.py` + `app/main/launcher.py`)
+
+- Grid kartu modul: 3 kolom (3x2) di desktop (`lg`), 2 kolom di tablet, 1 kolom di mobile dan Mobile View.
+  Setiap kartu memuat aksen warna, ikon, nama modul, dan widget ringkas; hover lift 4 px + glow 200 ms
+  (`.launcher-card` di `custom.css`, nonaktif di layar sentuh dan saat reduced-motion).
+- Widget dibaca dari database, satu fungsi per modul di `launcher.py`. Data kosong tampil sebagai pesan
+  ramah berwarna redup ("Keranjang masih kosong"), dan kegagalan satu widget tidak merusak halaman.
+  Guest melihat konten publik (produk, tutorial, artikel, thread terbaru).
+- Tombol **Lanjutkan: modul > halaman terakhir** dibangun dari `user_settings.last_module` dan `last_path`.
+  Jalurnya divalidasi ulang tiap tampil (lokal, masih cocok dengan rute, sesuai modul); bila tidak valid
+  tombol disembunyikan. Label halaman diambil dari hierarki di `app/navigation.py`.
+- **landing_mode**: `launcher` menampilkan Beranda; `last_module` mengalihkan ke halaman terakhir, tetapi
+  hanya pada kedatangan pertama di sesi (penanda sesi `dke_landed`), supaya tombol DKE di Top-Bar tetap
+  bisa membuka Beranda. Login dan logout memanggil `session.clear()`, jadi login baru dialihkan lagi.
+  Member mengubahnya lewat tombol "Saat membuka DKE" di Beranda (`static/js/launcher.js`, memakai
+  `POST /api/settings/global`).
+
+**Navigasi 3 level** (Blueprint 5.2)
+
+| Level | Komponen | Sumber |
+|-------|----------|--------|
+| 1 | Tombol Kembali: menuju induk langsung di hierarki halaman, bukan riwayat browser | `app/navigation.py` |
+| 2 | Breadcrumb: tiap jenjang bisa diklik; di mobile menjadi `... > Halaman`, tombol `...` membuka jenjang tersembunyi | `_components/breadcrumb.html` |
+| 3 | App Switcher (9 titik) + tombol DKE di Top-Bar, modul aktif ditandai | `_components/app_switcher.html` |
+
+Breadcrumb dan Kembali tampil **otomatis** di atas konten (`{% block page_nav %}` di `base.html`) untuk
+setiap halaman yang terdaftar di `app/navigation.py`. Contoh menambah halaman bersarang:
+
+```python
+node("elearning.course_detail", _course_title, parent="elearning.index")
+node("elearning.lesson", _lesson_title, parent="elearning.course_detail")
+```
+
+Contoh langsung 3 jenjang (E-Learning > judul kelas > Materi N): http://127.0.0.1:5000/dev/ui-test/navigasi/kelas/1/materi/1
+(ikut dimatikan oleh `DKE_UI_TEST=0`). Contoh nyata 2 jenjang: Information System > Profil & Pengaturan.
 
 ## Roadmap
 
