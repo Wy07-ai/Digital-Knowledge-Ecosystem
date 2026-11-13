@@ -42,7 +42,7 @@ Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris tiap tabel.
 Ubah kata sandi bawaan dengan variabel lingkungan `DKE_DEMO_PASSWORD` / `DKE_ADMIN_PASSWORD`
 sebelum seed pertama. Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten forum dan tidak bisa dipakai login.
 
-## Halaman yang tersedia (Fase 0)
+## Alamat modul
 
 | Blueprint   | URL          | Aksen     |
 |-------------|--------------|-----------|
@@ -53,6 +53,11 @@ sebelum seed pertama. Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten f
 | etutorial   | `/etutorial/`| `#7C3AED` |
 | portal      | `/portal/`   | `#E11D48` |
 | forum       | `/forum/`    | `#0D9488` |
+
+E-Commerce menyediakan katalog dan detail produk, keranjang, checkout simulasi,
+konfirmasi serta riwayat pesanan, dan pengaturan alamat/metode pembayaran favorit.
+Checkout menyimpan pesanan, item, enrollment kursus, notifikasi, dan log dalam satu
+transaksi database. Alur ini tercakup dalam `python -m unittest tests.test_ecommerce`.
 
 ## Struktur folder
 

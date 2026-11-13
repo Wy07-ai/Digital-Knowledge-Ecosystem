@@ -1,5 +1,15 @@
 {% extends "base.html" %}
-{# Layout modul E-Commerce. Sidebar/tab khusus modul ditambahkan di prompt berikutnya. #}
+{% from "_components/_icons.html" import icon %}
 {% block content %}
+  <nav class="ecommerce-nav mb-6 flex flex-wrap gap-2 border-b border-line pb-3" aria-label="Navigasi E-Commerce">
+    <a href="{{ url_for('ecommerce.index') }}" class="ecommerce-nav-link {% if request.endpoint in ('ecommerce.index', 'ecommerce.product') %}is-active{% endif %}"
+       {% if request.endpoint in ('ecommerce.index', 'ecommerce.product') %}aria-current="page"{% endif %}>Katalog</a>
+    {% if current_user %}
+      <a href="{{ url_for('ecommerce.orders') }}" class="ecommerce-nav-link {% if request.endpoint in ('ecommerce.orders', 'ecommerce.order_detail') %}is-active{% endif %}"
+         {% if request.endpoint in ('ecommerce.orders', 'ecommerce.order_detail') %}aria-current="page"{% endif %}>Pesanan Saya</a>
+      <a href="{{ url_for('ecommerce.settings') }}" class="ecommerce-nav-link {% if request.endpoint == 'ecommerce.settings' %}is-active{% endif %}"
+         {% if request.endpoint == 'ecommerce.settings' %}aria-current="page"{% endif %}>Pengaturan</a>
+    {% endif %}
+  </nav>
   {% block module_content %}{% endblock %}
 {% endblock %}
