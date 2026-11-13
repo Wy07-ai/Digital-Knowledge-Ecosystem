@@ -120,6 +120,21 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 - Tailwind dimuat dari CDN (`cdn.tailwindcss.com/3.4.17`) dan font Inter dari Google Fonts, jadi
   perlu internet saat demo; tanpa internet tampilan jatuh ke `system-ui` dan tanpa gaya Tailwind.
 
+## Autentikasi (Fase 1, UC-IS-01..03)
+
+| URL | Metode | Fungsi |
+|-----|--------|--------|
+| `/infosys/register` | GET, POST | Registrasi: membuat `users` + `user_settings` + log `register` dalam satu transaksi |
+| `/infosys/login`    | GET, POST | Login; mendukung `?next=<halaman asal>`; mencatat `activity_logs` dan `last_login_at` |
+| `/infosys/logout`   | POST      | Logout (mencatat `activity_logs`); GET hanya mengarahkan ke Beranda |
+| `/infosys/profil`   | GET       | Penampung halaman terlindungi (`@login_required`), diisi pada UC-IS-04 |
+
+- Validasi inline (Blueprint 5.5) ada di `app/infosys/validation.py` (server) dan `static/js/auth.js` (peramban); aturannya harus sama.
+- Kata sandi: `werkzeug.security.generate_password_hash`; kredensial salah memberi pesan sama untuk email tak dikenal dan kata sandi salah.
+- `next` hanya diterima bila jalur lokal (`utils.safe_next` memakai `is_safe_next`, menolak URL absolut, `//`, backslash, karakter kontrol, dan halaman login/register/logout).
+- Form dilindungi token CSRF per sesi (`utils.csrf_token` / `csrf_valid`); tombol Keluar memakai POST.
+- Tes otomatis: `python -m unittest discover -s tests -v`. Skenario uji manual: `docs/UJI_MANUAL_AUTH.md`.
+
 ## Roadmap
 
 Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan (selesai) dan autentikasi →

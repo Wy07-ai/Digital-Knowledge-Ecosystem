@@ -105,8 +105,12 @@
               <p class="truncate font-semibold">{{ current_user['full_name'] }}</p>
               <p class="truncate text-sm text-muted">{{ current_user['email'] }}</p>
             </div>
-            <a href="{{ url_for('infosys.index') }}" class="menu-item mt-1.5" data-popover-item>{{ icon('user') }}<span>Profil &amp; Pengaturan</span></a>
-            <a href="{{ safe_url('infosys.logout', '/infosys/logout') }}" class="menu-item" data-popover-item>{{ icon('log-out') }}<span>Keluar</span></a>
+            <a href="{{ safe_url('infosys.profile', '/infosys/profil') }}" class="menu-item mt-1.5" data-popover-item>{{ icon('user') }}<span>Profil &amp; Pengaturan</span></a>
+            {# Keluar memakai POST + token CSRF supaya situs lain tidak bisa mengeluarkan Member lewat tautan. #}
+            <form method="post" action="{{ safe_url('infosys.logout', '/infosys/logout') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="menu-item w-full" data-popover-item>{{ icon('log-out') }}<span>Keluar</span></button>
+            </form>
           </div>
         </div>
       {% else %}

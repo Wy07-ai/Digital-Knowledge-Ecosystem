@@ -6,7 +6,7 @@ from importlib import import_module
 from flask import Flask, g, request, session
 
 from . import db
-from .utils import current_login_url, notification_summary, safe_url_for
+from .utils import csrf_token, current_login_url, notification_summary, safe_url_for
 
 # Daftar 6 modul. Satu modul = satu Blueprint = satu folder template.
 # "key" sama dengan nama paket Python (app/<key>/) dan nama Blueprint.
@@ -131,4 +131,5 @@ def _register_hooks(app):
             "safe_url": safe_url_for,
             "login_url": current_login_url,
             "notification_summary": notification_summary,
+            "csrf_token": csrf_token,
         }
