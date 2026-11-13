@@ -235,3 +235,26 @@ html[data-view='mobile'] .cp-side { width: auto; position: static; }
 html[data-view='mobile'] .cp-tabs { flex-direction: row; overflow-x: auto; padding-bottom: .25rem; scrollbar-width: thin; }
 html[data-view='mobile'] .cp-tab { flex: none; white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; }
 html[data-view='mobile'] .cp-tab.is-active { border-bottom-color: rgb(var(--c-primary)); }
+
+/* ---------- 10. E-Commerce: aksen amber dengan kontras teks yang terjaga ---------- */
+.ecom-button {
+  background: #92400e;
+  color: #fff;
+}
+.ecom-button:hover { background: #78350f; }
+.ecom-category {
+  display: inline-flex; align-items: center; min-height: 1.75rem;
+  border-radius: 9999px; background: #fef3c7; color: #78350f;
+  padding: .125rem .625rem; font-size: .75rem; font-weight: 700;
+}
+.ecommerce-price { color: #78350f; }
+[data-cart-content][hidden] { display: none !important; }
+.ecommerce-empty > section > span {
+  background: #fef3c7;
+  color: #78350f;
+}
+.ecommerce-empty .btn-primary { background: #92400e; color: #fff; }
+.ecommerce-empty .btn-primary:hover { background: #78350f; }
+html.dark .ecom-category { background: #78350f; color: #fff; }
+html.dark .ecommerce-price { color: #fcd34d; }
+html.dark .ecommerce-empty > section > span { background: #78350f; color: #fcd34d; }

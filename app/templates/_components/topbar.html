@@ -19,6 +19,17 @@
       <span class="truncate">{{ page_heading }}</span>
     </p>
 
+    {% if current_module and current_module.key == 'ecommerce' %}
+      <a href="{{ url_for('ecommerce.cart') }}" class="tb-btn relative ml-1"
+         data-cart-link
+         aria-label="Keranjang belanja, {{ cart_item_count }} item"
+         {% if request.endpoint == 'ecommerce.cart' %}aria-current="page"{% endif %}>
+        {{ icon('ecommerce') }}
+        <span class="dke-hide-mobile">Keranjang</span>
+        <span data-cart-count class="cart-count absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-amber-300 px-1 text-[11px] font-bold leading-none text-amber-950 ring-2 ring-header">{{ '99+' if cart_item_count > 99 else cart_item_count }}</span>
+      </a>
+    {% endif %}
+
     <div class="ml-auto flex flex-none items-center">
 
       {# --- Sakelar tema: Terang / Gelap / Sistem --- #}

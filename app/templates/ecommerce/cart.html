@@ -1,0 +1,76 @@
+{% extends "ecommerce/layout_ecommerce.html" %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Keranjang{% endblock %}
+{% block module_content %}
+  <div class="mb-6">
+    <a href="{{ url_for('ecommerce.index') }}" class="text-sm font-semibold text-muted underline underline-offset-2">Kembali ke katalog</a>
+    <h1 class="mt-2 text-3xl font-bold tracking-tight">Keranjang Belanja</h1>
+    <p class="mt-1 text-muted" data-cart-item-count-label>{{ item_count }} item di keranjang</p>
+  </div>
+
+  <p data-cart-feedback class="sr-only" role="status" aria-live="polite"></p>
+  <div class="ecommerce-empty" data-cart-empty {% if items %}hidden{% endif %}>
+    {{ empty_state('Keranjang masih kosong', 'Produk yang kamu tambahkan akan muncul di sini.', 'Jelajahi katalog', url_for('ecommerce.index')) }}
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]" data-cart-content {% if not items %}hidden{% endif %}>
+    <section class="space-y-4" aria-label="Produk di keranjang" data-cart-items>
+      {% for item in items %}
+        <article class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-4 shadow-sm sm:flex-row sm:items-center"
+                 data-cart-item data-unit-price="{{ item.price }}">
+          <a href="{{ url_for('ecommerce.product', slug=item.slug) }}"
+             class="ecom-product-art flex h-24 w-full flex-none items-center justify-center overflow-hidden rounded-lg bg-amber-100 text-amber-950 sm:w-28"
+             aria-label="Lihat {{ item.name }}">
+            {% if item.image_url %}
+              <img src="{{ item.image_url }}" alt="{{ item.name }}" class="h-full w-full object-cover" loading="lazy">
+            {% else %}
+              {{ icon('ecommerce', 'h-8 w-8') }}
+            {% endif %}
+          </a>
+          <div class="min-w-0 flex-1">
+            <a href="{{ url_for('ecommerce.product', slug=item.slug) }}" class="font-bold text-ink hover:underline">{{ item.name }}</a>
+            <p class="ecommerce-price mt-1 text-sm font-semibold">{{ item.price|rupiah }}</p>
+            <p class="mt-1 text-sm text-muted" data-quantity-label>Jumlah: {{ item.qty }}</p>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3 sm:justify-end">
+            <div class="text-right">
+              <p class="text-xs text-muted">Subtotal item</p>
+              <p class="ecommerce-price font-bold" data-line-total>{{ (item.price * item.qty)|rupiah }}</p>
+            </div>
+            <form method="post" action="{{ url_for('ecommerce.update_cart_quantity', item_id=item.cart_item_id) }}" data-cart-update>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <label class="sr-only" for="qty-{{ item.cart_item_id }}">Jumlah {{ item.name }}</label>
+              <div class="flex items-center gap-2">
+                <input id="qty-{{ item.cart_item_id }}" name="qty" type="number" min="1" max="99" value="{{ item.qty }}"
+                       class="w-20 rounded-lg border border-line bg-page px-2 py-2 text-center text-ink">
+                <button type="submit" class="btn btn-secondary">Ubah</button>
+              </div>
+            </form>
+            <form method="post" action="{{ url_for('ecommerce.remove_cart_item', item_id=item.cart_item_id) }}" data-cart-remove>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-secondary text-red-700 dark:text-red-300">Hapus</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+
+    <aside class="h-fit rounded-xl border border-line bg-surface p-5 shadow-sm" aria-label="Ringkasan belanja" data-cart-summary>
+      <h2 class="text-lg font-bold">Ringkasan belanja</h2>
+      <dl class="mt-4 space-y-3">
+        <div class="flex justify-between gap-4 text-sm">
+          <dt class="text-muted">Subtotal</dt>
+          <dd class="font-semibold" data-subtotal>{{ subtotal|rupiah }}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-t border-line pt-3">
+          <dt class="font-bold">Total</dt>
+          <dd class="ecommerce-price font-bold" data-total>{{ total|rupiah }}</dd>
+        </div>
+      </dl>
+    </aside>
+  </div>
+{% endblock %}
+{% block scripts_extra %}
+  <script defer src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}
