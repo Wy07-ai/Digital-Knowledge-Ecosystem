@@ -1,8 +1,113 @@
 {% extends "ecommerce/layout_ecommerce.html" %}
 {% from "_components/empty_state.html" import empty_state %}
-{% block title %}E-Commerce{% endblock %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Katalog Produk{% endblock %}
 {% block module_content %}
-  <h1 class="text-2xl font-bold">E-Commerce</h1>
-  <p class="mt-1 text-muted">{{ current_module.desc }}</p>
-  {{ empty_state('Halaman ini sedang disiapkan', 'Konten modul E-Commerce dibangun pada fase berikutnya.', 'Kembali ke Beranda', url_for('main.index')) }}
+  {% set type_labels = dict(product_types) %}
+  <section class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-300">Belajar dan berkarya</p>
+    <div class="mt-1 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">Katalog Produk</h1>
+        <p class="mt-1 text-muted">Temukan kursus, e-book, dan aset digital untuk kebutuhanmu.</p>
+      </div>
+      <a href="{{ url_for('ecommerce.cart') if current_user else url_for('infosys.login', next=url_for('ecommerce.cart')) }}"
+         class="btn btn-secondary">Lihat keranjang{% if current_user and cart_item_count %} ({{ cart_item_count }}){% endif %}</a>
+    </div>
+  </section>
+
+  <form method="get" action="{{ url_for('ecommerce.index') }}"
+        class="mb-6 rounded-xl border border-line bg-surface p-4 shadow-sm" aria-label="Filter katalog">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+      <label class="lg:col-span-2">
+        <span class="mb-1 block text-sm font-semibold">Cari produk</span>
+        <input type="search" name="q" value="{{ filters.q }}" placeholder="Nama atau deskripsi"
+               class="w-full rounded-lg border border-line bg-page px-3 py-2 text-ink"
+               aria-label="Cari nama atau deskripsi produk">
+      </label>
+      <label>
+        <span class="mb-1 block text-sm font-semibold">Kategori</span>
+        <select name="category" class="w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">
+          <option value="">Semua kategori</option>
+          {% for category in categories %}
+            <option value="{{ category.slug }}" {% if filters.category == category.slug %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span class="mb-1 block text-sm font-semibold">Jenis produk</span>
+        <select name="type" class="w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">
+          <option value="">Semua jenis</option>
+          {% for value, label in product_types %}
+            <option value="{{ value }}" {% if filters.type == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span class="mb-1 block text-sm font-semibold">Urutkan</span>
+        <select name="sort" class="w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">
+          {% for value, option in sort_options.items() %}
+            <option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ option[0] }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="flex items-end gap-2">
+        <label class="min-w-0 flex-1">
+          <span class="mb-1 block text-sm font-semibold">Harga minimum</span>
+          <input type="number" name="min_price" min="0" value="{{ filters.min_price }}" placeholder="Rp"
+                 class="w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">
+        </label>
+        <label class="min-w-0 flex-1">
+          <span class="mb-1 block text-sm font-semibold">Harga maksimum</span>
+          <input type="number" name="max_price" min="0" value="{{ filters.max_price }}" placeholder="Rp"
+                 class="w-full rounded-lg border border-line bg-page px-3 py-2 text-ink">
+        </label>
+      </div>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <button type="submit" class="btn ecom-button">{{ icon('filter', 'h-4 w-4') }}Terapkan filter</button>
+      <a href="{{ url_for('ecommerce.index') }}" class="text-sm font-semibold text-muted underline underline-offset-2">Hapus filter</a>
+      <p class="ml-auto text-sm text-muted" aria-live="polite">{{ products|length }} produk ditemukan</p>
+    </div>
+  </form>
+
+  {% if products %}
+    <div class="product-grid grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {% for product in products %}
+        <article class="flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+          <a href="{{ url_for('ecommerce.product', slug=product.slug) }}"
+             class="ecom-product-art flex h-44 items-center justify-center overflow-hidden bg-amber-100 text-amber-950"
+             aria-label="Lihat {{ product.name }}">
+            {% if product.image_url %}
+              <img src="{{ product.image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover" loading="lazy">
+            {% else %}
+              {{ icon('ecommerce', 'h-14 w-14') }}
+            {% endif %}
+          </a>
+          <div class="flex flex-1 flex-col p-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="ecom-category">{{ product.category_name or type_labels.get(product.product_type, 'Produk digital') }}</span>
+              <span class="text-xs font-medium text-muted">{{ type_labels.get(product.product_type, 'Produk digital') }}</span>
+            </div>
+            <a href="{{ url_for('ecommerce.product', slug=product.slug) }}" class="mt-3 text-lg font-bold leading-snug text-ink hover:underline">
+              {{ product.name }}
+            </a>
+            <p class="mt-2 line-clamp-3 text-sm text-muted">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajarmu.' }}</p>
+            <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
+              <p class="ecommerce-price text-lg font-bold">{{ product.price|rupiah }}</p>
+              <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+                <button type="submit" class="btn ecom-button">Tambah ke keranjang</button>
+              </form>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="ecommerce-empty">
+      {{ empty_state('Produk tidak ditemukan', 'Coba ubah kata kunci atau rentang harga.', 'Tampilkan semua produk', url_for('ecommerce.index'), 'filter') }}
+    </div>
+  {% endif %}
 {% endblock %}
