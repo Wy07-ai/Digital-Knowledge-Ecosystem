@@ -6,6 +6,7 @@ from importlib import import_module
 from flask import Flask, g, request, session
 
 from . import db
+from .navigation import build_nav
 from .utils import csrf_token, current_login_url, notification_summary, safe_url_for
 
 # Daftar 6 modul. Satu modul = satu Blueprint = satu folder template.
@@ -28,6 +29,10 @@ DEFAULT_SETTINGS = {
     "last_module": None,
     "last_path": None,
 }
+
+# Penanda sesi: Member sudah "mendarat" (sudah membuka halaman apa pun) di sesi ini. Dipakai Beranda
+# agar landing_mode = last_module hanya mengalihkan pada kedatangan pertama (lihat main/routes.py).
+LANDED_KEY = "dke_landed"
 
 # Halaman yang tidak boleh dicatat sebagai "halaman terakhir".
 NO_TRACK_ENDPOINTS = {"infosys.login", "infosys.register", "infosys.logout"}
@@ -81,6 +86,8 @@ def _register_hooks(app):
                 session.pop("user_id", None)
                 return
             g.user = user
+            if request.endpoint != "main.index" and not session.get(LANDED_KEY):
+                session[LANDED_KEY] = True  # Member membuka halaman lain dulu: Beranda tidak dialihkan lagi
             row = conn.execute(
                 "SELECT * FROM user_settings WHERE user_id = ?", (user_id,)
             ).fetchone()
@@ -127,9 +134,18 @@ def _register_hooks(app):
             "accent": current["accent"] if current else "#475569",
             "current_user": g.get("user"),
             "settings": g.get("settings", DEFAULT_SETTINGS),
+            # Navigasi 3 level: breadcrumb + tombol Kembali dari hierarki (app/navigation.py)
+            "nav": _current_nav(),
             # Helper untuk Top-Bar (lihat app/utils.py)
             "safe_url": safe_url_for,
             "login_url": current_login_url,
             "notification_summary": notification_summary,
             "csrf_token": csrf_token,
         }
+
+
+def _current_nav():
+    """build_nav() sekali per permintaan (hasilnya di-cache di g)."""
+    if "_nav" not in g:
+        g._nav = build_nav()
+    return g._nav

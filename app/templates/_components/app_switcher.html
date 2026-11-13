@@ -34,5 +34,9 @@
         </a>
       {% endfor %}
     </div>
+    <a href="{{ url_for('main.index') }}" data-popover-item
+       class="menu-item mt-2 border-t border-line text-sm font-medium" {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
+      {{ icon('grid9', 'h-4 w-4') }}<span>Semua modul (Beranda)</span>
+    </a>
   </div>
 </div>

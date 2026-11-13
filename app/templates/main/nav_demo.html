@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Contoh Navigasi{% endblock %}
+{# Tidak ada pemanggilan breadcrumb() di sini: breadcrumb dan tombol Kembali muncul otomatis di atas
+   halaman ini karena endpoint-nya terdaftar di app/navigation.py (lihat node(...) "main.nav_demo_*"). #}
+{% block content %}
+  <h1 class="text-2xl font-bold">
+    {% if order_no %}Contoh halaman jenjang 3: Materi {{ order_no }}{% else %}Contoh halaman jenjang 2: Kelas {{ course_id }}{% endif %}
+  </h1>
+  <p class="mt-2 text-muted">
+    Perhatikan baris di atas judul: tombol <strong>Kembali</strong> dan <strong>breadcrumb</strong>.
+    Tombol Kembali selalu menuju
+    {% if order_no %}halaman kelas (induknya){% else %}daftar E-Learning (induknya){% endif %},
+    bukan halaman yang kebetulan Anda buka sebelumnya.
+  </p>
+
+  <section class="mt-6 rounded-xl border border-line bg-surface p-4" aria-labelledby="h-coba">
+    <h2 id="h-coba" class="text-lg font-semibold">Coba sendiri</h2>
+    <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm">
+      <li>Buka halaman ini dari tautan mana pun, lalu klik <em>Kembali</em>. Tujuannya tetap sama.</li>
+      <li>Klik jenjang di breadcrumb untuk naik langsung ke kelas atau ke daftar E-Learning.</li>
+      <li>Tekan tombol Mobile di Top-Bar: breadcrumb diringkas menjadi &hellip; &rsaquo; halaman aktif, dan tombol &hellip; membuka jenjang yang disembunyikan.</li>
+      <li>Buka App Switcher (ikon 9 titik) untuk pindah modul tanpa lewat Beranda.</li>
+    </ol>
+    <div class="mt-4 flex flex-wrap gap-3">
+      {% if order_no %}
+        {% if order_no > 1 %}<a class="btn btn-secondary text-sm" href="{{ url_for('main.nav_demo_lesson', course_id=course_id, order_no=order_no - 1) }}">Materi {{ order_no - 1 }}</a>{% endif %}
+        <a class="btn btn-secondary text-sm" href="{{ url_for('main.nav_demo_lesson', course_id=course_id, order_no=order_no + 1) }}">Materi {{ order_no + 1 }}</a>
+      {% else %}
+        <a class="btn btn-primary text-sm" href="{{ url_for('main.nav_demo_lesson', course_id=course_id, order_no=1) }}">Buka Materi 1 (jenjang 3)</a>
+      {% endif %}
+      <a class="btn btn-secondary text-sm" href="{{ url_for('main.ui_test') }}">Halaman uji komponen</a>
+    </div>
+  </section>
+
+  <section class="mt-6 rounded-xl border border-line bg-surface p-4" aria-labelledby="h-kode">
+    <h2 id="h-kode" class="text-lg font-semibold">Cara mendaftarkan halaman bersarang</h2>
+    <p class="mt-1 text-sm text-muted">Dua baris di <code>app/navigation.py</code> sudah cukup; template tidak perlu diubah.</p>
+    <pre class="mt-3 overflow-x-auto rounded-lg bg-page p-3 text-xs"><code>node("main.nav_demo_course", _course_title, parent="elearning.index")
+node("main.nav_demo_lesson", _lesson_title, parent="main.nav_demo_course")</code></pre>
+  </section>
+{% endblock %}

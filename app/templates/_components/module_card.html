@@ -1,16 +1,20 @@
 {# Kartu modul untuk Beranda 6 kotak dan tempat lain.
 
-   module_card(module, summary=None, progress=None, href=None)
+   module_card(module, summary=None, progress=None, href=None, detail=None, empty=False)
      module   : salah satu elemen MODULES (key, name, accent, desc)
-     summary  : cuplikan widget, mis. "2 item keranjang" (opsional)
+     summary  : cuplikan widget utama, mis. "2 item di keranjang" (opsional)
+     detail   : baris pendukung di bawah summary (opsional)
      progress : 0-100 untuk progress bar (opsional, mis. E-Learning)
-   Aksen warna hanya garis atas dan ikon; nama modul selalu tertulis.
-   Hover lift + glow 200 ms (Blueprint 5.4). Beri grid pembungkus kelas "launcher-grid". #}
+     empty    : True bila datanya kosong; summary tampil redup (bukan angka 0 yang membingungkan)
+   Aksen warna hanya garis atas dan ikon; nama modul selalu tertulis (warna bukan satu-satunya pembeda).
+   Hover lift 4 px + glow aksen 200 ms ada di custom.css (.launcher-card), nonaktif di layar sentuh
+   dan saat prefers-reduced-motion. Beri grid pembungkus kelas "launcher-grid". #}
 {% from '_components/_icons.html' import icon %}
-{% macro module_card(module, summary=None, progress=None, href=None) -%}
+{% macro module_card(module, summary=None, progress=None, href=None, detail=None, empty=False) -%}
 <a href="{{ href or url_for(module.key ~ '.index') }}"
-   class="group block rounded-xl border border-line bg-surface p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98]"
-   style="border-top: 4px solid {{ module.accent }}">
+   class="launcher-card group flex h-full flex-col rounded-xl border border-line bg-surface p-5 shadow-sm"
+   style="--card-accent: {{ module.accent }}; border-top: 4px solid {{ module.accent }}"
+   data-module="{{ module.key }}">
   <div class="flex items-center gap-3">
     <span class="flex h-11 w-11 flex-none items-center justify-center rounded-lg text-white" style="background: {{ module.accent }}">
       {{ icon(module.key, 'h-6 w-6') }}
@@ -18,13 +22,20 @@
     <h3 class="text-lg font-semibold leading-snug text-ink">{{ module.name }}</h3>
   </div>
   {% if module.desc %}<p class="mt-3 text-sm text-muted">{{ module.desc }}</p>{% endif %}
-  {% if summary %}<p class="mt-3 text-sm font-medium text-ink">{{ summary }}</p>{% endif %}
-  {% if progress is not none %}
-    <div class="mt-3 flex items-center gap-2">
-      <div class="h-2 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progres {{ module.name }}">
-        <div class="h-full rounded-full transition-[width] duration-300" style="width: {{ progress }}%; background: {{ module.accent }}"></div>
-      </div>
-      <span class="text-xs font-semibold text-ink">{{ progress }}%</span>
+  {% if summary or detail or progress is not none %}
+    <div class="mt-auto pt-4">
+    <div class="border-t border-line pt-3" data-widget{% if empty %} data-widget-empty{% endif %}>
+      {% if summary %}<p class="line-clamp-2 text-sm font-semibold {{ 'text-muted' if empty else 'text-ink' }}">{{ summary }}</p>{% endif %}
+      {% if progress is not none %}
+        <div class="mt-2 flex items-center gap-2">
+          <div class="h-2 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progres {{ summary or module.name }}">
+            <div class="h-full rounded-full transition-[width] duration-300" style="width: {{ progress }}%; background: {{ module.accent }}"></div>
+          </div>
+          <span class="text-xs font-semibold text-ink">{{ progress }}%</span>
+        </div>
+      {% endif %}
+      {% if detail %}<p class="mt-1 line-clamp-1 text-xs text-muted">{{ detail }}</p>{% endif %}
+    </div>
     </div>
   {% endif %}
 </a>

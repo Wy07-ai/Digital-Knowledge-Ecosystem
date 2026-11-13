@@ -11,6 +11,7 @@
    5. Toast root, breadcrumb mobile
    6. Mobile View (paksa di desktop + layar sempit sungguhan)
    7. prefers-reduced-motion
+   8. Kartu modul Beranda (hover lift)
    ===================================================================== */
 
 /* ---------- 1. Design token ---------- */
@@ -185,3 +186,20 @@ html[data-view='mobile'] #toast-root {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- 8. Kartu modul Beranda ----------
+   Hover lift 4 px + glow aksen modul, 200 ms (Blueprint 5.4). Hanya perangkat dengan hover
+   sungguhan, supaya kartu tidak "menempel" naik setelah disentuh di ponsel. Aksen kartu
+   dikirim lewat variabel --card-accent (lihat _components/module_card.html). */
+.launcher-card {
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+@media (hover: hover) {
+  .launcher-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgb(79 70 229 / .30), 0 4px 10px -4px rgb(0 0 0 / .12);   /* cadangan */
+    box-shadow: 0 12px 24px -8px color-mix(in srgb, var(--card-accent) 45%, transparent),
+                0 4px 10px -4px rgb(0 0 0 / .12);
+  }
+}
+.launcher-card:active { transform: translateY(-1px) scale(.99); }

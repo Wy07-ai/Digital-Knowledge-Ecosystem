@@ -9,6 +9,7 @@
     data-member            : "1" bila login -> sumber kebenaran = server, bukan localStorage
     data-settings-url      : endpoint POST pengaturan global
 #}
+{% from '_components/breadcrumb.html' import page_nav %}
 <html lang="id"
       data-theme="{{ settings.theme if settings.theme in ('light', 'dark', 'system') else 'system' }}"
       data-view="{{ settings.view_mode if settings.view_mode in ('desktop', 'mobile') else 'desktop' }}"
@@ -81,6 +82,9 @@
   {% include '_components/topbar.html' %}
 
   <main id="konten" class="page-enter mx-auto w-full flex-1 px-4 py-6 {% block main_class %}max-w-6xl{% endblock %}">
+    {# Navigasi level 1 dan 2: tombol Kembali + breadcrumb dari hierarki (app/navigation.py).
+       Halaman yang perlu menyembunyikannya cukup mengosongkan blok ini. #}
+    {% block page_nav %}{{ page_nav(nav) }}{% endblock %}
     {% block content %}{% endblock %}
   </main>
 
