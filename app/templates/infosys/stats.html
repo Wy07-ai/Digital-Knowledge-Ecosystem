@@ -1,0 +1,44 @@
+{% extends "infosys/_panel.html" %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "infosys/_panel_macros.html" import stat_card with context %}
+{% block title %}Statistik Lintas Modul{% endblock %}
+{% block panel %}
+  <h1 class="text-2xl font-bold">Statistik Lintas Modul</h1>
+  <p class="mt-1 text-muted">Angka dari E-Commerce, E-Learning, E-Tutorial, dan Forum. Hanya mencakup akun Anda.</p>
+
+  {% if stats.is_empty %}
+    {{ empty_state('Belum ada statistik', 'Angka akan muncul setelah Anda berbelanja, mengikuti kelas, menyimpan tutorial, atau berdiskusi di forum.', 'Jelajahi modul', url_for('main.index'), 'chart') }}
+  {% else %}
+    <div class="card-grid mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" data-stats>
+      {{ stat_card('Jumlah pesanan', stats.orders, ('Total belanja Rp ' ~ '{:,}'.format(stats.spent).replace(',', '.')) if stats.orders else 'Belum ada pesanan.', 'ecommerce', url_for('ecommerce.index')) }}
+      {{ stat_card('Kelas diikuti', stats.courses, 'Kelas yang sudah Anda ikuti.' if stats.courses else 'Belum mengikuti kelas.', 'elearning', url_for('elearning.index')) }}
+      {{ stat_card('Rata-rata progres', (stats.avg_progress ~ '%') if stats.avg_progress is not none else '-', 'Dari semua kelas yang diikuti.' if stats.avg_progress is not none else 'Muncul setelah Anda mengikuti kelas.', 'chart', None, stats.avg_progress) }}
+      {{ stat_card('Tutorial tersimpan', stats.bookmarks, 'Tutorial yang Anda bookmark.' if stats.bookmarks else 'Belum ada tutorial tersimpan.', 'etutorial', url_for('etutorial.index')) }}
+      {{ stat_card('Thread dibuat', stats.threads, 'Topik yang Anda mulai di forum.' if stats.threads else 'Belum membuat thread.', 'forum', url_for('forum.index')) }}
+      {{ stat_card('Balasan', stats.posts, 'Balasan yang Anda tulis di forum.' if stats.posts else 'Belum membalas thread.', 'forum', url_for('forum.index')) }}
+    </div>
+
+    <section class="mt-6" aria-labelledby="h-progres">
+      <h2 id="h-progres" class="text-lg font-semibold">Progres per kelas</h2>
+      {% if courses %}
+        <ul class="mt-3 divide-y divide-line rounded-xl border border-line bg-surface" data-course-progress>
+          {% for c in courses %}
+            <li class="px-4 py-3">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <span class="font-semibold">{{ c.title }}</span>
+                <span class="text-sm text-muted">{% if c.total %}{{ c.done }} dari {{ c.total }} materi &middot; {{ c.percent }}%{% else %}Belum ada materi{% endif %}</span>
+              </div>
+              <div class="mt-2 h-2 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow="{{ c.percent or 0 }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progres {{ c.title }}">
+                <div class="h-full rounded-full bg-primary" style="width: {{ c.percent or 0 }}%"></div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="mt-2 rounded-xl border border-dashed border-line bg-surface p-5 text-center text-muted" data-empty="courses">
+          Belum ada kelas yang diikuti. <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('elearning.index') }}">Lihat daftar kelas</a>
+        </p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

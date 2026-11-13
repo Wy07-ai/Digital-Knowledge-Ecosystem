@@ -127,7 +127,7 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 | `/infosys/register` | GET, POST | Registrasi: membuat `users` + `user_settings` + log `register` dalam satu transaksi |
 | `/infosys/login`    | GET, POST | Login; mendukung `?next=<halaman asal>`; mencatat `activity_logs` dan `last_login_at` |
 | `/infosys/logout`   | POST      | Logout (mencatat `activity_logs`); GET hanya mengarahkan ke Beranda |
-| `/infosys/profil`   | GET       | Penampung halaman terlindungi (`@login_required`), diisi pada UC-IS-04 |
+| `/infosys/profil`   | GET, POST | Tab Profil di Control Panel (lihat bagian "Control Panel" di bawah) |
 
 - Validasi inline (Blueprint 5.5) ada di `app/infosys/validation.py` (server) dan `static/js/auth.js` (peramban); aturannya harus sama.
 - Kata sandi: `werkzeug.security.generate_password_hash`; kredensial salah memberi pesan sama untuk email tak dikenal dan kata sandi salah.
@@ -173,7 +173,41 @@ node("elearning.lesson", _lesson_title, parent="elearning.course_detail")
 Contoh langsung 3 jenjang (E-Learning > judul kelas > Materi N): http://127.0.0.1:5000/dev/ui-test/navigasi/kelas/1/materi/1
 (ikut dimatikan oleh `DKE_UI_TEST=0`). Contoh nyata 2 jenjang: Information System > Profil & Pengaturan.
 
+## Control Panel Information System (Fase 2, UC-IS-04..08)
+
+Layout **sidebar tab di kiri, panel di kanan**, aksen indigo (`#4F46E5`). Di layar sempit dan Mobile View
+paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` bagian 9).
+
+| Tab | URL | Isi |
+|-----|-----|-----|
+| Ringkasan | `/infosys/` | Kartu akun, 4 statistik singkat, 5 aktivitas terbaru. Guest melihat ajakan masuk |
+| Profil | `/infosys/profil` | Ubah nama, bio (maks. 300), `avatar_url` (https, maks. 500) dengan pratinjau; form terpisah **Ganti kata sandi** (`POST /infosys/profil/sandi`) |
+| Log Aktivitas | `/infosys/log?modul=&halaman=` | Tabel dengan filter modul dan paginasi 10 baris per halaman |
+| Statistik Lintas Modul | `/infosys/statistik` | 6 kartu: pesanan, kelas diikuti, rata-rata progres, tutorial tersimpan, thread, balasan; progres per kelas |
+| Pengaturan Keamanan | `/infosys/keamanan?halaman=` | Riwayat login (waktu + IP) dengan paginasi, peringatan bila ada lebih dari satu IP, tautan ganti kata sandi |
+
+**Aturan penting**
+
+- **Data hanya milik pengguna yang login.** Id pengguna selalu diambil dari sesi (`g.user["id"]`), tidak pernah dari
+  query string atau form. Semua kueri di `app/infosys/panel.py` memakai `WHERE user_id = ?`. Tes `tests/test_panel.py`
+  memakai dua akun yang berbagi satu database untuk membuktikan tidak ada kebocoran (termasuk `?user_id=2`).
+- **Riwayat login memakai `activity_logs`** (`action = 'login'`), bukan tabel baru, supaya skema tetap 23 tabel sesuai Blueprint 3.3.
+  Skema tidak punya kolom user-agent, jadi yang ditampilkan waktu dan alamat IP.
+- **Setiap aksi form memberi toast** (`flash()` Flask atau `toast()` JS), dan **validasi inline** ada di server
+  (`app/infosys/validation.py`) dan peramban (`static/js/panel.js`); aturannya harus sama. Form selalu `novalidate`,
+  dilindungi token CSRF, dan kata sandi tidak pernah dikirim balik ke HTML.
+- **Ganti kata sandi:** kata sandi saat ini diverifikasi dengan hash; setelah 5 kali salah beruntun, form dikunci 5 menit
+  (penghitung di sesi, jadi ini pembatas ringan, bukan pengganti rate-limit di tingkat server). Berhasil atau gagal,
+  kejadiannya dicatat di `activity_logs`, dan keberhasilan juga membuat notifikasi.
+- **Empty state** ditangani per tab (log kosong, filter tanpa hasil, statistik nol semua, riwayat login kosong) memakai
+  komponen `empty_state()`; bagian kecil di Ringkasan memakai pesan ringkas.
+- Filter `modul` yang tidak dikenal diabaikan (bukan error) dan nomor halaman dijepit ke rentang sah.
+- Waktu ditampilkan dalam WIB (UTC+7); database tetap menyimpan UTC ISO-8601.
+
+Tes otomatis: `python -m unittest discover -s tests -v` (103 tes: 55 lama + 48 Control Panel).
+Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
+
 ## Roadmap
 
-Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan (selesai) dan autentikasi →
-Fase 2-5 modul → Fase 6 QA dan laporan.
+Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi (selesai) →
+Fase 2: Control Panel Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum → Fase 6 QA dan laporan.
