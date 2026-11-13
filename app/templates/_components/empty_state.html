@@ -1,0 +1,17 @@
+{# Empty state (Blueprint 5.5): ilustrasi sederhana + pesan + tombol aksi.
+
+   empty_state(title, message, action_label=None, action_url=None, icon_name='inbox')
+     {{ empty_state('Keranjang masih kosong', 'Jelajahi katalog untuk mulai.', 'Lihat katalog', url_for('ecommerce.index')) }} #}
+{% from '_components/_icons.html' import icon %}
+{% macro empty_state(title, message=None, action_label=None, action_url=None, icon_name='inbox') -%}
+<section class="animate-fade-in mx-auto my-8 flex max-w-md flex-col items-center rounded-xl border border-dashed border-line bg-surface px-6 py-10 text-center">
+  <span class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+    {{ icon(icon_name, 'h-8 w-8') }}
+  </span>
+  <h2 class="mt-4 text-lg font-semibold text-ink">{{ title }}</h2>
+  {% if message %}<p class="mt-1 text-muted">{{ message }}</p>{% endif %}
+  {% if action_label and action_url %}
+    <a href="{{ action_url }}" class="btn btn-primary mt-5">{{ action_label }}</a>
+  {% endif %}
+</section>
+{%- endmacro %}

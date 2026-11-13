@@ -1,0 +1,38 @@
+{# App Switcher: ikon 9 titik di kiri Top-Bar, membuka panel 6 modul.
+   Level 3 navigasi (Blueprint 5.2). Modul aktif ditandai tiga cara sekaligus
+   (cincin aksen, teks "Aktif", aria-current) supaya tidak bergantung pada warna.
+   Catatan: elemen panel TIDAK boleh diberi kelas display (grid/flex), karena
+   mengalahkan atribut [hidden]; grid ada di <div> di dalamnya. #}
+{% from '_components/_icons.html' import icon %}
+<div class="relative" data-popover>
+  <button type="button" class="tb-btn" data-popover-toggle
+          aria-haspopup="true" aria-expanded="false" aria-controls="app-switcher-panel"
+          aria-label="Pindah modul">
+    {{ icon('grid9', 'h-6 w-6') }}
+  </button>
+
+  <div id="app-switcher-panel" data-popover-panel hidden
+       class="popover-enter absolute left-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-line bg-surface p-3 text-ink shadow-xl">
+    <p class="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted">Pindah modul</p>
+    <div class="grid grid-cols-3 gap-2">
+      {% for m in MODULES %}
+        {% set active = current_module and current_module.key == m.key %}
+        <a href="{{ url_for(m.key ~ '.index') }}" data-popover-item
+           {% if active %}aria-current="page"{% endif %}
+           class="relative flex min-h-[5.5rem] flex-col items-center justify-start gap-1.5 rounded-lg border p-2 text-center text-xs font-medium leading-tight transition-colors duration-150 hover:bg-line/60
+                  {{ 'border-transparent' if not active else 'border-2' }}"
+           {% if active %}style="border-color: {{ m.accent }}; background: {{ m.accent }}1A"{% endif %}>
+          <span class="flex h-10 w-10 items-center justify-center rounded-full text-white" style="background: {{ m.accent }}">
+            {{ icon(m.key, 'h-5 w-5') }}
+          </span>
+          <span>{{ m.name }}</span>
+          {% if active %}
+            <span class="inline-flex items-center gap-0.5 rounded-full bg-ink px-1.5 py-0.5 text-[10px] font-semibold uppercase text-page">
+              {{ icon('check', 'h-3 w-3') }}Aktif
+            </span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>

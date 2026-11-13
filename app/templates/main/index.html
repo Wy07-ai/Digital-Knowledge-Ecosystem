@@ -1,6 +1,10 @@
 {% extends "base.html" %}
+{% from "_components/module_card.html" import module_card %}
 {% block title %}Beranda{% endblock %}
 {% block content %}
-  <h1>Beranda</h1>
-  <p class="muted">Halaman kosong. Dashboard Launcher dibangun di Prompt 6.</p>
+  <h1 class="text-2xl font-bold">Beranda</h1>
+  <p class="mt-1 text-muted">Pilih modul untuk mulai. Dashboard Launcher lengkap (widget, Lanjutkan) dibangun di Prompt 6.</p>
+  <div class="launcher-grid mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {% for m in MODULES %}{{ module_card(m) }}{% endfor %}
+  </div>
 {% endblock %}

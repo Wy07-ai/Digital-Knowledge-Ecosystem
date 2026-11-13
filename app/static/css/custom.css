@@ -1,1 +1,187 @@
-/* Gaya kustom DKE (diisi di Prompt 4). */
+/* =====================================================================
+   DKE - custom.css
+   Sumber: Project Blueprint 5.4 (design token, micro-interactions) dan 6.2
+   (mode Mobile paksa, prefers-reduced-motion).
+
+   Isi:
+   1. Design token Light / Dark (nilai RGB agar Tailwind bisa memakai alpha)
+   2. Dasar: tipografi Inter 16 px / 1,6, fokus keyboard, skip link
+   3. Komponen kecil: .btn, .tb-btn (tombol Top-Bar), ikon tema/tampilan
+   4. Keyframes: fade-in, slide-up, toast-in/out, theme-spin
+   5. Toast root, breadcrumb mobile
+   6. Mobile View (paksa di desktop + layar sempit sungguhan)
+   7. prefers-reduced-motion
+   ===================================================================== */
+
+/* ---------- 1. Design token ---------- */
+:root {
+  --c-page:        248 250 252;   /* #F8FAFC */
+  --c-surface:     255 255 255;   /* #FFFFFF */
+  --c-ink:         15 23 42;      /* #0F172A */
+  --c-muted:       71 85 105;     /* #475569  (turunan: teks sekunder, kontras >= 4,5:1) */
+  --c-border:      226 232 240;   /* #E2E8F0 */
+  --c-primary:     79 70 229;     /* #4F46E5 */
+  --c-on-primary:  255 255 255;   /* teks di atas primer */
+  --c-header:      30 58 138;     /* #1E3A8A Deep Blue */
+  --c-success:     4 120 87;      /* #047857 teks sukses */
+  --c-success-fill:16 185 129;    /* #10B981 isi/ikon sukses */
+  --c-outer:       226 232 240;   /* latar di luar bingkai Mobile View */
+}
+html.dark {
+  --c-page:        15 23 42;      /* #0F172A */
+  --c-surface:     30 41 59;      /* #1E293B */
+  --c-ink:         226 232 240;   /* #E2E8F0 */
+  --c-muted:       148 163 184;   /* #94A3B8 */
+  --c-border:      51 65 85;      /* #334155 */
+  --c-primary:     129 140 248;   /* #818CF8 */
+  --c-on-primary:  15 23 42;
+  --c-header:      30 58 138;     /* Deep Blue tetap sama di Dark */
+  --c-success:     52 211 153;    /* #34D399 */
+  --c-success-fill:52 211 153;
+  --c-outer:       2 6 23;
+  color-scheme: dark;
+}
+
+/* ---------- 2. Dasar ---------- */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: rgb(var(--c-page));
+  color: rgb(var(--c-ink));
+}
+:focus-visible {
+  outline: 2px solid rgb(var(--c-primary));
+  outline-offset: 2px;
+}
+.topbar :focus-visible { outline-color: #fff; }
+
+.skip-link {
+  position: absolute; left: .5rem; top: -4rem; z-index: 100;
+  padding: .625rem 1rem; border-radius: .5rem; font-weight: 600;
+  background: rgb(var(--c-primary)); color: rgb(var(--c-on-primary));
+  transition: top 150ms ease-out;
+}
+.skip-link:focus { top: .5rem; }
+
+/* ---------- 3. Komponen kecil ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; padding: .5rem 1rem; border-radius: .5rem;
+  font-weight: 600; line-height: 1.25; text-decoration: none; cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 150ms ease-out, background-color 150ms ease-out, opacity 150ms;
+}
+.btn:active { transform: scale(.95); }               /* tactile click 150 ms */
+.btn:disabled, .btn[aria-disabled='true'] { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-primary   { background: rgb(var(--c-primary)); color: rgb(var(--c-on-primary)); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-secondary {
+  background: rgb(var(--c-surface)); color: rgb(var(--c-ink));
+  border-color: rgb(var(--c-border));
+}
+.btn-secondary:hover { background: rgb(var(--c-border) / .5); }
+
+/* Tombol di Top-Bar (latar Deep Blue, teks putih) */
+.tb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .375rem;
+  min-width: 44px; min-height: 44px; padding: 0 .5rem; border-radius: .5rem;
+  color: #fff; font-size: .875rem; font-weight: 500; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease-out, transform 150ms ease-out;
+}
+.tb-btn:hover { background: rgb(255 255 255 / .15); }
+.tb-btn:active { transform: scale(.95); }
+.tb-btn[aria-pressed='true'],
+.tb-btn[aria-expanded='true'] { background: rgb(255 255 255 / .22); }
+
+/* Ikon tema dan tampilan mengikuti atribut <html>; tanpa JS, tanpa kedip */
+[data-theme-icon], [data-view-label-on] { display: none; }
+html[data-theme='light']  [data-theme-icon='light'],
+html[data-theme='dark']   [data-theme-icon='dark'],
+html[data-theme='system'] [data-theme-icon='system'] { display: block; }
+.theme-spin { animation: theme-spin 300ms ease-out; }
+
+/* Item menu di dalam popover */
+.menu-item {
+  display: flex; align-items: center; gap: .75rem; width: 100%;
+  min-height: 44px; padding: .5rem .75rem; border-radius: .5rem;
+  text-align: left; font-size: .9375rem; color: rgb(var(--c-ink)); text-decoration: none;
+  transition: background-color 150ms ease-out;
+}
+.menu-item:hover, .menu-item:focus-visible { background: rgb(var(--c-border) / .6); }
+.menu-item [data-check] { visibility: hidden; margin-left: auto; color: rgb(var(--c-primary)); }
+.menu-item[aria-checked='true'] [data-check] { visibility: visible; }
+.menu-item[aria-checked='true'] { font-weight: 600; }
+
+/* Panel popover (App Switcher, tema, notifikasi, profil) */
+.popover-enter { animation: slide-up 150ms ease-out; }
+
+/* ---------- 4. Keyframes ---------- */
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toast-in  { from { opacity: 0; transform: translateX(1.5rem); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toast-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(1.5rem); } }
+@keyframes theme-spin { from { transform: rotate(-180deg); opacity: .3; } to { transform: rotate(0); opacity: 1; } }
+
+.animate-fade-in  { animation: fade-in 300ms ease-out backwards; }
+.animate-slide-up { animation: slide-up 300ms ease-out backwards; }
+.page-enter       { animation: fade-in 300ms ease-out backwards, slide-up 300ms ease-out backwards; }
+.toast-in  { animation: toast-in 200ms ease-out; }
+.toast-out { animation: toast-out 200ms ease-in forwards; }
+
+/* ---------- 5. Toast root dan breadcrumb ---------- */
+#toast-root {
+  position: fixed; top: 4.5rem; right: 1rem; z-index: 60;
+  display: flex; flex-direction: column; gap: .5rem;
+  width: min(24rem, calc(100vw - 2rem));
+  pointer-events: none;                    /* area kosong tidak menghalangi klik */
+}
+#toast-root > * { pointer-events: auto; }
+
+.bc-item { display: inline-flex; align-items: center; gap: .25rem; }
+.bc-ellipsis { display: none; align-items: center; gap: .25rem; }
+
+/* ---------- 6. Mobile View ----------
+   Breakpoint Tailwind mengikuti lebar jendela sungguhan, jadi Mobile View
+   di desktop membutuhkan aturan eksplisit. Beri kelas penanda pada setiap
+   grid (launcher-grid, product-grid, card-grid) dan tumpukan flex (stack-mobile).
+   Kelas .dke-hide-mobile menyembunyikan elemen di Mobile View dan layar sempit. */
+html[data-view='mobile'] { background-color: rgb(var(--c-outer)); }
+html[data-view='mobile'] body {
+  max-width: 430px; margin-inline: auto;
+  border-inline: 1px solid rgb(var(--c-border));
+  box-shadow: 0 0 48px rgb(0 0 0 / .12);
+}
+html[data-view='mobile'] .launcher-grid,
+html[data-view='mobile'] .product-grid,
+html[data-view='mobile'] .card-grid { grid-template-columns: 1fr; }
+html[data-view='mobile'] .stack-mobile { flex-direction: column; }
+html[data-view='mobile'] .dke-hide-mobile { display: none !important; }
+html[data-view='mobile'] .bc-mid { display: none; }
+html[data-view='mobile'] .bc-ellipsis { display: inline-flex; }
+html[data-view='mobile'] #toast-root {
+  right: auto; left: 50%; transform: translateX(-50%);
+  width: min(430px, 100vw); padding-inline: 1rem;
+}
+
+/* Layar sempit sungguhan (di bawah breakpoint md Tailwind) */
+@media (max-width: 767px) {
+  .launcher-grid, .product-grid, .card-grid { grid-template-columns: 1fr; }
+  .stack-mobile { flex-direction: column; }
+  .dke-hide-mobile { display: none !important; }
+  .bc-mid { display: none; }
+  .bc-ellipsis { display: inline-flex; }
+  #toast-root { left: 1rem; right: 1rem; width: auto; }
+  /* Pengalih tampilan tidak berguna di ponsel sungguhan kecuali sedang aktif */
+  html:not([data-view='mobile']) .view-toggle { display: none; }
+}
+
+/* ---------- 7. Kurangi gerak ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
