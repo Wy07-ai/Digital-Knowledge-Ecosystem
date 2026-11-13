@@ -1,0 +1,8 @@
+{% extends "infosys/layout_infosys.html" %}
+{% from "_components/empty_state.html" import empty_state %}
+{% block title %}Profil &amp; Pengaturan{% endblock %}
+{% block module_content %}
+  <h1 class="text-2xl font-bold">Profil &amp; Pengaturan</h1>
+  <p class="mt-1 text-muted">Halo, {{ current_user['full_name'] }} ({{ current_user['email'] }}).</p>
+  {{ empty_state('Halaman ini sedang disiapkan', 'Pengelolaan profil dibangun pada UC-IS-04. Halaman ini sudah dilindungi login.', 'Kembali ke Beranda', url_for('main.index')) }}
+{% endblock %}

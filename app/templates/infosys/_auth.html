@@ -1,0 +1,32 @@
+{# Komponen form autentikasi (Blueprint 5.5: pesan validasi inline = teks di bawah field + ikon).
+
+   auth_field(id, label, type, value, error, autocomplete, hint)
+   - Pesan error selalu ada di DOM (hidden bila kosong) agar auth.js bisa menampilkannya tanpa reload.
+   - aria-invalid + aria-describedby menghubungkan input dengan pesannya untuk pembaca layar. #}
+{% from '_components/_icons.html' import icon %}
+
+{% macro auth_field(id, label, type='text', value='', error=None, autocomplete=None, hint=None, required=True) -%}
+<div class="mt-4" data-field-wrap="{{ id }}">
+  <label for="f-{{ id }}" class="block text-sm font-semibold">{{ label }}</label>
+  <div class="relative mt-1">
+    <input id="f-{{ id }}" name="{{ id }}" type="{{ type }}" data-field="{{ id }}"
+           {% if value %}value="{{ value }}"{% endif %}
+           {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+           {% if type == 'email' %}inputmode="email" autocapitalize="none" spellcheck="false"{% endif %}
+           {% if required %}aria-required="true"{% endif %}
+           aria-describedby="err-{{ id }}{% if hint %} hint-{{ id }}{% endif %}"
+           {% if error %}aria-invalid="true"{% endif %}
+           class="field-input block min-h-[44px] w-full rounded-lg border bg-surface px-3 py-2 text-ink placeholder:text-muted {{ 'border-red-600' if error else 'border-line' }} {{ 'pr-24' if type == 'password' }}">
+    {% if type == 'password' %}
+      <button type="button" data-toggle-password="f-{{ id }}" aria-pressed="false"
+              class="absolute inset-y-0 right-1 my-1 rounded-md px-3 text-sm font-semibold text-primary transition-transform active:scale-95">Tampilkan</button>
+    {% endif %}
+  </div>
+  {% if hint %}<p id="hint-{{ id }}" class="mt-1 text-sm text-muted">{{ hint }}</p>{% endif %}
+  <p id="err-{{ id }}" data-error-for="{{ id }}" {% if not error %}hidden{% endif %}
+     class="mt-1 flex items-start gap-1.5 text-sm font-medium text-red-600 dark:text-red-400">
+    <span class="mt-0.5 flex-none">{{ icon('error', 'h-4 w-4') }}</span>
+    <span data-error-text>{{ error or '' }}</span>
+  </p>
+</div>
+{%- endmacro %}

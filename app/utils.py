@@ -1,11 +1,13 @@
 """Fungsi bantu yang dipakai lintas modul."""
+import hmac
 import re
+import secrets
 import unicodedata
 from datetime import datetime, timezone
 from functools import wraps
 from urllib.parse import urlencode, urlsplit
 
-from flask import flash, g, redirect, request, url_for
+from flask import flash, g, redirect, request, session, url_for
 from werkzeug.routing import BuildError
 
 from .db import get_db
@@ -35,6 +37,23 @@ def is_safe_next(target):
         return False
     parts = urlsplit(target)
     return not parts.scheme and not parts.netloc
+
+
+# Halaman autentikasi tidak boleh jadi tujuan "next" (mencegah putaran login -> login).
+AUTH_PATHS = ("/infosys/login", "/infosys/register", "/infosys/logout")
+
+
+def safe_next(target):
+    """Kembalikan `target` bila aman dipakai sebagai tujuan setelah login, selain itu None.
+
+    Aman = lolos is_safe_next() (jalur lokal saja) dan bukan halaman login/register/logout.
+    """
+    if not is_safe_next(target):
+        return None
+    path = urlsplit(target).path.rstrip("/")
+    if path in AUTH_PATHS:
+        return None
+    return target
 
 
 def _origin_path():
@@ -70,6 +89,28 @@ def login_required(view):
         return view(*args, **kwargs)
 
     return wrapped
+
+
+# --------------------------------------------------------------------------
+# CSRF (token per sesi, tanpa ekstensi tambahan)
+# --------------------------------------------------------------------------
+CSRF_SESSION_KEY = "_csrf_token"
+
+
+def csrf_token():
+    """Token CSRF sesi ini (dibuat bila belum ada). Tersedia di template: {{ csrf_token() }}."""
+    token = session.get(CSRF_SESSION_KEY)
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session[CSRF_SESSION_KEY] = token
+    return token
+
+
+def csrf_valid():
+    """True bila field form `csrf_token` cocok dengan token di sesi (dibandingkan konstan-waktu)."""
+    expected = session.get(CSRF_SESSION_KEY)
+    sent = request.form.get("csrf_token", "")
+    return bool(expected) and hmac.compare_digest(str(expected), str(sent))
 
 
 # --------------------------------------------------------------------------

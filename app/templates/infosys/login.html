@@ -1,0 +1,28 @@
+{% extends "infosys/layout_infosys.html" %}
+{% from "infosys/_auth.html" import auth_field %}
+{% block title %}Masuk{% endblock %}
+{% block main_class %}max-w-md{% endblock %}
+{% block module_content %}
+  <section class="animate-fade-in rounded-xl border border-line bg-surface p-6 shadow-sm">
+    <h1 class="text-2xl font-bold">Masuk</h1>
+    <p class="mt-1 text-muted">Masuk untuk memakai keranjang, kelas, bookmark, dan forum.</p>
+
+    <form method="post" action="{{ url_for('infosys.login') }}" novalidate
+          data-auth-form="login" data-focus="{{ focus or '' }}" class="mt-2">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next_url or '' }}">
+
+      {{ auth_field('email', 'Email', 'email', values.get('email', ''), errors.get('email'), 'email') }}
+      {{ auth_field('password', 'Kata sandi', 'password', '', errors.get('password'), 'current-password') }}
+
+      <button type="submit" class="btn btn-primary mt-6 w-full" data-submit>Masuk</button>
+    </form>
+
+    <p class="mt-5 text-center text-sm text-muted">
+      Belum punya akun?
+      <a class="font-semibold text-primary underline underline-offset-2"
+         href="{{ url_for('infosys.register', next=next_url) if next_url else url_for('infosys.register') }}">Daftar</a>
+    </p>
+  </section>
+{% endblock %}
+{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/auth.js') }}"></script>{% endblock %}

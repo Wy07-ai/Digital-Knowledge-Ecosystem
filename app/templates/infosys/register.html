@@ -1,0 +1,33 @@
+{% extends "infosys/layout_infosys.html" %}
+{% from "infosys/_auth.html" import auth_field %}
+{% block title %}Daftar{% endblock %}
+{% block main_class %}max-w-md{% endblock %}
+{% block module_content %}
+  <section class="animate-fade-in rounded-xl border border-line bg-surface p-6 shadow-sm">
+    <h1 class="text-2xl font-bold">Buat akun</h1>
+    <p class="mt-1 text-muted">Satu akun untuk semua modul DKE. Gratis.</p>
+
+    <form method="post" action="{{ url_for('infosys.register') }}" novalidate
+          data-auth-form="register" data-focus="{{ focus or '' }}" class="mt-2">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next_url or '' }}">
+      {# Diisi auth.js dari pilihan tema/tampilan Guest (localStorage) agar tidak berubah setelah daftar. #}
+      <input type="hidden" name="pref_theme" value="">
+      <input type="hidden" name="pref_view" value="">
+
+      {{ auth_field('name', 'Nama lengkap', 'text', values.get('name', ''), errors.get('name'), 'name') }}
+      {{ auth_field('email', 'Email', 'email', values.get('email', ''), errors.get('email'), 'email') }}
+      {{ auth_field('password', 'Kata sandi', 'password', '', errors.get('password'), 'new-password', hint='Minimal 8 karakter.') }}
+      {{ auth_field('confirm', 'Konfirmasi kata sandi', 'password', '', errors.get('confirm'), 'new-password') }}
+
+      <button type="submit" class="btn btn-primary mt-6 w-full" data-submit>Daftar</button>
+    </form>
+
+    <p class="mt-5 text-center text-sm text-muted">
+      Sudah punya akun?
+      <a class="font-semibold text-primary underline underline-offset-2"
+         href="{{ url_for('infosys.login', next=next_url) if next_url else url_for('infosys.login') }}">Masuk</a>
+    </p>
+  </section>
+{% endblock %}
+{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/auth.js') }}"></script>{% endblock %}
