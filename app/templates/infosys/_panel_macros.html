@@ -1,0 +1,99 @@
+{# Komponen Control Panel Information System.
+
+   avatar(name, url, size, text)           : foto bulat; inisial bila url kosong atau gambar gagal dimuat (panel.js)
+   panel_field(id, label, value, error, ...) : kolom form dengan pesan inline (Blueprint 5.5), dipakai panel.js
+   stat_card(label, value, sub, ico, href)   : kartu statistik
+   badge_module(key)                         : lencana modul berwarna aksen
+   pagination(pager, noun)                   : paginasi (pager dibuat _pagination_ctx di routes.py) #}
+{% from '_components/_icons.html' import icon %}
+
+{% macro avatar(name, url, size='h-16 w-16', text='text-xl') -%}
+<span class="relative inline-flex {{ size }} flex-none items-center justify-center overflow-hidden rounded-full bg-primary/10 font-bold text-primary {{ text }}" data-avatar-wrap>
+  <span aria-hidden="true" data-avatar-initials>{{ initials(name) }}</span>
+  <img alt="" referrerpolicy="no-referrer" loading="lazy" data-avatar {% if url %}src="{{ url }}"{% else %}hidden{% endif %}
+       class="absolute inset-0 h-full w-full object-cover">
+</span>
+{%- endmacro %}
+
+{% macro panel_field(id, label, value='', error=None, type='text', autocomplete=None, hint=None, rows=0, counter=0, required=True) -%}
+<div class="mt-4" data-field-wrap="{{ id }}">
+  <div class="flex items-baseline justify-between gap-2">
+    <label for="p-{{ id }}" class="block text-sm font-semibold">{{ label }}{% if not required %} <span class="font-normal text-muted">(opsional)</span>{% endif %}</label>
+    {% if counter %}<span class="text-xs text-muted" data-counter-for="{{ id }}" data-max="{{ counter }}" aria-live="polite">{{ (value or '')|length }}/{{ counter }}</span>{% endif %}
+  </div>
+  <div class="relative mt-1">
+    {% if rows %}
+      <textarea id="p-{{ id }}" name="{{ id }}" data-field="{{ id }}" rows="{{ rows }}"
+                aria-describedby="err-{{ id }}{% if hint %} hint-{{ id }}{% endif %}" {% if error %}aria-invalid="true"{% endif %}
+                class="field-input block w-full rounded-lg border bg-surface px-3 py-2 text-ink placeholder:text-muted {{ 'border-red-600' if error else 'border-line' }}">{{ value or '' }}</textarea>
+    {% else %}
+      <input id="p-{{ id }}" name="{{ id }}" type="{{ type }}" data-field="{{ id }}"
+             {% if value %}value="{{ value }}"{% endif %}
+             {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+             {% if type == 'url' %}inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://contoh.com/foto.jpg"{% endif %}
+             {% if required %}aria-required="true"{% endif %}
+             aria-describedby="err-{{ id }}{% if hint %} hint-{{ id }}{% endif %}" {% if error %}aria-invalid="true"{% endif %}
+             class="field-input block min-h-[44px] w-full rounded-lg border bg-surface px-3 py-2 text-ink placeholder:text-muted {{ 'border-red-600' if error else 'border-line' }} {{ 'pr-24' if type == 'password' }}">
+      {% if type == 'password' %}
+        <button type="button" data-toggle-password="p-{{ id }}" aria-pressed="false"
+                class="absolute inset-y-0 right-1 my-1 rounded-md px-3 text-sm font-semibold text-primary transition-transform active:scale-95">Tampilkan</button>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% if hint %}<p id="hint-{{ id }}" class="mt-1 text-sm text-muted">{{ hint }}</p>{% endif %}
+  <p id="err-{{ id }}" data-error-for="{{ id }}" {% if not error %}hidden{% endif %}
+     class="mt-1 flex items-start gap-1.5 text-sm font-medium text-red-600 dark:text-red-400">
+    <span class="mt-0.5 flex-none">{{ icon('error', 'h-4 w-4') }}</span>
+    <span data-error-text>{{ error or '' }}</span>
+  </p>
+</div>
+{%- endmacro %}
+
+{% macro stat_card(label, value, sub=None, ico='chart', href=None, bar=None) -%}
+<{{ 'a' if href else 'div' }} {% if href %}href="{{ href }}"{% endif %}
+   class="block rounded-xl border border-line bg-surface p-4 shadow-sm {{ 'transition-colors hover:border-primary focus-visible:border-primary' if href }}" data-stat-card>
+  <div class="flex items-center justify-between gap-2 text-muted">
+    <span class="text-sm font-semibold">{{ label }}</span>
+    <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-primary/10 text-primary">{{ icon(ico, 'h-5 w-5') }}</span>
+  </div>
+  <p class="mt-2 text-3xl font-bold tabular-nums text-ink" data-stat-value>{{ value }}</p>
+  {% if bar is not none %}
+    <div class="mt-2 h-2 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow="{{ bar }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ label }}">
+      <div class="h-full rounded-full bg-primary" style="width: {{ bar }}%"></div>
+    </div>
+  {% endif %}
+  {% if sub %}<p class="mt-1 text-sm text-muted">{{ sub }}</p>{% endif %}
+</{{ 'a' if href else 'div' }}>
+{%- endmacro %}
+
+{% macro badge_module(key) -%}
+{%- set mod = (MODULES|selectattr('key', 'equalto', key)|list|first) if key else none -%}
+{%- if mod -%}
+<span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line px-2 py-0.5 text-xs font-semibold">
+  <span class="h-2 w-2 rounded-full" style="background: {{ mod.accent }}" aria-hidden="true"></span>{{ mod.name }}
+</span>
+{%- else -%}<span class="text-muted">-</span>{%- endif -%}
+{%- endmacro %}
+
+{% macro pagination(pager, noun='data') -%}
+<div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm" data-pagination>
+  <p class="text-muted">{% if pager.total %}Menampilkan {{ pager.first }}&ndash;{{ pager.last }} dari {{ pager.total }} {{ noun }}{% else %}Tidak ada {{ noun }}{% endif %}</p>
+  {% if pager.pages > 1 %}
+  <nav aria-label="Halaman {{ noun }}">
+    <ul class="flex items-center gap-1">
+      <li>{% if pager.page > 1 %}<a href="{{ pager.url(pager.page - 1) }}" rel="prev" class="btn btn-secondary">Sebelumnya</a>
+          {% else %}<span class="btn btn-secondary" aria-disabled="true">Sebelumnya</span>{% endif %}</li>
+      {% for n in pager.numbers %}
+        {% if n is none %}<li class="px-1 text-muted" aria-hidden="true">&hellip;</li>
+        {% else %}<li class="dke-hide-mobile">
+          <a href="{{ pager.url(n) }}" {% if n == pager.page %}aria-current="page"{% endif %}
+             class="btn {{ 'btn-primary' if n == pager.page else 'btn-secondary' }} min-w-[44px]">{{ n }}</a></li>{% endif %}
+      {% endfor %}
+      <li class="px-2 text-muted sm:hidden">{{ pager.page }}/{{ pager.pages }}</li>
+      <li>{% if pager.page < pager.pages %}<a href="{{ pager.url(pager.page + 1) }}" rel="next" class="btn btn-secondary">Berikutnya</a>
+          {% else %}<span class="btn btn-secondary" aria-disabled="true">Berikutnya</span>{% endif %}</li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{%- endmacro %}

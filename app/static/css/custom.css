@@ -203,3 +203,35 @@ html[data-view='mobile'] #toast-root {
   }
 }
 .launcher-card:active { transform: translateY(-1px) scale(.99); }
+
+/* ---------- 9. Control Panel Information System ----------
+   Sidebar tab di kiri, panel di kanan (Blueprint 5.3). Di layar sempit dan Mobile View paksa,
+   sidebar menjadi deretan tab horizontal yang bisa digeser. Aksen indigo mengikuti token --c-primary. */
+.cp-shell { display: flex; align-items: flex-start; gap: 1.5rem; }
+.cp-side { width: 16rem; flex: none; position: sticky; top: 5rem; }
+.cp-main { min-width: 0; flex: 1; }
+.cp-tabs { display: flex; flex-direction: column; gap: .25rem; }
+.cp-tab {
+  display: flex; align-items: center; gap: .625rem; min-height: 44px; padding: .5rem .75rem;
+  border-radius: .5rem; border-left: 3px solid transparent; font-weight: 600; font-size: .9375rem;
+  color: rgb(var(--c-ink)); text-decoration: none;
+  transition: background-color 150ms ease-out, transform 150ms ease-out;
+}
+.cp-tab:hover { background: rgb(var(--c-border) / .6); }
+.cp-tab:active { transform: scale(.98); }
+.cp-tab.is-active {
+  background: rgb(var(--c-primary) / .12); color: rgb(var(--c-primary));
+  border-left-color: rgb(var(--c-primary));
+}
+@media (max-width: 767px) {
+  .cp-shell { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .cp-side { width: auto; position: static; }
+  .cp-tabs { flex-direction: row; overflow-x: auto; padding-bottom: .25rem; scrollbar-width: thin; }
+  .cp-tab { flex: none; white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; }
+  .cp-tab.is-active { border-bottom-color: rgb(var(--c-primary)); }
+}
+html[data-view='mobile'] .cp-shell { flex-direction: column; align-items: stretch; gap: 1rem; }
+html[data-view='mobile'] .cp-side { width: auto; position: static; }
+html[data-view='mobile'] .cp-tabs { flex-direction: row; overflow-x: auto; padding-bottom: .25rem; scrollbar-width: thin; }
+html[data-view='mobile'] .cp-tab { flex: none; white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; }
+html[data-view='mobile'] .cp-tab.is-active { border-bottom-color: rgb(var(--c-primary)); }

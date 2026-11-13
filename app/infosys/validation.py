@@ -82,3 +82,72 @@ def validate_login(email, password):
     if not password:
         errors["password"] = MSG_PASSWORD_REQUIRED
     return errors
+
+
+# --------------------------------------------------------------------------
+# Control Panel (UC-IS-04 profil, UC-IS-05 ganti kata sandi)
+# Aturan di sini HARUS sama dengan static/js/panel.js.
+# --------------------------------------------------------------------------
+MSG_BIO_TOO_LONG = "Bio maksimal 300 karakter."
+MSG_AVATAR_INVALID = "Tautan avatar belum valid. Gunakan alamat gambar yang diawali https://"
+MSG_AVATAR_TOO_LONG = "Tautan avatar maksimal 500 karakter."
+MSG_CURRENT_REQUIRED = "Kata sandi saat ini wajib diisi."
+MSG_CURRENT_WRONG = "Kata sandi saat ini salah. Periksa kembali dan coba lagi."
+MSG_NEW_SAME = "Kata sandi baru harus berbeda dari kata sandi saat ini."
+MSG_NEW_CONFIRM_MISMATCH = "Konfirmasi kata sandi baru belum sama. Ketik ulang kata sandi yang sama."
+MSG_PASSWORD_LOCKED = "Terlalu banyak percobaan. Tunggu beberapa menit, lalu coba lagi."
+
+BIO_MAX = 300
+AVATAR_MAX = 500
+
+
+def normalize_bio(value):
+    """Seragamkan baris baru dan buang spasi tepi; baris kosong beruntun diringkas jadi satu."""
+    text = (value or "").replace("\r\n", "\n").replace("\r", "\n").strip()
+    return re.sub(r"\n{3,}", "\n\n", text)
+
+
+def normalize_avatar_url(value):
+    return (value or "").strip()
+
+
+def check_avatar_url(url):
+    """Pesan error untuk tautan avatar, atau None. Kosong = boleh (memakai inisial nama)."""
+    if not url:
+        return None
+    if len(url) > AVATAR_MAX:
+        return MSG_AVATAR_TOO_LONG
+    if re.search(r"\s", url) or not re.match(r"^https?://[^/\s?#]+", url, re.I):
+        return MSG_AVATAR_INVALID
+    return None
+
+
+def validate_profile(name, bio, avatar_url):
+    """Kembalikan dict {field: pesan} untuk form profil (nilai sudah dinormalisasi)."""
+    errors = {}
+    if not name:
+        errors["name"] = MSG_NAME_REQUIRED
+    elif len(name) > NAME_MAX:
+        errors["name"] = MSG_NAME_TOO_LONG
+    if len(bio) > BIO_MAX:
+        errors["bio"] = MSG_BIO_TOO_LONG
+    msg = check_avatar_url(avatar_url)
+    if msg:
+        errors["avatar_url"] = msg
+    return errors
+
+
+def validate_password_change(current, new, confirm):
+    """Format saja; kecocokan kata sandi saat ini diperiksa di rute (butuh hash dari database)."""
+    errors = {}
+    if not current:
+        errors["current_password"] = MSG_CURRENT_REQUIRED
+    if len(new) < PASSWORD_MIN:
+        errors["new_password"] = MSG_PASSWORD_MIN
+    elif len(new) > PASSWORD_MAX:
+        errors["new_password"] = MSG_PASSWORD_MAX
+    elif current and new == current:
+        errors["new_password"] = MSG_NEW_SAME
+    if confirm != new:
+        errors["confirm_password"] = MSG_NEW_CONFIRM_MISMATCH
+    return errors

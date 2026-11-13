@@ -1,0 +1,34 @@
+{% extends "infosys/layout_infosys.html" %}
+{# Kerangka Control Panel: sidebar tab di kiri, panel di kanan (Blueprint 5.3).
+   Member (tab terisi) -> sidebar + {% block panel %}. Guest di halaman utama -> {% block guest %}.
+   Di layar sempit dan Mobile View sidebar menjadi deretan tab yang bisa digeser (custom.css bagian 9). #}
+{% from '_components/_icons.html' import icon %}
+{% from 'infosys/_panel_macros.html' import avatar with context %}
+{% block module_content %}
+{% if current_user and tab %}
+<div class="cp-shell animate-fade-in">
+  <aside class="cp-side" aria-label="Menu Control Panel">
+    <div class="cp-user dke-hide-mobile mb-3 flex items-center gap-3 rounded-xl border border-line bg-surface p-3">
+      {{ avatar(current_user['full_name'], current_user['avatar_url'], 'h-11 w-11', 'text-base') }}
+      <div class="min-w-0">
+        <p class="truncate font-semibold">{{ current_user['full_name'] }}</p>
+        <p class="truncate text-sm text-muted">{{ current_user['email'] }}</p>
+      </div>
+    </div>
+    <nav class="cp-tabs" aria-label="Tab Control Panel">
+      {% for key, endpoint, label, ico in PANEL_TABS %}
+        <a href="{{ url_for(endpoint) }}" class="cp-tab{{ ' is-active' if key == tab }}" {% if key == tab %}aria-current="page"{% endif %}>
+          {{ icon(ico, 'h-5 w-5 flex-none') }}<span>{{ label }}</span>
+        </a>
+      {% endfor %}
+    </nav>
+  </aside>
+  <div class="cp-main">
+    {% block panel %}{% endblock %}
+  </div>
+</div>
+{% else %}
+  {% block guest %}{% endblock %}
+{% endif %}
+{% endblock %}
+{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/panel.js') }}"></script>{% endblock %}

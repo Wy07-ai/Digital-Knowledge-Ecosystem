@@ -1,8 +1,37 @@
-{% extends "infosys/layout_infosys.html" %}
-{% from "_components/empty_state.html" import empty_state %}
+{% extends "infosys/_panel.html" %}
+{% from "infosys/_panel_macros.html" import avatar, panel_field with context %}
 {% block title %}Profil &amp; Pengaturan{% endblock %}
-{% block module_content %}
-  <h1 class="text-2xl font-bold">Profil &amp; Pengaturan</h1>
-  <p class="mt-1 text-muted">Halo, {{ current_user['full_name'] }} ({{ current_user['email'] }}).</p>
-  {{ empty_state('Halaman ini sedang disiapkan', 'Pengelolaan profil dibangun pada UC-IS-04. Halaman ini sudah dilindungi login.', 'Kembali ke Beranda', url_for('main.index')) }}
+{% block panel %}
+  <h1 class="text-2xl font-bold">Profil</h1>
+  <p class="mt-1 text-muted">Ubah nama, bio, dan foto profil. Email <strong>{{ current_user['email'] }}</strong> tidak dapat diubah.</p>
+
+  <section class="mt-5 rounded-xl border border-line bg-surface p-5 shadow-sm" aria-labelledby="h-profil">
+    <h2 id="h-profil" class="text-lg font-semibold">Data profil</h2>
+    <form method="post" action="{{ url_for('infosys.profile') }}" novalidate data-panel-form="profile" data-focus="{{ focus if pf_errors else '' }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mt-4 flex items-center gap-4" data-avatar-preview>
+        {{ avatar(values.name or current_user['full_name'], values.avatar_url if not pf_errors.get('avatar_url') else '', 'h-20 w-20', 'text-2xl') }}
+        <p class="text-sm text-muted">Pratinjau avatar. Tempel tautan gambar di bawah; bila kosong atau gagal dimuat, inisial nama dipakai.</p>
+      </div>
+      {{ panel_field('name', 'Nama lengkap', values.name, pf_errors.get('name'), 'text', 'name') }}
+      {{ panel_field('bio', 'Bio', values.bio, pf_errors.get('bio'), rows=4, counter=300, required=False, hint='Ceritakan singkat tentang diri Anda.') }}
+      {{ panel_field('avatar_url', 'Tautan avatar (avatar_url)', values.avatar_url, pf_errors.get('avatar_url'), 'url', 'off', required=False, hint='Alamat gambar berawalan https://. Maksimal 500 karakter.') }}
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" data-submit>Simpan profil</button>
+        <a href="{{ url_for('infosys.profile') }}" class="btn btn-secondary">Batalkan perubahan</a>
+      </div>
+    </form>
+  </section>
+
+  <section id="sandi" class="mt-6 rounded-xl border border-line bg-surface p-5 shadow-sm" aria-labelledby="h-sandi">
+    <h2 id="h-sandi" class="text-lg font-semibold">Ganti kata sandi</h2>
+    <p class="mt-1 text-sm text-muted">Gunakan minimal 8 karakter. Setelah diganti, Anda tetap masuk di perangkat ini.</p>
+    <form method="post" action="{{ url_for('infosys.change_password') }}" novalidate data-panel-form="password" data-focus="{{ focus if pw_errors else '' }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ panel_field('current_password', 'Kata sandi saat ini', '', pw_errors.get('current_password'), 'password', 'current-password') }}
+      {{ panel_field('new_password', 'Kata sandi baru', '', pw_errors.get('new_password'), 'password', 'new-password', hint='Minimal 8 karakter.') }}
+      {{ panel_field('confirm_password', 'Konfirmasi kata sandi baru', '', pw_errors.get('confirm_password'), 'password', 'new-password') }}
+      <button type="submit" class="btn btn-primary mt-6" data-submit>Ganti kata sandi</button>
+    </form>
+  </section>
 {% endblock %}
