@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_components/breadcrumb.html" import breadcrumb, back_link %}
+{% from "_components/module_card.html" import module_card %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Uji Komponen{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold">Uji Komponen Fondasi Tampilan</h1>
+  <p class="mt-1 text-muted">Halaman pengembangan. Matikan di produksi dengan <code>DKE_UI_TEST=0</code>.</p>
+
+  {# ---------------- Toast ---------------- #}
+  <section class="mt-8" aria-labelledby="h-toast">
+    <h2 id="h-toast" class="text-xl font-semibold">1. Toast (JavaScript)</h2>
+    <p class="mt-1 text-sm text-muted">Masuk dari kanan atas 200 ms, hilang otomatis 3,5 detik, berhenti saat disorot atau difokus.</p>
+    <div class="mt-4 flex flex-wrap gap-3">
+      <button type="button" class="btn bg-emerald-700 text-white" data-toast="Produk ditambahkan ke keranjang." data-toast-type="success">{{ icon('success', 'h-5 w-5') }}Sukses</button>
+      <button type="button" class="btn bg-red-600 text-white" data-toast="Email atau kata sandi salah. Periksa kembali dan coba lagi." data-toast-type="error">{{ icon('error', 'h-5 w-5') }}Error</button>
+      <button type="button" class="btn bg-indigo-600 text-white" data-toast="Progres belajar tersimpan otomatis." data-toast-type="info">{{ icon('info', 'h-5 w-5') }}Informasi</button>
+      <button type="button" class="btn bg-amber-700 text-white" data-toast="Koneksi lambat. Perubahan akan disimpan saat tersambung kembali." data-toast-type="warning">{{ icon('warning', 'h-5 w-5') }}Peringatan</button>
+    </div>
+    <div class="mt-3 flex flex-wrap gap-3">
+      <button type="button" class="btn btn-secondary" data-toast-all>Keempat jenis sekaligus</button>
+      <button type="button" class="btn btn-secondary" data-toast="Pesanan DKE-20261112-0001 berhasil dibuat. Struk dan rincian pesanan sudah dikirim ke email Anda, silakan periksa kotak masuk atau folder spam." data-toast-type="success">Pesan panjang</button>
+      <button type="button" class="btn btn-secondary" data-toast="Toast ini tidak hilang otomatis. Tutup dengan tombol x." data-toast-type="info" data-toast-ms="0">Tanpa auto-hide</button>
+      <button type="button" class="btn btn-secondary" data-toast-clear>Tutup semua</button>
+    </div>
+  </section>
+
+  {# ---------------- flash() ---------------- #}
+  <section class="mt-10" aria-labelledby="h-flash">
+    <h2 id="h-flash" class="text-xl font-semibold">2. Pesan <code>flash()</code> Flask</h2>
+    <p class="mt-1 text-sm text-muted">Memicu 5 pesan flash di server (success, error, info, warning, dan kategori bawaan), lalu halaman dimuat ulang. Semuanya harus tampil sebagai toast.</p>
+    <a href="{{ url_for('main.ui_test_flash') }}" class="btn btn-primary mt-4">Kirim flash dari server</a>
+  </section>
+
+  {# ---------------- Tema dan tampilan ---------------- #}
+  <section class="mt-10" aria-labelledby="h-pref">
+    <h2 id="h-pref" class="text-xl font-semibold">3. Tema dan tampilan</h2>
+    <p class="mt-1 text-sm text-muted">Ubah lewat ikon tema dan tombol Mobile di Top-Bar, lalu muat ulang halaman: pilihan harus bertahan tanpa kedip.</p>
+    <dl class="mt-4 grid max-w-xl grid-cols-[auto_1fr] gap-x-6 gap-y-1 rounded-xl border border-line bg-surface p-4 text-sm">
+      <dt class="text-muted">Tema pilihan</dt><dd class="font-semibold" data-pref-readout="theme">-</dd>
+      <dt class="text-muted">Mode gelap aktif</dt><dd class="font-semibold" data-pref-readout="dark">-</dd>
+      <dt class="text-muted">Tampilan</dt><dd class="font-semibold" data-pref-readout="view">-</dd>
+      <dt class="text-muted">Disimpan di</dt><dd class="font-semibold" data-pref-readout="storage">-</dd>
+    </dl>
+  </section>
+
+  {# ---------------- Komponen ---------------- #}
+  <section class="mt-10" aria-labelledby="h-comp">
+    <h2 id="h-comp" class="text-xl font-semibold">4. Breadcrumb dan tombol Kembali</h2>
+    <p class="mt-1 text-sm text-muted">Di Mobile View, jenjang tengah diringkas menjadi &hellip; &rsaquo; Materi 1.</p>
+    <div class="mt-4 rounded-xl border border-line bg-surface p-4">
+      {{ back_link(url_for('main.index'), 'Kembali ke Beranda') }}
+      {{ breadcrumb([('E-Learning', url_for('elearning.index')), ('Python Dasar', url_for('elearning.index')), ('Materi 1', None)]) }}
+    </div>
+  </section>
+
+  <section class="mt-10" aria-labelledby="h-card">
+    <h2 id="h-card" class="text-xl font-semibold">5. Kartu modul dan penanda modul aktif</h2>
+    <p class="mt-1 text-sm text-muted">Klik kartu untuk membuka modul; di sana App Switcher (ikon 9 titik) menandai modul aktif.</p>
+    <div class="launcher-grid mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {% for m in modules %}
+        {{ module_card(m, summary=('Python Dasar' if m.key == 'elearning' else None), progress=(45 if m.key == 'elearning' else None)) }}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mt-10" aria-labelledby="h-empty">
+    <h2 id="h-empty" class="text-xl font-semibold">6. Empty state</h2>
+    {{ empty_state('Keranjang masih kosong', 'Jelajahi katalog untuk mulai.', 'Lihat katalog', url_for('ecommerce.index'), 'ecommerce') }}
+  </section>
+{% endblock %}

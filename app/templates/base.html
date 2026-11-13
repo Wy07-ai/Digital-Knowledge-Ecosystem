@@ -1,27 +1,102 @@
 <!doctype html>
-<html lang="id">
+{#
+  base.html - kerangka dasar DKE (Blueprint 6.1 dan 6.2).
+  Blok yang bisa diisi turunan:
+    title, head_extra, main_class, content, scripts_extra
+  Atribut <html>:
+    data-theme / data-view : nilai tersimpan (Member: dari database; Guest: bawaan,
+                             lalu ditimpa localStorage oleh skrip anti-kedip)
+    data-member            : "1" bila login -> sumber kebenaran = server, bukan localStorage
+    data-settings-url      : endpoint POST pengaturan global
+#}
+<html lang="id"
+      data-theme="{{ settings.theme if settings.theme in ('light', 'dark', 'system') else 'system' }}"
+      data-view="{{ settings.view_mode if settings.view_mode in ('desktop', 'mobile') else 'desktop' }}"
+      data-member="{{ '1' if current_user else '0' }}"
+      data-settings-url="{{ url_for('main.update_global_settings') }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}DKE{% endblock %} · DKE</title>
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Beranda{% endblock %} · DKE</title>
+
+  {# 1. Skrip tema anti-kedip: HARUS sinkron dan berada sebelum stylesheet/body. #}
+  <script>
+    (function () {
+      var d = document.documentElement;
+      function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+      var member = d.dataset.member === '1';
+      // Member: database (dari server) menang. Guest: localStorage, lalu nilai bawaan server.
+      var t = member ? d.dataset.theme : (ls('dke-theme') || d.dataset.theme);
+      var v = member ? d.dataset.view  : (ls('dke-view')  || d.dataset.view);
+      if (['light', 'dark', 'system'].indexOf(t) < 0) t = 'system';
+      if (['desktop', 'mobile'].indexOf(v) < 0) v = 'desktop';
+      var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+      d.classList.toggle('dark', dark);
+      d.dataset.theme = t;
+      d.dataset.view = v;
+    })();
+  </script>
+
+  {# 2. Inter (fallback system-ui) #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
+  {# 3. Tailwind v3 Play CDN + design token Blueprint 5.4 (nilai ada di custom.css) #}
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'] },
+          colors: {
+            page:    'rgb(var(--c-page) / <alpha-value>)',
+            surface: 'rgb(var(--c-surface) / <alpha-value>)',
+            ink:     'rgb(var(--c-ink) / <alpha-value>)',
+            muted:   'rgb(var(--c-muted) / <alpha-value>)',
+            line:    'rgb(var(--c-border) / <alpha-value>)',
+            primary: 'rgb(var(--c-primary) / <alpha-value>)',
+            'on-primary':   'rgb(var(--c-on-primary) / <alpha-value>)',
+            header:  'rgb(var(--c-header) / <alpha-value>)',
+            success: 'rgb(var(--c-success) / <alpha-value>)',
+            'success-fill': 'rgb(var(--c-success-fill) / <alpha-value>)'
+          }
+        }
+      }
+    };
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-  {# Kerangka sementara. base.html lengkap (Tailwind, tema, Top-Bar, toast) dibuat di Prompt 4. #}
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 0; color: #111827; background: #fff; }
-    nav { display: flex; gap: .5rem; flex-wrap: wrap; padding: .75rem 1rem; border-bottom: 4px solid {{ accent }}; }
-    nav a { padding: .6rem .8rem; min-height: 44px; box-sizing: border-box; color: #111827; text-decoration: none; border-radius: .375rem; }
-    nav a.active { background: {{ accent }}; color: #fff; }
-    main { padding: 1.5rem 1rem; max-width: 64rem; margin: 0 auto; }
-    .muted { color: #4B5563; }
-  </style>
+  {% block head_extra %}{% endblock %}
+
+  <script defer src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/switcher.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
 </head>
-<body>
-  <nav aria-label="Navigasi modul">
-    <a href="{{ url_for('main.index') }}" {% if not current_module %}class="active"{% endif %}>Beranda</a>
-    {% for m in MODULES %}
-      <a href="{{ url_for(m.key ~ '.index') }}" {% if current_module and current_module.key == m.key %}class="active"{% endif %}>{{ m.name }}</a>
-    {% endfor %}
-  </nav>
-  <main>{% block content %}{% endblock %}</main>
+<body class="flex min-h-screen flex-col bg-page font-sans text-ink antialiased" style="--accent: {{ accent }}">
+  <a href="#konten" class="skip-link">Lewati ke konten utama</a>
+
+  {% include '_components/topbar.html' %}
+
+  <main id="konten" class="page-enter mx-auto w-full flex-1 px-4 py-6 {% block main_class %}max-w-6xl{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  {# Wadah toast. Pesan flash() Flask dikirim sebagai JSON aman dan ditampilkan oleh app.js. #}
+  <div id="toast-root"></div>
+  {% with flashes = get_flashed_messages(with_categories=true) %}
+    {% if flashes %}
+      <script type="application/json" id="flash-data">{{ flashes|tojson }}</script>
+      <noscript>
+        <ul class="mx-auto max-w-6xl px-4 pb-6">
+          {% for category, message in flashes %}<li class="text-sm">{{ message }}</li>{% endfor %}
+        </ul>
+      </noscript>
+    {% endif %}
+  {% endwith %}
+
+  {% block scripts_extra %}{% endblock %}
 </body>
 </html>

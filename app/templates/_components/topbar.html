@@ -1,0 +1,118 @@
+{# Global Top-Bar (sticky). Urutan sesuai wireframe Blueprint 5.4:
+   [App Switcher] [Home DKE] Judul modul ............ [Tema] [Mobile] [Bell] [Profil]
+   Guest: [Tema] [Mobile] [Masuk] [Daftar]. #}
+{% from '_components/_icons.html' import icon %}
+{% set page_heading = current_module.name if current_module else (page_title or 'Beranda') %}
+<header class="topbar sticky top-0 z-40 bg-header text-white" style="border-bottom: 3px solid var(--accent)">
+  <div class="mx-auto flex h-14 max-w-6xl items-center gap-1 px-3">
+
+    {% include '_components/app_switcher.html' %}
+
+    <a href="{{ url_for('main.index') }}" class="tb-btn font-bold tracking-tight"
+       aria-label="Beranda DKE"
+       {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
+      <span class="rounded-md bg-white/15 px-2 py-0.5 text-base">DKE</span>
+    </a>
+
+    <p class="ml-1 flex min-w-0 items-center gap-2 border-l border-white/25 pl-3 text-sm font-semibold">
+      <span class="h-2.5 w-2.5 flex-none rounded-full ring-2 ring-white/70" style="background: var(--accent)" aria-hidden="true"></span>
+      <span class="truncate">{{ page_heading }}</span>
+    </p>
+
+    <div class="ml-auto flex flex-none items-center">
+
+      {# --- Sakelar tema: Terang / Gelap / Sistem --- #}
+      <div class="relative" data-popover>
+        <button type="button" class="tb-btn" data-popover-toggle
+                aria-haspopup="true" aria-expanded="false" aria-controls="theme-panel"
+                aria-label="Pilih tema">
+          <span class="flex" data-theme-spin>
+            <span data-theme-icon="light">{{ icon('sun') }}</span>
+            <span data-theme-icon="dark">{{ icon('moon') }}</span>
+            <span data-theme-icon="system">{{ icon('monitor') }}</span>
+          </span>
+        </button>
+        <div id="theme-panel" data-popover-panel hidden role="menu" aria-label="Tema tampilan"
+             class="popover-enter absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-line bg-surface p-1.5 text-ink shadow-xl">
+          <button type="button" role="menuitemradio" aria-checked="false" class="menu-item" data-popover-item data-theme-option="light">
+            {{ icon('sun') }}<span>Terang</span><span data-check>{{ icon('check', 'h-4 w-4') }}</span>
+          </button>
+          <button type="button" role="menuitemradio" aria-checked="false" class="menu-item" data-popover-item data-theme-option="dark">
+            {{ icon('moon') }}<span>Gelap</span><span data-check>{{ icon('check', 'h-4 w-4') }}</span>
+          </button>
+          <button type="button" role="menuitemradio" aria-checked="false" class="menu-item" data-popover-item data-theme-option="system">
+            {{ icon('monitor') }}<span>Sistem</span><span data-check>{{ icon('check', 'h-4 w-4') }}</span>
+          </button>
+        </div>
+      </div>
+
+      {# --- Pengalih Mobile View (Desktop = nonaktif, Mobile = aktif) --- #}
+      <button type="button" class="tb-btn view-toggle" data-view-toggle aria-pressed="false"
+              aria-label="Tampilan Mobile" title="Tampilan Mobile (aktif/nonaktif)">
+        {{ icon('smartphone') }}<span class="dke-hide-mobile">Mobile</span>
+      </button>
+
+      {% if current_user %}
+        {% set notif = notification_summary() %}
+        {# --- Notifikasi --- #}
+        <div class="relative" data-popover>
+          <button type="button" class="tb-btn relative" data-popover-toggle
+                  aria-haspopup="true" aria-expanded="false" aria-controls="notif-panel"
+                  aria-label="Notifikasi{% if notif.unread %}, {{ notif.unread }} belum dibaca{% endif %}">
+            {{ icon('bell') }}
+            {% if notif.unread %}
+              <span class="absolute right-1 top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-header">
+                {{ '9+' if notif.unread > 9 else notif.unread }}
+              </span>
+            {% endif %}
+          </button>
+          <div id="notif-panel" data-popover-panel hidden
+               class="popover-enter absolute right-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-line bg-surface p-2 text-ink shadow-xl">
+            <p class="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-muted">Notifikasi</p>
+            {% if notif.rows %}
+              <ul>
+                {% for n in notif.rows %}
+                  <li>
+                    {% if n.link %}
+                      <a href="{{ n.link }}" class="menu-item items-start" data-popover-item>
+                    {% else %}
+                      <div class="menu-item items-start">
+                    {% endif %}
+                      <span class="mt-2 h-2 w-2 flex-none rounded-full {{ 'bg-primary' if not n.is_read else 'bg-transparent' }}" aria-hidden="true"></span>
+                      <span class="text-sm {{ 'font-semibold' if not n.is_read }}">{{ n.message }}</span>
+                    {% if n.link %}</a>{% else %}</div>{% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="px-2 py-4 text-center text-sm text-muted">Belum ada notifikasi.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# --- Menu profil --- #}
+        <div class="relative" data-popover>
+          <button type="button" class="tb-btn" data-popover-toggle
+                  aria-haspopup="true" aria-expanded="false" aria-controls="profile-panel"
+                  aria-label="Menu profil {{ current_user['full_name'] }}">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-header" aria-hidden="true">{{ current_user['full_name'][:1]|upper }}</span>
+            <span class="dke-hide-mobile max-w-[8rem] truncate">{{ current_user['full_name'].split()[0] }}</span>
+            <span class="dke-hide-mobile">{{ icon('chevron-down', 'h-4 w-4') }}</span>
+          </button>
+          <div id="profile-panel" data-popover-panel hidden
+               class="popover-enter absolute right-0 top-full z-50 mt-2 w-64 max-w-[calc(100vw-1rem)] rounded-xl border border-line bg-surface p-1.5 text-ink shadow-xl">
+            <div class="border-b border-line px-3 pb-2 pt-1.5">
+              <p class="truncate font-semibold">{{ current_user['full_name'] }}</p>
+              <p class="truncate text-sm text-muted">{{ current_user['email'] }}</p>
+            </div>
+            <a href="{{ url_for('infosys.index') }}" class="menu-item mt-1.5" data-popover-item>{{ icon('user') }}<span>Profil &amp; Pengaturan</span></a>
+            <a href="{{ safe_url('infosys.logout', '/infosys/logout') }}" class="menu-item" data-popover-item>{{ icon('log-out') }}<span>Keluar</span></a>
+          </div>
+        </div>
+      {% else %}
+        <a href="{{ login_url() }}" class="tb-btn">Masuk</a>
+        <a href="{{ safe_url('infosys.register', '/infosys/register') }}" class="dke-hide-mobile ml-1 inline-flex min-h-[44px] items-center rounded-lg bg-white px-3 text-sm font-semibold text-header transition-transform duration-150 hover:bg-white/90 active:scale-95">Daftar</a>
+      {% endif %}
+    </div>
+  </div>
+</header>

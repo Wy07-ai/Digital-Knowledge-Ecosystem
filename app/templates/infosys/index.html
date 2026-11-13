@@ -1,6 +1,8 @@
 {% extends "infosys/layout_infosys.html" %}
+{% from "_components/empty_state.html" import empty_state %}
 {% block title %}Information System{% endblock %}
 {% block module_content %}
-  <h1>Information System</h1>
-  <p class="muted">Halaman kosong.</p>
+  <h1 class="text-2xl font-bold">Information System</h1>
+  <p class="mt-1 text-muted">{{ current_module.desc }}</p>
+  {{ empty_state('Halaman ini sedang disiapkan', 'Konten modul Information System dibangun pada fase berikutnya.', 'Kembali ke Beranda', url_for('main.index')) }}
 {% endblock %}

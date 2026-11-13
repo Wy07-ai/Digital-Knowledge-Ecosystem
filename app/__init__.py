@@ -6,16 +6,17 @@ from importlib import import_module
 from flask import Flask, g, request, session
 
 from . import db
+from .utils import current_login_url, notification_summary, safe_url_for
 
 # Daftar 6 modul. Satu modul = satu Blueprint = satu folder template.
 # "key" sama dengan nama paket Python (app/<key>/) dan nama Blueprint.
 MODULES = [
-    {"key": "infosys",   "name": "Information System", "prefix": "/infosys",   "accent": "#4F46E5"},
-    {"key": "ecommerce", "name": "E-Commerce",         "prefix": "/ecommerce", "accent": "#F59E0B"},
-    {"key": "elearning", "name": "E-Learning",         "prefix": "/elearning", "accent": "#2563EB"},
-    {"key": "etutorial", "name": "E-Tutorial",         "prefix": "/etutorial", "accent": "#7C3AED"},
-    {"key": "portal",    "name": "Portal",             "prefix": "/portal",    "accent": "#E11D48"},
-    {"key": "forum",     "name": "Forum",              "prefix": "/forum",     "accent": "#0D9488"},
+    {"key": "infosys",   "name": "Information System", "prefix": "/infosys",   "accent": "#4F46E5", "desc": "Profil, log aktivitas, dan statistik lintas modul."},
+    {"key": "ecommerce", "name": "E-Commerce",         "prefix": "/ecommerce", "accent": "#F59E0B", "desc": "Katalog produk, keranjang, dan checkout."},
+    {"key": "elearning", "name": "E-Learning",         "prefix": "/elearning", "accent": "#2563EB", "desc": "Kelas, materi, kuis, dan progres belajar."},
+    {"key": "etutorial", "name": "E-Tutorial",         "prefix": "/etutorial", "accent": "#7C3AED", "desc": "Tutorial langkah demi langkah dengan contoh kode."},
+    {"key": "portal",    "name": "Portal",             "prefix": "/portal",    "accent": "#E11D48", "desc": "Artikel dan berita pilihan per kategori."},
+    {"key": "forum",     "name": "Forum",              "prefix": "/forum",     "accent": "#0D9488", "desc": "Diskusi, tanya jawab, dan balasan komunitas."},
 ]
 MODULE_BY_KEY = {m["key"]: m for m in MODULES}
 
@@ -38,6 +39,8 @@ def create_app(test_config=None):
         # Ganti lewat variabel lingkungan DKE_SECRET_KEY saat dipakai sungguhan.
         SECRET_KEY=os.environ.get("DKE_SECRET_KEY", "dev-only-ganti-di-produksi"),
         DATABASE=os.path.join(app.instance_path, "dke.db"),
+        # Halaman uji komponen (/dev/ui-test). Matikan di produksi: DKE_UI_TEST=0
+        UI_TEST_PAGE=os.environ.get("DKE_UI_TEST", "1") == "1",
     )
     if test_config:
         app.config.update(test_config)
@@ -124,4 +127,8 @@ def _register_hooks(app):
             "accent": current["accent"] if current else "#475569",
             "current_user": g.get("user"),
             "settings": g.get("settings", DEFAULT_SETTINGS),
+            # Helper untuk Top-Bar (lihat app/utils.py)
+            "safe_url": safe_url_for,
+            "login_url": current_login_url,
+            "notification_summary": notification_summary,
         }

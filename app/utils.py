@@ -120,3 +120,52 @@ def slugify(text, max_length=80):
     text = text.encode("ascii", "ignore").decode("ascii").lower()
     text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
     return text[:max_length].strip("-")
+
+
+# --------------------------------------------------------------------------
+# Helper untuk template (Top-Bar): URL aman, URL login, ringkasan notifikasi
+# --------------------------------------------------------------------------
+def safe_url_for(endpoint, fallback, **values):
+    """url_for() yang tidak error bila rute belum dibuat (mis. login di Fase 1 awal)."""
+    try:
+        return url_for(endpoint, **values)
+    except BuildError:
+        return fallback
+
+
+def current_login_url():
+    """URL login untuk Guest, membawa ?next=<halaman sekarang> (kecuali di halaman login sendiri)."""
+    if request.endpoint in ("infosys.login", "infosys.register"):
+        return _login_url(None)
+    return _login_url(_origin_path())
+
+
+def notification_summary(limit=5):
+    """Jumlah notifikasi belum dibaca dan `limit` notifikasi terbaru milik Member.
+
+    Dikembalikan sebagai dict {"unread": int, "rows": [{message, link, is_read}]}.
+    Hasil disimpan di g agar pemanggilan berulang dalam satu permintaan tidak mengulang kueri.
+    """
+    cached = g.get("_notif_summary")
+    if cached is not None:
+        return cached
+    summary = {"unread": 0, "rows": []}
+    if g.get("user") is not None:
+        try:
+            db = get_db()
+            uid = g.user["id"]
+            summary["unread"] = db.execute(
+                "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0", (uid,)
+            ).fetchone()[0]
+            for row in db.execute(
+                "SELECT message, link_url, is_read FROM notifications "
+                "WHERE user_id = ? ORDER BY created_at DESC, id DESC LIMIT ?", (uid, limit)
+            ):
+                link = row["link_url"] if is_safe_next(row["link_url"]) else None
+                summary["rows"].append(
+                    {"message": row["message"], "link": link, "is_read": bool(row["is_read"])}
+                )
+        except Exception:  # tabel belum ada / DB belum di-seed: lonceng tetap tampil kosong
+            pass
+    g._notif_summary = summary
+    return summary

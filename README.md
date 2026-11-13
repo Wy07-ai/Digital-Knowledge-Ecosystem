@@ -65,16 +65,18 @@ dke/
     ├── __init__.py         # create_app, MODULES, registrasi blueprint, hook, context processor
     ├── db.py               # get_db, close_db, init_app
     ├── utils.py            # login_required, log_activity, notify, slugify
-    ├── main/               # Beranda
+    ├── main/               # Beranda, API pengaturan global (api.py), halaman uji
     ├── infosys/ ecommerce/ elearning/ etutorial/ portal/ forum/
     │   ├── __init__.py     # Blueprint
     │   └── routes.py       # rute modul
     ├── templates/
-    │   ├── base.html       # kerangka sementara (final di Prompt 4)
-    │   ├── _components/    # topbar, app_switcher, breadcrumb, ... (Prompt 4)
+    │   ├── base.html       # Tailwind CDN, tema anti-kedip, Top-Bar sticky, toast-root
+    │   ├── _components/    # topbar, app_switcher, breadcrumb, module_card, empty_state, _icons
     │   ├── main/
     │   └── <modul>/        # layout_<modul>.html + halaman modul
-    └── static/{css,js,img}
+    └── static/
+        ├── css/custom.css  # token Light/Dark, keyframes, Mobile View, reduced-motion
+        └── js/             # theme.js toast.js switcher.js app.js
 ```
 
 Aturan: satu blueprint = satu modul = satu folder template = satu `layout_<modul>.html`
@@ -98,7 +100,27 @@ Nama kolom `activity_logs` dan `notifications` di `app/utils.py` sudah disesuaik
 (`module_key`, `message`, `link_url`). `notify()` menggabungkan `title` dan `body` menjadi satu `message`,
 karena Blueprint hanya mendefinisikan kolom `message`.
 
+## Fondasi tampilan (Fase 1, Prompt 4)
+
+- **Tema** Light/Dark/Sistem dan **tampilan** Desktop/Mobile: Guest -> `localStorage`
+  (`dke-theme`, `dke-view`); Member -> `POST /api/settings/global` (tabel `user_settings`),
+  dan nilai dari database dipakai saat halaman dimuat. Skrip anti-kedip di `<head>` `base.html`.
+- **Toast** menggantikan `alert()`: `toast(pesan, 'success|error|info|warning', ms)`.
+  Pesan `flash()` Flask otomatis tampil sebagai toast (kategori `danger` -> error, tanpa kategori -> info).
+- **Mobile View paksa**: beri kelas `launcher-grid` / `product-grid` / `card-grid` pada grid,
+  `stack-mobile` pada tumpukan flex, `dke-hide-mobile` pada elemen yang disembunyikan di mobile.
+  Kelas responsif Tailwind (`md:`, `lg:`) mengikuti lebar jendela sungguhan, jadi untuk elemen
+  baru yang harus patuh pada Mobile View gunakan kelas-kelas tersebut.
+- **Komponen** (`{% from "_components/xxx.html" import xxx %}`): `breadcrumb()`, `back_link()`,
+  `module_card()`, `empty_state()`; `topbar` dan `app_switcher` di-include oleh `base.html`.
+- **Token warna Tailwind**: `bg-page bg-surface text-ink text-muted border-line bg-primary text-on-primary bg-header text-success`.
+  Nilainya di `custom.css`, sehingga satu kelas berlaku untuk Light dan Dark.
+- **Halaman uji**: http://127.0.0.1:5000/dev/ui-test (semua jenis toast, flash() dari server, status tema).
+  Matikan di produksi dengan `DKE_UI_TEST=0`.
+- Tailwind dimuat dari CDN (`cdn.tailwindcss.com/3.4.17`) dan font Inter dari Google Fonts, jadi
+  perlu internet saat demo; tanpa internet tampilan jatuh ke `system-ui` dan tanpa gaya Tailwind.
+
 ## Roadmap
 
-Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi →
+Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan (selesai) dan autentikasi →
 Fase 2-5 modul → Fase 6 QA dan laporan.
