@@ -74,7 +74,7 @@ def login_required(view):
 
 # --------------------------------------------------------------------------
 # Log aktivitas dan notifikasi
-# (nama kolom mengikuti asumsi awal; cocokkan dengan schema.sql di Prompt 2)
+# (nama kolom sudah disesuaikan dengan schema.sql / Blueprint 3.3)
 # --------------------------------------------------------------------------
 def log_activity(module, action, detail=None, user_id=None, commit=True):
     """Catat satu baris ke activity_logs untuk pengguna yang sedang login.
@@ -88,9 +88,9 @@ def log_activity(module, action, detail=None, user_id=None, commit=True):
         return
     db = get_db()
     db.execute(
-        "INSERT INTO activity_logs (user_id, module, action, detail, created_at) "
-        "VALUES (?, ?, ?, ?, ?)",
-        (user_id, module, action, detail, now_iso()),
+        "INSERT INTO activity_logs (user_id, module_key, action, detail, ip_address, created_at) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, module, action, detail, request.remote_addr, now_iso()),
     )
     if commit:
         db.commit()
@@ -98,11 +98,14 @@ def log_activity(module, action, detail=None, user_id=None, commit=True):
 
 def notify(user_id, title, body=None, link=None, module=None, commit=True):
     """Buat notifikasi untuk user_id (tampil di lonceng Top-Bar)."""
+    # schema.sql (Blueprint 3.3) hanya punya kolom `message` dan `link_url`,
+    # jadi judul dan isi digabung menjadi satu pesan.
+    message = f"{title}: {body}" if body else title
     db = get_db()
     db.execute(
-        "INSERT INTO notifications (user_id, module, title, body, link, is_read, created_at) "
-        "VALUES (?, ?, ?, ?, ?, 0, ?)",
-        (user_id, module, title, body, link, now_iso()),
+        "INSERT INTO notifications (user_id, module_key, message, link_url, is_read, created_at) "
+        "VALUES (?, ?, ?, ?, 0, ?)",
+        (user_id, module, message, link, now_iso()),
     )
     if commit:
         db.commit()
