@@ -32,7 +32,7 @@ python seed.py --reset    # hapus semua tabel lalu bangun ulang dari nol (data l
 Isi seed: kategori per modul, 6 produk (2 bertipe kursus, terhubung ke kursus lewat `course_id`),
 3 kursus (15 pelajaran, 3 kuis, 15 soal; 1 kursus gratis), 5 tutorial (22 langkah dengan snippet kode),
 10 artikel (2 featured), 5 thread dengan 18 balasan, serta data contoh untuk akun demo.
-Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris tiap tabel.
+Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris setiap tabel.
 
 | Akun  | Email            | Kata sandi bawaan |
 |-------|------------------|-------------------|
