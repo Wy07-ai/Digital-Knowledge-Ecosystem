@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DKE{% endblock %} · DKE</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+  {# Kerangka sementara. base.html lengkap (Tailwind, tema, Top-Bar, toast) dibuat di Prompt 4. #}
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; color: #111827; background: #fff; }
+    nav { display: flex; gap: .5rem; flex-wrap: wrap; padding: .75rem 1rem; border-bottom: 4px solid {{ accent }}; }
+    nav a { padding: .6rem .8rem; min-height: 44px; box-sizing: border-box; color: #111827; text-decoration: none; border-radius: .375rem; }
+    nav a.active { background: {{ accent }}; color: #fff; }
+    main { padding: 1.5rem 1rem; max-width: 64rem; margin: 0 auto; }
+    .muted { color: #4B5563; }
+  </style>
+</head>
+<body>
+  <nav aria-label="Navigasi modul">
+    <a href="{{ url_for('main.index') }}" {% if not current_module %}class="active"{% endif %}>Beranda</a>
+    {% for m in MODULES %}
+      <a href="{{ url_for(m.key ~ '.index') }}" {% if current_module and current_module.key == m.key %}class="active"{% endif %}>{{ m.name }}</a>
+    {% endfor %}
+  </nav>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>

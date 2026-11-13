@@ -1,0 +1,127 @@
+"""Application factory Digital Knowledge Ecosystem (DKE)."""
+import os
+import sqlite3
+from importlib import import_module
+
+from flask import Flask, g, request, session
+
+from . import db
+
+# Daftar 6 modul. Satu modul = satu Blueprint = satu folder template.
+# "key" sama dengan nama paket Python (app/<key>/) dan nama Blueprint.
+MODULES = [
+    {"key": "infosys",   "name": "Information System", "prefix": "/infosys",   "accent": "#4F46E5"},
+    {"key": "ecommerce", "name": "E-Commerce",         "prefix": "/ecommerce", "accent": "#F59E0B"},
+    {"key": "elearning", "name": "E-Learning",         "prefix": "/elearning", "accent": "#2563EB"},
+    {"key": "etutorial", "name": "E-Tutorial",         "prefix": "/etutorial", "accent": "#7C3AED"},
+    {"key": "portal",    "name": "Portal",             "prefix": "/portal",    "accent": "#E11D48"},
+    {"key": "forum",     "name": "Forum",              "prefix": "/forum",     "accent": "#0D9488"},
+]
+MODULE_BY_KEY = {m["key"]: m for m in MODULES}
+
+# Pengaturan bawaan untuk Guest atau bila baris user_settings belum ada.
+DEFAULT_SETTINGS = {
+    "theme": "system",         # light | dark | system
+    "view_mode": "desktop",    # desktop | mobile
+    "landing_mode": "launcher",  # launcher | last_module (Smart Landing)
+    "last_module": None,
+    "last_path": None,
+}
+
+# Halaman yang tidak boleh dicatat sebagai "halaman terakhir".
+NO_TRACK_ENDPOINTS = {"infosys.login", "infosys.register", "infosys.logout"}
+
+
+def create_app(test_config=None):
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_mapping(
+        # Ganti lewat variabel lingkungan DKE_SECRET_KEY saat dipakai sungguhan.
+        SECRET_KEY=os.environ.get("DKE_SECRET_KEY", "dev-only-ganti-di-produksi"),
+        DATABASE=os.path.join(app.instance_path, "dke.db"),
+    )
+    if test_config:
+        app.config.update(test_config)
+
+    os.makedirs(app.instance_path, exist_ok=True)
+    db.init_app(app)
+
+    _register_blueprints(app)
+    _register_hooks(app)
+    return app
+
+
+def _register_blueprints(app):
+    """Daftarkan 7 blueprint: Beranda (main) + 6 modul dengan url_prefix masing-masing."""
+    from .main import bp as main_bp
+
+    app.register_blueprint(main_bp)  # Beranda di "/"
+    for module in MODULES:
+        bp = import_module(f"app.{module['key']}").bp
+        app.register_blueprint(bp, url_prefix=module["prefix"])
+
+
+def _register_hooks(app):
+    @app.before_request
+    def load_user_and_settings():
+        """Isi g.user dan g.settings untuk setiap permintaan."""
+        g.user = None
+        g.settings = dict(DEFAULT_SETTINGS)
+        if request.endpoint == "static":
+            return
+        user_id = session.get("user_id")
+        if user_id is None:  # Guest: cukup pengaturan bawaan
+            return
+        try:
+            conn = db.get_db()
+            user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+            if user is None:  # akun sudah tidak ada -> anggap Guest
+                session.pop("user_id", None)
+                return
+            g.user = user
+            row = conn.execute(
+                "SELECT * FROM user_settings WHERE user_id = ?", (user_id,)
+            ).fetchone()
+            if row is not None:
+                g.settings.update({k: row[k] for k in row.keys() if row[k] is not None})
+        except sqlite3.OperationalError:
+            # Tabel belum ada (database belum di-seed): perlakukan sebagai Guest.
+            g.user = None
+
+    @app.after_request
+    def remember_last_page(response):
+        """Simpan modul dan halaman terakhir yang dibuka Member (untuk Smart Landing)."""
+        if (
+            g.get("user") is None
+            or request.method != "GET"
+            or response.status_code != 200
+            or response.mimetype != "text/html"
+            or request.blueprint not in MODULE_BY_KEY
+            or request.endpoint in NO_TRACK_ENDPOINTS
+        ):
+            return response
+        module_key = request.blueprint
+        path = request.full_path.rstrip("?")
+        if g.settings.get("last_module") == module_key and g.settings.get("last_path") == path:
+            return response  # tidak berubah, hemat satu UPDATE
+        try:
+            conn = db.get_db()
+            conn.execute(
+                "UPDATE user_settings SET last_module = ?, last_path = ? WHERE user_id = ?",
+                (module_key, path, g.user["id"]),
+            )
+            conn.commit()
+        except sqlite3.Error:
+            app.logger.warning("Gagal menyimpan last_module/last_path", exc_info=True)
+        return response
+
+    @app.context_processor
+    def inject_globals():
+        """Variabel yang tersedia di semua template."""
+        current = MODULE_BY_KEY.get(request.blueprint)
+        return {
+            "MODULES": MODULES,
+            "current_module": current,
+            "accent": current["accent"] if current else "#475569",
+            "current_user": g.get("user"),
+            "settings": g.get("settings", DEFAULT_SETTINGS),
+        }

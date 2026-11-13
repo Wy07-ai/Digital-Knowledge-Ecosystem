@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Database lokal (dibuat ulang oleh seed.py)
+instance/*
+!instance/.gitkeep
+*.db
+*.sqlite3
+
+# Rahasia dan konfigurasi lokal
+.env
+.env.*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Pengujian
+.pytest_cache/
+.coverage
+htmlcov/
