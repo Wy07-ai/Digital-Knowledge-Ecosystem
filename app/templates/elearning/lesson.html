@@ -100,6 +100,11 @@
              aria-valuenow="{{ progress.percent }}" data-progress-bar>
           <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%" data-progress-fill></div>
         </div>
+        {% if quiz %}
+          <a href="{{ url_for('elearning.quiz', course_id=course.id) }}" class="btn btn-secondary mt-3 w-full">
+            {% if quiz.passed %}Kuis lulus · coba lagi{% elif quiz.attempts %}Coba kuis lagi{% else %}Kerjakan kuis{% endif %}
+          </a>
+        {% endif %}
         <button type="button" class="el-chapters-toggle btn btn-secondary mt-3 w-full justify-between"
                 aria-expanded="false" aria-controls="daftar-bab" data-chapters-toggle>
           <span>Daftar bab ({{ lessons|length }})</span>{{ icon('chevron-down', 'h-4 w-4') }}

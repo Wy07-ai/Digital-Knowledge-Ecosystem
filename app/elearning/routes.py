@@ -1,24 +1,26 @@
 """E-Learning: daftar kelas, detail, enroll gratis, Kelas Saya, Ruang Belajar, progres, pengaturan.
 
 Use case (Blueprint 4.x): UC-EL-01 daftar kelas, UC-EL-02 enroll kelas gratis, UC-EL-03 materi
-teks/video, UC-EL-04 tandai selesai + progres, UC-EL-07 kecepatan video dan target belajar.
+teks/video, UC-EL-04 tandai selesai + progres, UC-EL-05 mengerjakan kuis, UC-EL-06 hasil kuis +
+pembahasan, UC-EL-07 kecepatan video dan target belajar.
 
 Aturan penting:
   * progress_percent selalu DIHITUNG dari lesson_progress (tidak ada kolom persen yang disimpan).
   * Kursus hasil checkout masuk lewat tabel enrollments (source='order'), jadi otomatis tampil di
     Kelas Saya tanpa kode khusus di sini.
-  * Ruang Belajar dan API progres hanya untuk Member yang punya baris enrollments untuk kelas itu.
+  * Ruang Belajar, API progres, dan kuis hanya untuk Member yang punya baris enrollments untuk kelas itu.
+  * Kuis dinilai di server (quiz.grade). Halaman pengerjaan tidak pernah memuat kunci jawaban.
 """
 import re
 import sqlite3
 from urllib.parse import parse_qs, urlsplit
 
-from flask import (abort, current_app, flash, g, jsonify, redirect, render_template,
+from flask import (abort, current_app, flash, g, jsonify, make_response, redirect, render_template,
                    request, session, url_for)
 
 from ..db import get_db
 from ..utils import CSRF_SESSION_KEY, csrf_valid, log_activity, login_required, notify, now_iso
-from . import bp
+from . import bp, quiz as quizlib
 
 LEVELS = (("pemula", "Pemula"), ("menengah", "Menengah"), ("lanjut", "Lanjut"))
 LEVEL_LABEL = dict(LEVELS)
@@ -329,13 +331,14 @@ def course_detail(course_id):
     if course is None:
         abort(404)
     lessons = get_lessons(course_id)
-    enrolled, done_ids, progress, resume = False, set(), None, None
+    enrolled, done_ids, progress, resume, quiz = False, set(), None, None, None
     if g.user is not None:
         enrolled = get_enrollment(g.user["id"], course_id) is not None
         if enrolled:
             done_ids = completed_lesson_ids(g.user["id"], course_id)
             progress = course_progress(g.user["id"], [course_id])[course_id]
             resume = resume_lesson(lessons, done_ids)
+            quiz = quizlib.quiz_summary(get_db(), g.user["id"], course_id)
     return render_template(
         "elearning/course_detail.html",
         page_title=course["title"],
@@ -345,6 +348,7 @@ def course_detail(course_id):
         done_ids=done_ids,
         progress=progress,
         resume=resume,
+        quiz=quiz,
         format_rupiah=format_rupiah,
         format_minutes=format_minutes,
     )
@@ -491,6 +495,7 @@ def lesson(course_id, order_no):
         blocks=text_blocks(current["content_body"]),
         embed=embed,
         el_settings=get_settings(user_id),
+        quiz=quizlib.quiz_summary(get_db(), user_id, course_id),
         format_minutes=format_minutes,
         speed_label=speed_label,
     )
@@ -566,6 +571,146 @@ def api_lesson_complete(lesson_id):
     )
     resp.headers["Cache-Control"] = "no-store"
     return resp
+
+
+# --------------------------------------------------------------------------
+# Kuis: kerjakan (UC-EL-05), kumpulkan + nilai di server, hasil dan pembahasan (UC-EL-06)
+# --------------------------------------------------------------------------
+def _quiz_storage_key(user_id, quiz_id):
+    """Kunci penyimpanan jawaban sementara di browser; memuat id pengguna agar akun tidak saling timpa."""
+    return f"dke:quiz:{user_id}:{quiz_id}"
+
+
+def _quiz_context(course_id):
+    """Prasyarat semua halaman kuis: (course, quiz, None) atau (None, None, respons_redirect).
+
+    404 untuk kelas yang tidak ada; Member yang belum terdaftar dan kelas tanpa soal dialihkan ke
+    detail kelas dengan penjelasan.
+    """
+    course = get_course(course_id)
+    if course is None:
+        abort(404)
+    detail = redirect(url_for("elearning.course_detail", course_id=course_id))
+    if get_enrollment(g.user["id"], course_id) is None:
+        flash("Anda belum terdaftar di kelas ini. Ikuti kelas lebih dulu untuk mengerjakan kuis.", "error")
+        return None, None, detail
+    quiz = quizlib.get_quiz(get_db(), course_id)
+    if quiz is None or not quizlib.get_public_questions(get_db(), quiz["id"]):
+        flash("Kelas ini belum memiliki kuis.", "info")
+        return None, None, detail
+    return course, quiz, None
+
+
+def _no_store(response):
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@bp.route("/kelas/<int:course_id>/kuis")
+@login_required
+def quiz(course_id):
+    course, quiz_row, denied = _quiz_context(course_id)
+    if denied is not None:
+        return denied
+    # Hanya kolom soal dan opsi: tanpa correct_option dan explanation (lihat quizlib.get_public_questions).
+    questions = [
+        {"id": q["id"], "question": q["question"], "options": quizlib.question_options(q)}
+        for q in quizlib.get_public_questions(get_db(), quiz_row["id"])
+    ]
+    return _no_store(make_response(render_template(
+        "elearning/quiz.html",
+        page_title=quiz_row["title"],
+        course=course,
+        quiz=quiz_row,
+        questions=questions,
+        storage_key=_quiz_storage_key(g.user["id"], quiz_row["id"]),
+        summary=quizlib.quiz_summary(get_db(), g.user["id"], course_id),
+    )))
+
+
+@bp.post("/kelas/<int:course_id>/kuis/kumpul")
+@login_required
+def quiz_submit(course_id):
+    """Terima jawaban, nilai di server, simpan percobaan, lalu redirect ke hasil (Post/Redirect/Get).
+
+    Field yang dibaca hanya q_<id soal> = a|b|c|d. Field lain (mis. score, passed) diabaikan.
+    """
+    quiz_url = url_for("elearning.quiz", course_id=course_id)
+    if not csrf_valid():
+        flash(MSG_CSRF, "error")
+        return redirect(quiz_url)
+    course, quiz_row, denied = _quiz_context(course_id)
+    if denied is not None:
+        return denied
+
+    db = get_db()
+    user_id = g.user["id"]
+    questions = quizlib.get_full_questions(db, quiz_row["id"])
+    answers = {q["id"]: request.form.get(f"q_{q['id']}", "") for q in questions}
+    result = quizlib.grade(questions, answers, quiz_row["pass_score"])
+
+    taken_at = now_iso()
+    try:
+        attempt_id = quizlib.save_attempt(db, user_id, quiz_row["id"], result, taken_at)
+        detail = f"{quiz_row['title']}: skor {result['score']}"
+        if result["passed"]:
+            newly_completed = quizlib.complete_course(db, user_id, course_id, taken_at)
+            log_activity("elearning", "quiz_passed", detail, commit=False)
+            if newly_completed:
+                notify(user_id, "Kelas selesai",
+                       f"Anda lulus kuis dan menyelesaikan kelas {course['title']}.",
+                       link=url_for("elearning.course_detail", course_id=course_id),
+                       module="elearning", commit=False)
+        else:
+            log_activity("elearning", "quiz_failed", detail, commit=False)
+        db.commit()
+    except sqlite3.Error:
+        db.rollback()
+        current_app.logger.exception("Gagal menyimpan kuis user_id=%s course_id=%s", user_id, course_id)
+        flash("Jawaban belum bisa disimpan. Coba kumpulkan lagi; jawaban Anda masih tersimpan di browser.", "error")
+        return redirect(quiz_url)
+    return redirect(url_for("elearning.quiz_result", course_id=course_id, attempt_id=attempt_id))
+
+
+@bp.route("/kelas/<int:course_id>/kuis/hasil/<int:attempt_id>")
+@login_required
+def quiz_result(course_id, attempt_id):
+    course, quiz_row, denied = _quiz_context(course_id)
+    if denied is not None:
+        return denied
+    db = get_db()
+    attempt = quizlib.get_attempt(db, g.user["id"], course_id, attempt_id)
+    if attempt is None:  # tidak ada, atau milik pengguna lain: sama-sama 404
+        abort(404)
+
+    questions = quizlib.get_full_questions(db, attempt["quiz_id"])
+    graded = quizlib.grade(questions, quizlib.answers_from_json(attempt["answers_json"]), attempt["pass_score"])
+    by_id = {q["id"]: q for q in questions}
+    review = []
+    for number, item in enumerate(graded["results"], start=1):
+        q = by_id[item["question_id"]]
+        review.append({
+            "number": number,
+            "question": q["question"],
+            "options": quizlib.question_options(q),
+            "chosen": item["chosen"],
+            "correct_option": item["correct_option"],
+            "is_correct": item["is_correct"],
+            "answered": item["answered"],
+            "explanation": q["explanation"],
+        })
+    return _no_store(make_response(render_template(
+        "elearning/quiz_result.html",
+        page_title=f"Hasil {attempt['quiz_title']}",
+        course=course,
+        attempt=attempt,
+        passed=bool(attempt["passed"]),
+        correct=graded["correct"],
+        total=graded["total"],
+        review=review,
+        storage_key=_quiz_storage_key(g.user["id"], attempt["quiz_id"]),
+        taken_at=attempt["taken_at"],
+    )))
 
 
 # --------------------------------------------------------------------------

@@ -1,0 +1,81 @@
+{% extends "elearning/layout_elearning.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}{{ quiz.title }} · {{ course.title }}{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{# Halaman pengerjaan kuis (UC-EL-05).
+   Penting: halaman ini TIDAK menerima correct_option maupun explanation. Kunci jawaban baru
+   dikirim server setelah kuis dikumpulkan (halaman hasil).
+   Tanpa JavaScript semua soal tampil berurutan dalam satu formulir biasa dan tetap bisa dikumpulkan;
+   quiz.js mengubahnya menjadi satu soal per layar. #}
+{% block module_content %}
+  {% set total = questions|length %}
+  <form method="post" action="{{ url_for('elearning.quiz_submit', course_id=course.id) }}"
+        class="el-quiz" data-quiz data-storage-key="{{ storage_key }}" data-total="{{ total }}" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <header class="mb-5">
+      <p class="text-sm font-semibold uppercase tracking-wide el-text">{{ course.title }}</p>
+      <h1 class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{{ quiz.title }}</h1>
+      <p class="mt-1 text-sm text-muted">
+        {{ total }} soal · nilai minimal lulus {{ quiz.pass_score }}
+        {% if summary and summary.attempts %}· percobaan sebelumnya: {{ summary.attempts }}, nilai terbaik {{ summary.best_score }}{% endif %}
+      </p>
+    </header>
+
+    {# Indikator nomor: ditampilkan JS (tanpa JS tidak berguna karena semua soal sudah terlihat) #}
+    <nav class="el-qnav" aria-label="Nomor soal" data-qnav hidden>
+      <ol>
+        {% for q in questions %}
+          <li><button type="button" class="el-qdot" data-goto="{{ loop.index0 }}" aria-label="Soal {{ loop.index }}">{{ loop.index }}</button></li>
+        {% endfor %}
+      </ol>
+    </nav>
+    <p class="mt-3 text-sm font-semibold" data-answered-text aria-live="polite" hidden></p>
+
+    <div class="mt-4 space-y-4">
+      {% for q in questions %}
+        <fieldset class="el-q" data-q data-qid="{{ q.id }}" tabindex="-1">
+          <legend class="el-q-legend">
+            <span class="el-q-number">Soal {{ loop.index }} dari {{ total }}</span>
+            <span class="el-q-text">{{ q.question }}</span>
+          </legend>
+          <div class="el-opts">
+            {% for key, text in q.options %}
+              <label class="el-opt">
+                <input type="radio" name="q_{{ q.id }}" value="{{ key }}">
+                <span class="el-opt-key" aria-hidden="true">{{ key|upper }}</span>
+                <span class="el-opt-text"><span class="sr-only">Pilihan {{ key|upper }}: </span>{{ text }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+      {% endfor %}
+    </div>
+
+    {# Kontrol satu-per-satu (JS). Cadangan tanpa JS: tombol kumpulkan biasa di bawah. #}
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5" data-controls hidden>
+      <button type="button" class="btn btn-secondary" data-prev>{{ icon('arrow-left', 'h-4 w-4') }}<span>Sebelumnya</span></button>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" class="el-btn" data-next><span>Selanjutnya</span>{{ icon('chevron-right', 'h-4 w-4') }}</button>
+        <button type="submit" class="el-btn" data-finish hidden>{{ icon('check', 'h-5 w-5') }}<span>Kumpulkan</span></button>
+      </div>
+    </div>
+    <div class="mt-6 border-t border-line pt-5" data-fallback>
+      <button type="submit" class="el-btn">{{ icon('check', 'h-5 w-5') }}<span>Kumpulkan jawaban</span></button>
+    </div>
+
+    {# Dialog konfirmasi bila ada soal kosong #}
+    <dialog class="el-dialog" data-confirm aria-labelledby="judul-konfirmasi">
+      <h2 id="judul-konfirmasi" class="text-lg font-bold">Masih ada soal yang kosong</h2>
+      <p class="mt-2 text-sm" data-confirm-text></p>
+      <p class="mt-2 text-sm text-muted">Soal yang tidak dijawab dihitung salah, dan kuis yang sudah dikumpulkan tidak bisa diubah.</p>
+      <div class="mt-5 flex flex-wrap justify-end gap-3">
+        <button type="button" class="btn btn-secondary" data-confirm-back>Periksa lagi</button>
+        <button type="button" class="el-btn" data-confirm-submit>Kumpulkan sekarang</button>
+      </div>
+    </dialog>
+  </form>
+{% endblock %}
+{% block scripts_extra %}
+  <script src="{{ url_for('static', filename='js/quiz.js') }}" defer></script>
+{% endblock %}
