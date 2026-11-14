@@ -1,8 +1,59 @@
 {% extends "etutorial/layout_etutorial.html" %}
 {% from "_components/empty_state.html" import empty_state %}
-{% block title %}E-Tutorial{% endblock %}
+{% from "etutorial/_tutorial_card.html" import tutorial_card with context %}
+{% block title %}Daftar Tutorial{% endblock %}
 {% block module_content %}
-  <h1 class="text-2xl font-bold">E-Tutorial</h1>
-  <p class="mt-1 text-muted">{{ current_module.desc }}</p>
-  {{ empty_state('Halaman ini sedang disiapkan', 'Konten modul E-Tutorial dibangun pada fase berikutnya.', 'Kembali ke Beranda', url_for('main.index')) }}
+  <header class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide et-text">E-Tutorial</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Daftar Tutorial</h1>
+    <p class="mt-1 text-muted">{{ current_module.desc }}</p>
+  </header>
+
+  {# Filter: tautan biasa (tanpa JS). Tiap tombol mempertahankan filter lain yang sedang aktif. #}
+  <div class="mb-6 space-y-4">
+    <nav aria-label="Filter kategori">
+      <p class="mb-2 text-sm font-semibold">Kategori</p>
+      <div class="flex flex-wrap gap-2">
+        <a href="{{ url_for('etutorial.index', tingkat=difficulty) }}" class="et-pill {{ 'is-active' if not category }}"
+           {% if not category %}aria-current="true"{% endif %}>Semua kategori <span class="et-count">({{ all_cat_count }})</span></a>
+        {% for c in categories %}
+          <a href="{{ url_for('etutorial.index', kategori=c.slug, tingkat=difficulty) }}" class="et-pill {{ 'is-active' if category == c.slug }}"
+             {% if category == c.slug %}aria-current="true"{% endif %}>{{ c.name }} <span class="et-count">({{ cat_counts[c.slug] }})</span></a>
+        {% endfor %}
+      </div>
+    </nav>
+    <nav aria-label="Filter tingkat kesulitan">
+      <p class="mb-2 text-sm font-semibold">Tingkat kesulitan</p>
+      <div class="flex flex-wrap gap-2">
+        <a href="{{ url_for('etutorial.index', kategori=category) }}" class="et-pill {{ 'is-active' if not difficulty }}"
+           {% if not difficulty %}aria-current="true"{% endif %}>Semua tingkat <span class="et-count">({{ all_diff_count }})</span></a>
+        {% for key, label in difficulties %}
+          <a href="{{ url_for('etutorial.index', kategori=category, tingkat=key) }}" class="et-pill {{ 'is-active' if difficulty == key }}"
+             {% if difficulty == key %}aria-current="true"{% endif %}>{{ label }} <span class="et-count">({{ diff_counts[key] }})</span></a>
+        {% endfor %}
+      </div>
+    </nav>
+    {% if category or difficulty %}
+      <p><a href="{{ url_for('etutorial.index') }}" class="text-sm font-semibold et-text underline underline-offset-2">Atur ulang filter</a></p>
+    {% endif %}
+  </div>
+
+  {% if unknown_filter %}
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">
+      Sebagian filter tidak dikenal, jadi diabaikan.
+    </p>
+  {% endif %}
+
+  {% if tutorials %}
+    <p class="mb-3 text-sm text-muted" aria-live="polite">Menampilkan {{ tutorials|length }} dari {{ total_count }} tutorial.</p>
+    <div class="card-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {% for t in tutorials %}
+        {{ tutorial_card(t, saved=t.id in saved_ids) }}
+      {% endfor %}
+    </div>
+  {% elif total_count %}
+    {{ empty_state('Tidak ada tutorial yang cocok', 'Coba kategori atau tingkat lain, atau atur ulang filter.', 'Atur ulang filter', url_for('etutorial.index'), 'filter') }}
+  {% else %}
+    {{ empty_state('Belum ada tutorial', 'Tutorial baru akan muncul di sini. Sementara itu, jelajahi modul lain.', 'Kembali ke Beranda', url_for('main.index')) }}
+  {% endif %}
 {% endblock %}

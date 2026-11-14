@@ -1,0 +1,129 @@
+{% extends "etutorial/layout_etutorial.html" %}
+{% from "_components/_icons.html" import icon %}
+{% from "_components/empty_state.html" import empty_state %}
+{# Halaman tutorial satu kolom. SEMUA teks dari database (judul, isi, kode, bahasa) dicetak dengan
+   {{ ... }} sehingga di-escape otomatis oleh Jinja. Jangan pernah menonaktifkan escape di halaman ini. #}
+{% block title %}{{ tutorial.title }}{% if step %} · Step {{ current }}{% endif %}{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{% block scripts_extra %}
+  <script defer src="{{ url_for('static', filename='js/copy.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/etutorial.js') }}"></script>
+{% endblock %}
+
+{% block module_content %}
+<div class="et-reader" data-et-reader data-font="{{ font }}">
+
+  <header class="mb-6">
+    <div class="flex flex-wrap items-center gap-2">
+      {% if tutorial.category_name %}<span class="et-badge">{{ tutorial.category_name }}</span>{% endif %}
+      <span class="et-badge et-badge-diff">{{ tutorial.difficulty_label }}</span>
+      {% if tutorial.est_minutes %}
+        <span class="inline-flex items-center gap-1.5 text-sm text-muted">{{ icon('clock', 'h-4 w-4') }}Estimasi {{ format_minutes(tutorial.est_minutes) }}</span>
+      {% endif %}
+    </div>
+    <h1 class="et-title mt-3 font-bold tracking-tight">{{ tutorial.title }}</h1>
+    {% if tutorial.summary %}<p class="et-lead mt-2 text-muted">{{ tutorial.summary }}</p>{% endif %}
+
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      {% if current_user %}
+        <form method="post" action="{{ url_for('etutorial.bookmark', slug=tutorial.slug) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="{{ 'remove' if bookmarked else 'add' }}">
+          <input type="hidden" name="next" value="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=current or 1) }}">
+          <button type="submit" class="btn btn-secondary" {% if bookmarked %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+            {{ icon('bookmark', 'h-5 w-5') }}{{ 'Hapus dari Tersimpan' if bookmarked else 'Simpan tutorial' }}
+          </button>
+        </form>
+      {% else %}
+        <a href="{{ login_url() }}" class="btn btn-secondary">{{ icon('bookmark', 'h-5 w-5') }}Masuk untuk menyimpan</a>
+      {% endif %}
+      <a href="{{ url_for('etutorial.settings') }}" class="text-sm font-semibold et-text underline underline-offset-2">
+        Ukuran font: {{ {'sm': 'Kecil', 'md': 'Sedang', 'lg': 'Besar'}[font] }} · Ubah
+      </a>
+    </div>
+  </header>
+
+  {% if step %}
+    {# ---- Stepper: Step 1..n + indikator ---- #}
+    <nav class="et-stepper mb-6" aria-label="Langkah tutorial">
+      <div class="flex items-baseline justify-between gap-3">
+        <p class="et-stepcount font-semibold" aria-live="polite">Step {{ current }} dari {{ total }}</p>
+        <p class="text-sm text-muted">{{ percent }}%</p>
+      </div>
+      <div class="et-progress mt-2" role="progressbar" aria-label="Posisi langkah"
+           aria-valuemin="1" aria-valuemax="{{ total }}" aria-valuenow="{{ current }}"
+           aria-valuetext="Step {{ current }} dari {{ total }}">
+        <div class="et-progress-fill" style="width: {{ percent }}%"></div>
+      </div>
+      <ol class="et-dots mt-3" data-et-dots>
+        {% for s in steps %}
+          {% set n = loop.index %}
+          <li>
+            <a href="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=n) }}"
+               class="et-dot {{ 'is-current' if n == current }}{{ ' is-done' if n < current }}"
+               {% if n == current %}aria-current="step"{% endif %}
+               aria-label="Step {{ n }}: {{ s.title }}{{ ' (sudah dilewati)' if n < current }}">
+              {% if n < current %}{{ icon('check', 'h-4 w-4') }}<span class="sr-only">{{ n }}</span>{% else %}{{ n }}{% endif %}
+            </a>
+          </li>
+        {% endfor %}
+      </ol>
+    </nav>
+
+    {# ---- Isi langkah ---- #}
+    <article class="et-step rounded-xl border border-line bg-surface shadow-sm" aria-labelledby="langkah-judul">
+      <p class="et-step-label font-semibold et-text">Step {{ current }}</p>
+      <h2 id="langkah-judul" class="et-step-title mt-1 font-bold leading-snug">{{ step.title }}</h2>
+
+      <div class="et-body mt-3">
+        {% for para in step.paragraphs %}<p>{{ para }}</p>{% endfor %}
+      </div>
+
+      {% if step.code_snippet %}
+        <figure class="et-code mt-5">
+          <figcaption class="et-code-head">
+            <span class="et-code-lang">{{ step.language or 'kode' }}</span>
+            <button type="button" class="et-copy" data-copy-target="kode-{{ current }}"
+                    aria-label="Salin kode Step {{ current }}">
+              {{ icon('copy', 'h-4 w-4') }}<span data-copy-label>Salin</span>
+            </button>
+          </figcaption>
+          <pre tabindex="0" role="region" aria-label="Kode Step {{ current }}"><code id="kode-{{ current }}"{% if step.language %} class="language-{{ step.language }}"{% endif %}>{{ step.code_snippet }}</code></pre>
+        </figure>
+      {% endif %}
+    </article>
+
+    {# ---- Sebelumnya / Berikutnya ---- #}
+    <div class="et-nav-row mt-6">
+      {% if current > 1 %}
+        <a href="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=current - 1) }}" class="btn btn-secondary et-nav-btn" data-et-prev rel="prev">
+          {{ icon('arrow-left', 'h-5 w-5') }}Sebelumnya
+        </a>
+      {% else %}
+        <button type="button" class="btn btn-secondary et-nav-btn" disabled>{{ icon('arrow-left', 'h-5 w-5') }}Sebelumnya</button>
+      {% endif %}
+      {% if current < total %}
+        <a href="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=current + 1) }}" class="et-btn et-nav-btn" data-et-next rel="next">
+          Berikutnya{{ icon('arrow-right', 'h-5 w-5') }}
+        </a>
+      {% else %}
+        <a href="{{ url_for('etutorial.index') }}" class="et-btn et-nav-btn">Selesai{{ icon('check', 'h-5 w-5') }}</a>
+      {% endif %}
+    </div>
+
+    {% if current == total %}
+      <section class="et-done mt-6 rounded-xl border border-line bg-surface p-5" aria-labelledby="selesai-judul">
+        <h2 id="selesai-judul" class="font-bold">Tutorial selesai</h2>
+        <p class="mt-1 text-muted">Anda sudah sampai di langkah terakhir. Coba ulangi dari nol tanpa menyalin kode untuk memastikan Anda benar-benar paham.</p>
+        <p class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold">
+          <a class="et-text underline underline-offset-2" href="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=1) }}">Ulangi dari Step 1</a>
+          <a class="et-text underline underline-offset-2" href="{{ url_for('etutorial.index') }}">Tutorial lainnya</a>
+          {% if current_user %}<a class="et-text underline underline-offset-2" href="{{ url_for('etutorial.saved') }}">Buka Tersimpan</a>{% endif %}
+        </p>
+      </section>
+    {% endif %}
+  {% else %}
+    {{ empty_state('Tutorial ini belum punya langkah', 'Langkah-langkahnya sedang disiapkan. Coba tutorial lain dulu.', 'Kembali ke daftar', url_for('etutorial.index'), 'inbox') }}
+  {% endif %}
+</div>
+{% endblock %}

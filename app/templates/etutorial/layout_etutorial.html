@@ -1,5 +1,18 @@
 {% extends "base.html" %}
-{# Layout modul E-Tutorial. Sidebar/tab khusus modul ditambahkan di prompt berikutnya. #}
+{# Layout modul E-Tutorial: tab modul (Daftar Tutorial, Tersimpan, Pengaturan) + aksen violet #7C3AED.
+   Halaman tutorial satu kolom mempersempit lebar lewat blok main_class (lihat tutorial.html). #}
 {% block content %}
+  {% set ep = request.endpoint %}
+  <nav class="mb-6 flex flex-wrap gap-2 border-b border-line pb-3" aria-label="Navigasi E-Tutorial">
+    <a href="{{ url_for('etutorial.index') }}"
+       class="et-nav-link {% if ep in ('etutorial.index', 'etutorial.tutorial') %}is-active{% endif %}"
+       {% if ep in ('etutorial.index', 'etutorial.tutorial') %}aria-current="page"{% endif %}>Daftar Tutorial</a>
+    <a href="{{ url_for('etutorial.saved') }}"
+       class="et-nav-link {% if ep == 'etutorial.saved' %}is-active{% endif %}"
+       {% if ep == 'etutorial.saved' %}aria-current="page"{% endif %}>Tersimpan</a>
+    <a href="{{ url_for('etutorial.settings') }}"
+       class="et-nav-link {% if ep == 'etutorial.settings' %}is-active{% endif %}"
+       {% if ep == 'etutorial.settings' %}aria-current="page"{% endif %}>Pengaturan</a>
+  </nav>
   {% block module_content %}{% endblock %}
 {% endblock %}
