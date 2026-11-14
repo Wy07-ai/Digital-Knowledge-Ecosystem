@@ -59,6 +59,23 @@ konfirmasi serta riwayat pesanan, dan pengaturan alamat/metode pembayaran favori
 Checkout menyimpan pesanan, item, enrollment kursus, notifikasi, dan log dalam satu
 transaksi database. Alur ini tercakup dalam `python -m unittest tests.test_ecommerce`.
 
+E-Learning (bagian 1) menyediakan daftar kelas dengan filter level, detail kelas, enroll kelas gratis,
+Kelas Saya, Ruang Belajar (materi teks atau embed video + sidebar daftar bab), tombol Tandai Selesai
+tanpa reload (progress bar bertransisi 300 ms), navigasi materi sebelumnya/berikutnya, serta tab
+Pengaturan (kecepatan video, target belajar). `progress_percent` selalu dihitung dari `lesson_progress`;
+kursus hasil checkout (`enrollments.source = 'order'`) langsung tampil di Kelas Saya; Ruang Belajar dan API
+progres menolak pengguna yang belum terdaftar. Kuis (UC-EL-05/06) menyusul di bagian 2.
+Uji: `python -m unittest tests.test_elearning`; panduan manual: `docs/UJI_MANUAL_ELEARNING.md`.
+
+| Rute E-Learning | Fungsi |
+|-----------------|--------|
+| `/elearning/` (`?level=`) | Daftar kelas (UC-EL-01) |
+| `/elearning/kelas/<id>` | Detail kelas; tombol enroll gratis (UC-EL-02) |
+| `/elearning/kelas-saya` | Kelas Saya + target belajar hari ini |
+| `/elearning/kelas/<id>/materi/<no>` | Ruang Belajar (UC-EL-03), hanya peserta terdaftar |
+| `POST /elearning/api/materi/<id>/selesai` | Tandai/batalkan selesai (UC-EL-04), JSON + token CSRF |
+| `/elearning/pengaturan` | Kecepatan video dan target belajar (UC-EL-07) |
+
 ## Struktur folder
 
 ```

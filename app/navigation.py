@@ -75,6 +75,12 @@ node("infosys.activity", "Log Aktivitas", parent="infosys.index")
 node("infosys.stats", "Statistik Lintas Modul", parent="infosys.index")
 node("infosys.security", "Pengaturan Keamanan", parent="infosys.index")
 
+# E-Learning: E-Learning > <judul kelas> > Materi N: <judul materi>
+node("elearning.course_detail", _course_title, parent="elearning.index")
+node("elearning.lesson", _lesson_title, parent="elearning.course_detail")
+node("elearning.my_courses", "Kelas Saya", parent="elearning.index")
+node("elearning.settings", "Pengaturan", parent="elearning.index")
+
 # Contoh halaman bersarang 3 jenjang (halaman uji /dev/ui-test, hanya bila UI_TEST_PAGE aktif):
 #   E-Learning > <judul kelas> > Materi N: <judul materi>
 node("main.nav_demo_course", _course_title, parent="elearning.index")

@@ -1,0 +1,45 @@
+{% extends "elearning/layout_elearning.html" %}
+{% block title %}Pengaturan E-Learning{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide el-text">E-Learning</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Pengaturan E-Learning</h1>
+    <p class="mt-1 text-muted">Atur kecepatan putar video dan target belajar harian Anda. Perubahan berlaku mulai materi berikutnya.</p>
+  </header>
+
+  <form method="post" action="{{ url_for('elearning.settings') }}" novalidate
+        class="max-w-2xl rounded-xl border border-line bg-surface p-6 shadow-sm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <fieldset aria-describedby="{{ 'speed-error' if errors.get('playback_speed') else 'speed-help' }}">
+      <legend class="text-sm font-semibold">Kecepatan video</legend>
+      <div class="mt-2 flex flex-wrap gap-2" role="radiogroup">
+        {% for s in speeds %}
+          <label class="cursor-pointer">
+            <input type="radio" name="playback_speed" value="{{ s }}" class="peer sr-only" {% if values.speed == s %}checked{% endif %}>
+            <span class="el-pill peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#2563EB]">{{ speed_label(s) }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {% if errors.get('playback_speed') %}
+        <p id="speed-error" class="mt-2 text-sm font-medium text-red-700 dark:text-red-300">{{ errors.playback_speed }}</p>
+      {% else %}
+        <p id="speed-help" class="mt-2 text-sm text-muted">Dipakai di pemutar video Ruang Belajar. Pemutar yang tidak mendukung pengaturan ini tetap memakai kecepatan normal.</p>
+      {% endif %}
+    </fieldset>
+
+    <label for="daily-goal" class="mt-6 block text-sm font-semibold">Target belajar (menit per hari)</label>
+    <input id="daily-goal" type="number" name="daily_goal_min" inputmode="numeric"
+           min="{{ goal_min }}" max="{{ goal_max }}" step="{{ goal_step }}" value="{{ values.goal }}" required
+           aria-invalid="{{ 'true' if errors.get('daily_goal_min') else 'false' }}"
+           aria-describedby="{{ 'goal-error' if errors.get('daily_goal_min') else 'goal-help' }}"
+           class="mt-1 w-40 rounded-lg border border-line bg-page px-3 py-2 text-ink">
+    {% if errors.get('daily_goal_min') %}
+      <p id="goal-error" class="mt-1 text-sm font-medium text-red-700 dark:text-red-300">{{ errors.daily_goal_min }}</p>
+    {% else %}
+      <p id="goal-help" class="mt-1 text-sm text-muted">{{ goal_min }}–{{ goal_max }} menit. Menit belajar dihitung dari durasi materi yang Anda tandai selesai hari ini.</p>
+    {% endif %}
+
+    <button type="submit" class="el-btn mt-6">Simpan pengaturan</button>
+  </form>
+{% endblock %}

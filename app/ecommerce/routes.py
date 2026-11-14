@@ -577,10 +577,16 @@ def order_detail(order_code):
         "WHERE oi.order_id = ? ORDER BY oi.id",
         (order["id"],),
     ).fetchall()
+    has_course = db.execute(
+        "SELECT 1 FROM order_items oi JOIN products p ON p.id = oi.product_id "
+        "WHERE oi.order_id = ? AND p.product_type = 'course' AND p.course_id IS NOT NULL LIMIT 1",
+        (order["id"],),
+    ).fetchone() is not None
     return render_template(
         "ecommerce/order_detail.html",
         page_title="Konfirmasi Pesanan",
         order=order,
         items=items,
+        has_course=has_course,
         payment_label=_payment_label(order["payment_method"]),
     )

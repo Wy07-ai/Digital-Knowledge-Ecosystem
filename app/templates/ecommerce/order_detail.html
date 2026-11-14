@@ -43,7 +43,8 @@
         <span class="ecommerce-price text-lg font-bold">{{ order.total|rupiah }}</span>
       </div>
       <div class="mt-7 flex flex-wrap gap-3">
-        <a href="{{ url_for('ecommerce.orders') }}" class="btn ecom-button">Pesanan Saya</a>
+        {% if has_course %}<a href="{{ url_for('elearning.my_courses') }}" class="btn ecom-button">Mulai belajar di Kelas Saya</a>{% endif %}
+        <a href="{{ url_for('ecommerce.orders') }}" class="btn {{ 'btn-secondary' if has_course else 'ecom-button' }}">Pesanan Saya</a>
         <a href="{{ url_for('ecommerce.index') }}" class="btn btn-secondary">Kembali ke katalog</a>
       </div>
     </div>

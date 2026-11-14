@@ -1,0 +1,51 @@
+{# Kartu kelas. Parameter: course, enrolled (bool), prog (dict|None). #}
+{% from "_components/_icons.html" import icon %}
+{% macro course_card(course, enrolled=False, prog=None, resume_url=None) -%}
+<article class="el-card flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+  <div class="el-cover">
+    {% if course.thumbnail_url and course.thumbnail_url.startswith('https://') %}
+      <img src="{{ course.thumbnail_url }}" alt="" loading="lazy">
+    {% endif %}
+    <span class="flex items-center gap-2 text-sm font-semibold">
+      {{ icon('elearning', 'h-5 w-5') }}{{ course.category_name or 'Kelas' }}
+    </span>
+  </div>
+  <div class="flex flex-1 flex-col p-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="el-badge">{{ course.level_label }}</span>
+      {% if course.is_free %}<span class="el-badge el-badge-free">Gratis</span>
+      {% else %}<span class="el-badge el-badge-paid">{{ format_rupiah(course.price) }}</span>{% endif %}
+    </div>
+    <h2 class="mt-2 text-lg font-bold leading-snug">
+      <a href="{{ url_for('elearning.course_detail', course_id=course.id) }}" class="hover:underline">{{ course.title }}</a>
+    </h2>
+    {% if course.instructor_name %}<p class="mt-0.5 text-sm text-muted">{{ course.instructor_name }}</p>{% endif %}
+    <p class="mt-2 text-sm text-muted">
+      {{ course.lesson_count }} materi{% if course.total_minutes %} · {{ format_minutes(course.total_minutes) }}{% endif %}
+    </p>
+
+    {% if prog %}
+      <div class="mt-3">
+        <div class="flex justify-between text-xs font-semibold text-muted">
+          <span>{{ prog.done }} dari {{ prog.total }} materi</span><span>{{ prog.percent }}%</span>
+        </div>
+        <div class="el-progress mt-1" role="progressbar" aria-label="Progres {{ course.title }}"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ prog.percent }}">
+          <div class="el-progress-fill{{ ' is-complete' if prog.percent >= 100 }}" style="width: {{ prog.percent }}%"></div>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="mt-auto flex flex-wrap gap-2 pt-4">
+      {% if resume_url %}
+        <a href="{{ resume_url }}" class="el-btn">
+          {% if prog and prog.percent >= 100 %}Tinjau ulang{% elif prog and prog.done %}Lanjutkan belajar{% else %}Mulai belajar{% endif %}
+        </a>
+      {% elif enrolled %}
+        <a href="{{ url_for('elearning.course_detail', course_id=course.id) }}" class="el-btn">Buka kelas</a>
+      {% endif %}
+      <a href="{{ url_for('elearning.course_detail', course_id=course.id) }}" class="btn btn-secondary">Detail kelas</a>
+    </div>
+  </div>
+</article>
+{%- endmacro %}

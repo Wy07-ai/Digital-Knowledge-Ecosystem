@@ -1,0 +1,35 @@
+{% extends "elearning/layout_elearning.html" %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "elearning/_course_card.html" import course_card with context %}
+{% block title %}Kelas Saya{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide el-text">E-Learning</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Kelas Saya</h1>
+    <p class="mt-1 text-muted">Kelas gratis yang Anda ikuti dan kursus hasil pembelian muncul di sini.</p>
+  </header>
+
+  <section class="mb-6 rounded-xl border border-line bg-surface p-4 shadow-sm" aria-label="Target belajar hari ini">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h2 class="font-bold">Target belajar hari ini</h2>
+      <a href="{{ url_for('elearning.settings') }}" class="text-sm font-semibold el-text underline underline-offset-2">Ubah target</a>
+    </div>
+    <p class="mt-1 text-sm text-muted">
+      {% if studied >= goal %}Target tercapai. Kerja bagus!
+      {% else %}{{ studied }} dari {{ goal }} menit. Tandai materi selesai untuk menambah menit belajar.{% endif %}
+    </p>
+    <div class="el-progress mt-2" role="progressbar" aria-label="Target belajar harian" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ goal_percent }}">
+      <div class="el-progress-fill{{ ' is-complete' if goal_percent >= 100 }}" style="width: {{ goal_percent }}%"></div>
+    </div>
+  </section>
+
+  {% if courses %}
+    <div class="card-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {% for course in courses %}
+        {{ course_card(course, enrolled=True, prog=progress[course.id], resume_url=resume_urls[course.id]) }}
+      {% endfor %}
+    </div>
+  {% else %}
+    {{ empty_state('Belum mengikuti kelas', 'Pilih kelas gratis di Daftar Kelas, atau beli kursus lewat E-Commerce.', 'Lihat daftar kelas', url_for('elearning.index'), 'elearning') }}
+  {% endif %}
+{% endblock %}

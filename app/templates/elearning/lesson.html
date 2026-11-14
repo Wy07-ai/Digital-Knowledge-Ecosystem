@@ -1,0 +1,127 @@
+{% extends "elearning/layout_elearning.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}{{ current.title }} · {{ course.title }}{% endblock %}
+{% block main_class %}max-w-7xl{% endblock %}
+{% block module_content %}
+  {% set is_done = current.id in done_ids %}
+  <div class="el-room" data-room
+       data-csrf="{{ csrf_token() }}"
+       data-api="{{ url_for('elearning.api_lesson_complete', lesson_id=current.id) }}"
+       data-lesson-id="{{ current.id }}"
+       data-speed="{{ el_settings.speed }}">
+
+    {# ---------- Konten utama ---------- #}
+    <article class="el-main" aria-labelledby="judul-materi">
+      <header class="mb-4">
+        <p class="text-sm font-semibold el-text">Materi {{ position }} dari {{ lessons|length }} · {{ 'Video' if current.content_type == 'video' else 'Bacaan' }}{% if current.duration_min %} · {{ current.duration_min }} mnt{% endif %}</p>
+        <h1 id="judul-materi" class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{{ current.title }}</h1>
+      </header>
+
+      <div class="mb-6" aria-label="Progres kelas">
+        <div class="flex justify-between text-sm font-semibold">
+          <span>Progres kelas</span>
+          <span data-progress-text>{{ progress.done }} dari {{ progress.total }} materi · {{ progress.percent }}%</span>
+        </div>
+        <div class="el-progress mt-1" role="progressbar" aria-label="Progres kelas" aria-valuemin="0" aria-valuemax="100"
+             aria-valuenow="{{ progress.percent }}" data-progress-bar>
+          <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%" data-progress-fill></div>
+        </div>
+      </div>
+
+      {% if current.content_type == 'video' %}
+        {% if embed %}
+          <div class="el-video">
+            {% if embed.kind == 'file' %}
+              <video controls preload="metadata" playsinline src="{{ embed.src }}" data-player aria-label="{{ current.title }}"></video>
+            {% else %}
+              <iframe src="{{ embed.src }}" title="Video: {{ current.title }}" loading="lazy" allowfullscreen
+                      allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen"
+                      referrerpolicy="strict-origin-when-cross-origin" data-player-frame="{{ embed.kind }}"></iframe>
+            {% endif %}
+          </div>
+          <p class="mt-2 text-sm text-muted">Kecepatan putar: {{ speed_label(el_settings.speed) }}.
+            <a href="{{ url_for('elearning.settings') }}" class="font-semibold el-text underline underline-offset-2">Ubah di Pengaturan</a></p>
+        {% else %}
+          <div class="rounded-xl border border-dashed border-line bg-surface p-6 text-center" role="status">
+            <p class="font-semibold">Video belum bisa ditampilkan.</p>
+            <p class="mt-1 text-sm text-muted">Tautan video materi ini tidak didukung atau belum diisi. Anda tetap bisa melanjutkan ke materi berikutnya.</p>
+          </div>
+        {% endif %}
+      {% endif %}
+
+      {% if blocks %}
+        <div class="el-prose {{ 'mt-6' if current.content_type == 'video' }}">
+          {% if current.content_type == 'video' %}<h2 class="mb-3 text-lg font-bold">Catatan materi</h2>{% endif %}
+          {% for b in blocks %}
+            {% if b.type == 'code' %}<pre tabindex="0"><code>{{ b.text }}</code></pre>
+            {% else %}<p>{{ b.text }}</p>{% endif %}
+          {% endfor %}
+        </div>
+      {% elif current.content_type != 'video' %}
+        <p class="text-muted">Isi materi belum tersedia.</p>
+      {% endif %}
+
+      {# ---------- Aksi: sebelumnya / tandai selesai / berikutnya ---------- #}
+      <div class="mt-8 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
+        {% if prev_lesson %}
+          <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=prev_lesson.order_no) }}" class="btn btn-secondary" rel="prev">
+            {{ icon('arrow-left', 'h-4 w-4') }}<span>Sebelumnya<span class="dke-hide-mobile">: {{ prev_lesson.title|truncate(28) }}</span></span>
+          </a>
+        {% else %}
+          <span class="btn btn-secondary" aria-disabled="true">{{ icon('arrow-left', 'h-4 w-4') }}Sebelumnya</span>
+        {% endif %}
+
+        <button type="button" data-complete-btn aria-pressed="{{ 'true' if is_done else 'false' }}"
+                class="el-btn{{ ' is-done' if is_done }}">
+          {{ icon('check', 'h-5 w-5') }}
+          <span data-complete-label>{{ 'Selesai · Batalkan' if is_done else 'Tandai Selesai' }}</span>
+        </button>
+
+        {% if next_lesson %}
+          <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=next_lesson.order_no) }}"
+             class="{{ 'el-btn' if is_done else 'btn btn-secondary' }}" rel="next" data-next-btn>
+            <span>Berikutnya<span class="dke-hide-mobile">: {{ next_lesson.title|truncate(28) }}</span></span>{{ icon('chevron-right', 'h-4 w-4') }}
+          </a>
+        {% else %}
+          <span class="btn btn-secondary" aria-disabled="true">Ini materi terakhir</span>
+        {% endif %}
+      </div>
+      <p class="mt-3 text-sm font-medium text-emerald-800 dark:text-emerald-300" data-complete-banner {% if progress.percent < 100 %}hidden{% endif %}>
+        Semua materi kelas ini sudah selesai. Kerja bagus!
+      </p>
+    </article>
+
+    {# ---------- Sidebar daftar bab ---------- #}
+    <aside class="el-side rounded-xl border border-line bg-surface shadow-sm" data-chapters data-collapsed="true" aria-label="Daftar bab">
+      <div class="border-b border-line p-4">
+        <a href="{{ url_for('elearning.course_detail', course_id=course.id) }}" class="font-bold leading-snug hover:underline">{{ course.title }}</a>
+        <p class="mt-1 text-xs text-muted" data-progress-text>{{ progress.done }} dari {{ progress.total }} materi · {{ progress.percent }}%</p>
+        <div class="el-progress mt-2" role="progressbar" aria-label="Progres kelas" aria-valuemin="0" aria-valuemax="100"
+             aria-valuenow="{{ progress.percent }}" data-progress-bar>
+          <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%" data-progress-fill></div>
+        </div>
+        <button type="button" class="el-chapters-toggle btn btn-secondary mt-3 w-full justify-between"
+                aria-expanded="false" aria-controls="daftar-bab" data-chapters-toggle>
+          <span>Daftar bab ({{ lessons|length }})</span>{{ icon('chevron-down', 'h-4 w-4') }}
+        </button>
+      </div>
+      <nav id="daftar-bab" class="el-chapter-list p-2" aria-label="Bab kelas">
+        {% for l in lessons %}
+          {% set l_done = l.id in done_ids %}
+          <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=l.order_no) }}"
+             class="el-chapter{{ ' is-current' if l.id == current.id }}{{ ' is-done' if l_done }}"
+             data-lesson-id="{{ l.id }}" {% if l.id == current.id %}aria-current="page"{% endif %}>
+            <span class="el-mark">{{ icon('check', 'h-3.5 w-3.5') }}</span>
+            <span class="min-w-0">
+              <span class="block">{{ l.order_no }}. {{ l.title }}<span class="sr-only" data-done-label>{{ ' (selesai)' if l_done }}</span></span>
+              <span class="block text-xs font-normal text-muted">{{ 'Video' if l.content_type == 'video' else 'Bacaan' }}{% if l.duration_min %} · {{ l.duration_min }} mnt{% endif %}</span>
+            </span>
+          </a>
+        {% endfor %}
+      </nav>
+    </aside>
+  </div>
+{% endblock %}
+{% block scripts_extra %}
+  <script src="{{ url_for('static', filename='js/elearning.js') }}" defer></script>
+{% endblock %}

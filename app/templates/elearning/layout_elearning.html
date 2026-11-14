@@ -1,5 +1,21 @@
 {% extends "base.html" %}
-{# Layout modul E-Learning. Sidebar/tab khusus modul ditambahkan di prompt berikutnya. #}
+{% from "_components/_icons.html" import icon %}
+{# Layout modul E-Learning: tab modul (Daftar Kelas, Kelas Saya, Pengaturan) + aksen biru #2563EB.
+   Ruang belajar memakai halaman lebih lebar lewat blok main_class. #}
 {% block content %}
+  {% set ep = request.endpoint %}
+  <nav class="mb-6 flex flex-wrap gap-2 border-b border-line pb-3" aria-label="Navigasi E-Learning">
+    <a href="{{ url_for('elearning.index') }}"
+       class="el-nav-link {% if ep in ('elearning.index', 'elearning.course_detail') %}is-active{% endif %}"
+       {% if ep in ('elearning.index', 'elearning.course_detail') %}aria-current="page"{% endif %}>Daftar Kelas</a>
+    {% if current_user %}
+      <a href="{{ url_for('elearning.my_courses') }}"
+         class="el-nav-link {% if ep in ('elearning.my_courses', 'elearning.lesson') %}is-active{% endif %}"
+         {% if ep in ('elearning.my_courses', 'elearning.lesson') %}aria-current="page"{% endif %}>Kelas Saya</a>
+      <a href="{{ url_for('elearning.settings') }}"
+         class="el-nav-link {% if ep == 'elearning.settings' %}is-active{% endif %}"
+         {% if ep == 'elearning.settings' %}aria-current="page"{% endif %}>Pengaturan</a>
+    {% endif %}
+  </nav>
   {% block module_content %}{% endblock %}
 {% endblock %}

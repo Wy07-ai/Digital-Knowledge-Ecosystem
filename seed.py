@@ -973,6 +973,13 @@ def seed_categories(conn):
     return cats
 
 
+# Materi bertipe video (contoh): (slug kursus, nomor materi) -> tautan. Ganti dengan video Anda sendiri;
+# tautan yang didukung: YouTube, Vimeo, atau berkas langsung .mp4/.webm/.ogg (https).
+VIDEO_LESSONS = {
+    ("dasar-pemrograman-python", 2): "https://www.youtube.com/watch?v=rfscVS0vtbw",
+}
+
+
 def seed_courses(conn, cats):
     """Kursus, pelajaran, kuis, dan soal. Mengembalikan peta slug -> info untuk tahap berikutnya."""
     info = {}
@@ -985,9 +992,10 @@ def seed_courses(conn, cats):
 
         lesson_ids = []
         for order_no, (title, minutes, body) in enumerate(c["lessons"], start=1):
+            video_url = VIDEO_LESSONS.get((c["slug"], order_no))
             lesson_ids.append(ensure(conn, "lessons", {"course_id": course_id, "order_no": order_no}, {
-                "title": title, "content_type": "text", "content_body": body.strip(),
-                "video_url": None, "duration_min": minutes}))
+                "title": title, "content_type": "video" if video_url else "text",
+                "content_body": body.strip(), "video_url": video_url, "duration_min": minutes}))
 
         quiz_id = ensure(conn, "quizzes", {"course_id": course_id, "title": c["quiz_title"]},
                          {"pass_score": c["pass_score"]})

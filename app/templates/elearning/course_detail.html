@@ -1,0 +1,90 @@
+{% extends "elearning/layout_elearning.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block module_content %}
+  <section class="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
+    <div class="el-cover !aspect-auto min-h-[9rem] sm:min-h-[11rem]">
+      {% if course.thumbnail_url and course.thumbnail_url.startswith('https://') %}<img src="{{ course.thumbnail_url }}" alt="">{% endif %}
+      <div>
+        <span class="el-badge !bg-white/20 !text-white">{{ course.level_label }}</span>
+        <h1 class="mt-2 text-2xl font-bold leading-tight sm:text-3xl">{{ course.title }}</h1>
+        {% if course.instructor_name %}<p class="mt-1 text-sm text-white/90">Pengajar: {{ course.instructor_name }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div class="stack-mobile flex flex-col gap-6 p-5 sm:p-6 lg:flex-row">
+      <div class="min-w-0 flex-1">
+        <h2 class="text-lg font-bold">Tentang kelas</h2>
+        <p class="mt-2 whitespace-pre-line leading-relaxed">{{ course.description or 'Deskripsi kelas belum tersedia.' }}</p>
+
+        <h2 class="mt-8 text-lg font-bold">Daftar materi ({{ lessons|length }})</h2>
+        {% if lessons %}
+          <ol class="mt-3 divide-y divide-line rounded-xl border border-line">
+            {% for l in lessons %}
+              <li class="flex items-center gap-3 px-4 py-3">
+                <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-primary/10 text-sm font-bold {{ 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' if l.id in done_ids else 'el-text' }}">
+                  {% if l.id in done_ids %}{{ icon('check', 'h-4 w-4') }}<span class="sr-only">Selesai</span>{% else %}{{ l.order_no }}{% endif %}
+                </span>
+                <div class="min-w-0 flex-1">
+                  {% if enrolled %}
+                    <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=l.order_no) }}" class="font-semibold hover:underline">{{ l.title }}</a>
+                  {% else %}
+                    <span class="font-semibold">{{ l.title }}</span>
+                  {% endif %}
+                  <p class="text-xs text-muted">{{ 'Video' if l.content_type == 'video' else 'Bacaan' }}{% if l.duration_min %} · {{ l.duration_min }} mnt{% endif %}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="mt-2 text-muted">Materi belum tersedia.</p>
+        {% endif %}
+      </div>
+
+      <aside class="w-full flex-none lg:w-80" aria-label="Ikuti kelas">
+        <div class="rounded-xl border border-line bg-page p-5 lg:sticky lg:top-24">
+          <dl class="grid grid-cols-2 gap-3 text-sm">
+            <div><dt class="text-muted">Level</dt><dd class="font-semibold">{{ course.level_label }}</dd></div>
+            <div><dt class="text-muted">Materi</dt><dd class="font-semibold">{{ course.lesson_count }}</dd></div>
+            <div><dt class="text-muted">Durasi</dt><dd class="font-semibold">{{ format_minutes(course.total_minutes) if course.total_minutes else '–' }}</dd></div>
+            <div><dt class="text-muted">Harga</dt><dd class="font-semibold">{{ 'Gratis' if course.is_free else format_rupiah(course.price) }}</dd></div>
+          </dl>
+
+          {% if enrolled %}
+            <div class="mt-5">
+              <div class="flex justify-between text-sm font-semibold"><span>{{ progress.done }} dari {{ progress.total }} materi</span><span>{{ progress.percent }}%</span></div>
+              <div class="el-progress mt-1" role="progressbar" aria-label="Progres belajar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress.percent }}">
+                <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%"></div>
+              </div>
+            </div>
+            {% if resume %}
+              <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=resume.order_no) }}" class="el-btn mt-5 w-full">
+                {% if progress.percent >= 100 %}Tinjau ulang{% elif progress.done %}Lanjutkan belajar{% else %}Mulai belajar{% endif %}
+              </a>
+            {% endif %}
+            <p class="mt-3 text-center text-xs text-muted">Anda sudah terdaftar di kelas ini.</p>
+          {% elif not lessons %}
+            <button type="button" class="el-btn mt-5 w-full" disabled>Belum ada materi</button>
+          {% elif course.is_free %}
+            {% if current_user %}
+              <form method="post" action="{{ url_for('elearning.enroll', course_id=course.id) }}" class="mt-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="el-btn w-full">Ikuti kelas gratis</button>
+              </form>
+            {% else %}
+              <a href="{{ login_url() }}" class="el-btn mt-5 w-full">Masuk untuk mengikuti kelas</a>
+              <p class="mt-3 text-center text-xs text-muted">Kelas ini gratis. Setelah masuk, Anda kembali ke halaman ini.</p>
+            {% endif %}
+          {% else %}
+            {% if course.product_slug %}
+              <a href="{{ url_for('ecommerce.product', slug=course.product_slug) }}" class="el-btn mt-5 w-full">Beli di E-Commerce</a>
+              <p class="mt-3 text-center text-xs text-muted">Setelah checkout, kelas langsung muncul di Kelas Saya.</p>
+            {% else %}
+              <button type="button" class="el-btn mt-5 w-full" disabled>Belum dijual</button>
+            {% endif %}
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+  </section>
+{% endblock %}
