@@ -173,6 +173,7 @@ CATEGORIES = [
     ("portal", "Pendidikan", "pendidikan"),
     ("portal", "Karier", "karier"),
     ("portal", "Produktivitas", "produktivitas"),
+    ("portal", "Kesehatan Digital", "kesehatan-digital"),   # sengaja belum punya artikel (demo empty state)
 
     ("forum", "Diskusi Umum", "diskusi-umum"),
     ("forum", "Tanya Jawab Teknis", "tanya-jawab-teknis"),
@@ -1042,6 +1043,7 @@ def seed_articles(conn, cats, admin_id):
         ensure(conn, "articles", {"slug": slug}, {
             "category_id": cats[("portal", cat)], "author_id": admin_id, "title": title,
             "excerpt": excerpt, "body": body.strip(), "is_featured": featured, "read_minutes": minutes,
+            "cover_url": f"img/portal/{slug}.svg",   # sampul lokal (static/img/portal)
         }, fixed={"views": views, "published_at": ts(days_ago, hours=1)})
 
 

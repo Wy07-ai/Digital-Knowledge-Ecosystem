@@ -1,0 +1,82 @@
+{# Komponen Portal. Semua teks dari database dicetak lewat autoescape Jinja (tanpa filter safe).
+   Gambar: loading="lazy" + decoding="async", width/height (cegah layout bergeser), alt bermakna. #}
+{% from "_components/_icons.html" import icon %}
+
+{% macro cover(a, size, extra_class='') -%}
+<div class="pt-cover {{ extra_class }}">
+  <img src="{{ a.cover_src }}" alt="{{ a.cover_alt }}" width="{{ size[0] }}" height="{{ size[1] }}"
+       loading="lazy" decoding="async" data-pt-img
+       data-fallback="{{ url_for('static', filename='img/portal/default.svg') }}" class="h-full w-full object-cover">
+</div>
+{%- endmacro %}
+
+{% macro meta(a, views=False) -%}
+<ul class="pt-meta flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+  <li class="inline-flex items-center gap-1.5">{{ icon('user', 'h-4 w-4') }}<span>{{ a.author_label }}</span></li>
+  <li class="inline-flex items-center gap-1.5">{{ icon('calendar', 'h-4 w-4') }}<time datetime="{{ a.date_iso }}">{{ a.date_label }}</time></li>
+  <li class="inline-flex items-center gap-1.5">{{ icon('clock', 'h-4 w-4') }}<span>{{ a.read_minutes }} menit baca</span></li>
+  {% if views %}<li class="inline-flex items-center gap-1.5">{{ icon('eye', 'h-4 w-4') }}<span>{{ a.views_label }} kali dibaca</span></li>{% endif %}
+</ul>
+{%- endmacro %}
+
+{# Artikel featured besar di atas beranda. Tanpa penanda "Featured" bila artikelnya bukan featured. #}
+{% macro hero(a, size) -%}
+<article class="pt-hero overflow-hidden rounded-2xl border border-line bg-surface shadow-sm" aria-labelledby="pt-hero-title">
+  <div class="grid md:grid-cols-5">
+    {{ cover(a, size, 'md:col-span-3 pt-cover-hero') }}
+    <div class="flex flex-col justify-center gap-3 p-5 sm:p-7 md:col-span-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="pt-badge pt-badge-solid">{{ 'Featured' if a.is_featured else 'Terbaru' }}</span>
+        {% if a.category_name %}<span class="pt-badge">{{ a.category_name }}</span>{% endif %}
+      </div>
+      <h2 id="pt-hero-title" class="text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
+        <a href="{{ url_for('portal.article', slug=a.slug) }}" class="hover:underline">{{ a.title }}</a>
+      </h2>
+      {% if a.excerpt %}<p class="text-base leading-relaxed text-muted">{{ a.excerpt }}</p>{% endif %}
+      {{ meta(a) }}
+      <div class="pt-2">
+        <a href="{{ url_for('portal.article', slug=a.slug) }}" class="pt-btn">Baca artikel {{ icon('arrow-right', 'h-4 w-4') }}</a>
+      </div>
+    </div>
+  </div>
+</article>
+{%- endmacro %}
+
+{# Kartu artikel. Judul adalah tautan yang membentang ke seluruh kartu (target sentuh besar). #}
+{% macro card(a, size, level=3) -%}
+<article class="pt-card relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+  {{ cover(a, size) }}
+  <div class="flex flex-1 flex-col gap-2 p-4">
+    {% if a.category_name %}<div><span class="pt-badge">{{ a.category_name }}</span></div>{% endif %}
+    <h{{ level }} class="text-lg font-bold leading-snug">
+      <a href="{{ url_for('portal.article', slug=a.slug) }}" class="pt-link">{{ a.title }}</a>
+    </h{{ level }}>
+    {% if a.excerpt %}<p class="line-clamp-3 text-sm leading-relaxed text-muted">{{ a.excerpt }}</p>{% endif %}
+    <div class="mt-auto pt-2">{{ meta(a) }}</div>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro pagination(p) -%}
+<div class="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm" data-pagination>
+  <p class="text-muted" aria-live="polite">{% if p.total %}Menampilkan {{ p.first }}&ndash;{{ p.last }} dari {{ p.total }} artikel lainnya{% endif %}</p>
+  {% if p.pages > 1 %}
+  <nav aria-label="Halaman artikel">
+    <ul class="flex items-center gap-1">
+      <li>{% if p.page > 1 %}<a href="{{ p.url(p.page - 1) }}" rel="prev" class="btn btn-secondary">Sebelumnya</a>
+          {% else %}<span class="btn btn-secondary" aria-disabled="true">Sebelumnya</span>{% endif %}</li>
+      {% for n in p.numbers %}
+        {% if n is none %}<li class="px-1 text-muted" aria-hidden="true">&hellip;</li>
+        {% else %}<li class="dke-hide-mobile">
+          <a href="{{ p.url(n) }}" {% if n == p.page %}aria-current="page"{% endif %}
+             class="btn {{ 'pt-btn' if n == p.page else 'btn-secondary' }} min-w-[44px]"
+             aria-label="Halaman {{ n }}">{{ n }}</a></li>{% endif %}
+      {% endfor %}
+      <li class="px-2 text-muted sm:hidden">{{ p.page }}/{{ p.pages }}</li>
+      <li>{% if p.page < p.pages %}<a href="{{ p.url(p.page + 1) }}" rel="next" class="btn btn-secondary">Berikutnya</a>
+          {% else %}<span class="btn btn-secondary" aria-disabled="true">Berikutnya</span>{% endif %}</li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{%- endmacro %}

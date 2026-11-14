@@ -1,0 +1,38 @@
+{% extends "portal/layout_portal.html" %}
+{% from "portal/_components.html" import cover, meta, card with context %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block module_content %}
+  <article class="mx-auto max-w-3xl" aria-labelledby="pt-title">
+    <header>
+      <div class="flex flex-wrap items-center gap-2">
+        {% if article.category_name %}
+          <a href="{{ url_for('portal.index', kategori=article.category_slug) }}" class="pt-badge hover:underline">{{ article.category_name }}</a>
+        {% endif %}
+        {% if article.is_featured %}<span class="pt-badge pt-badge-solid">Featured</span>{% endif %}
+      </div>
+      <h1 id="pt-title" class="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{{ article.title }}</h1>
+      {% if article.excerpt %}<p class="mt-3 text-lg leading-relaxed text-muted">{{ article.excerpt }}</p>{% endif %}
+      <div class="mt-4">{{ meta(article, views=True) }}</div>
+    </header>
+
+    {{ cover(article, cover_size, 'mt-6 rounded-xl') }}
+
+    <div class="pt-body mt-6">
+      {% for p in article.paragraphs %}<p>{{ p }}</p>{% endfor %}
+    </div>
+  </article>
+
+  {% if article.category_slug %}
+    <section class="mt-12 border-t border-line pt-8" aria-labelledby="pt-related">
+      <h2 id="pt-related" class="mb-4 text-xl font-bold">Artikel terkait di {{ article.category_name }}</h2>
+      {% if related %}
+        <div class="card-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {% for a in related %}{{ card(a, cover_size) }}{% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted">Belum ada artikel lain di kategori ini.
+          <a href="{{ url_for('portal.index') }}" class="font-semibold pt-text underline underline-offset-2">Lihat semua artikel</a></p>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}

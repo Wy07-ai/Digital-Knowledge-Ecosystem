@@ -1,0 +1,45 @@
+{% extends "portal/layout_portal.html" %}
+{% from "_components/_icons.html" import icon %}
+{% from "_components/empty_state.html" import empty_state %}
+{% block title %}Pengaturan Portal{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide pt-text">Portal</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Pengaturan Portal</h1>
+    <p class="mt-1 text-muted">Pilih kategori favorit Anda. Artikel dari kategori itu tampil lebih dulu di beranda Portal. Tidak ada artikel yang disembunyikan.</p>
+  </header>
+
+  {% if categories %}
+    <form method="post" action="{{ url_for('portal.settings') }}" novalidate
+          class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <fieldset aria-describedby="pt-help">
+        <legend class="text-sm font-semibold">Kategori favorit</legend>
+        <div class="pt-choices mt-3">
+          {% for c in categories %}
+            <label class="pt-choice">
+              <input type="checkbox" name="categories" value="{{ c.slug }}" {% if c.slug in preferred %}checked{% endif %}>
+              <span class="pt-choice-face">
+                <span class="pt-tick" aria-hidden="true">{{ icon('check', 'h-4 w-4') }}</span>
+                <span class="pt-choice-name">{{ c.name }}</span>
+                <span class="pt-choice-note">{{ c.article_count }} artikel</span>
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+        <p id="pt-help" class="mt-3 text-sm text-muted">
+          {% if preferred %}Saat ini diutamakan: {{ categories|selectattr('slug', 'in', preferred)|map(attribute='name')|join(', ') }}.
+          {% else %}Belum ada kategori favorit, jadi beranda diurutkan dari artikel terbaru.{% endif %}
+        </p>
+      </fieldset>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button type="submit" name="action" value="save" class="pt-btn">Simpan preferensi</button>
+        {% if preferred %}<button type="submit" name="action" value="reset" class="btn btn-secondary">Hapus preferensi</button>{% endif %}
+        <a href="{{ url_for('portal.index') }}" class="btn btn-secondary">Lihat beranda Portal</a>
+      </div>
+    </form>
+  {% else %}
+    {{ empty_state('Belum ada kategori', 'Kategori Portal akan muncul di sini setelah ditambahkan.', 'Kembali ke Portal', url_for('portal.index')) }}
+  {% endif %}
+{% endblock %}

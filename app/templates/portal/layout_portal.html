@@ -1,5 +1,16 @@
 {% extends "base.html" %}
-{# Layout modul Portal. Sidebar/tab khusus modul ditambahkan di prompt berikutnya. #}
+{# Layout modul Portal: tab modul (Artikel, Pengaturan) + aksen rose #E11D48.
+   Halaman detail mempersempit kolom baca di dalam template-nya sendiri. #}
+{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/portal.js') }}"></script>{% endblock %}
 {% block content %}
+  {% set ep = request.endpoint %}
+  <nav class="mb-6 flex flex-wrap gap-2 border-b border-line pb-3" aria-label="Navigasi Portal">
+    <a href="{{ url_for('portal.index') }}"
+       class="pt-nav-link {% if ep in ('portal.index', 'portal.article') %}is-active{% endif %}"
+       {% if ep in ('portal.index', 'portal.article') %}aria-current="page"{% endif %}>Artikel</a>
+    <a href="{{ url_for('portal.settings') }}"
+       class="pt-nav-link {% if ep == 'portal.settings' %}is-active{% endif %}"
+       {% if ep == 'portal.settings' %}aria-current="page"{% endif %}>Pengaturan</a>
+  </nav>
   {% block module_content %}{% endblock %}
 {% endblock %}
