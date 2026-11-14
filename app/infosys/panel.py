@@ -25,6 +25,7 @@ ACTION_LABELS = {
     "reply": "Balas thread",
     "bookmark": "Simpan tutorial",
     "unbookmark": "Hapus simpanan tutorial",
+    "portal_preferences": "Ubah preferensi Portal",
 }
 
 

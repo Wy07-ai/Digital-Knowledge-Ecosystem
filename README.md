@@ -53,6 +53,20 @@ sebelum seed pertama. Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten f
 
 Uji: `python -m unittest tests.test_etutorial`; panduan manual: `docs/UJI_MANUAL_ETUTORIAL.md`.
 
+## Portal (aksen rose `#E11D48`)
+
+- **Beranda** (`/portal/`): artikel *featured* besar di atas (gambar + judul + kutipan + penulis, tanggal, waktu baca) dan kartu artikel di bawahnya. Bila tidak ada artikel featured, artikel terbaru dipakai dan lencananya berubah menjadi "Terbaru".
+- **Chip kategori** sebagai filter (`?kategori=<slug>`), lengkap dengan jumlah artikel. Slug tak dikenal diabaikan dengan pemberitahuan.
+- **Paginasi** (`?halaman=<n>`, 6 kartu per halaman). Artikel featured hanya tampil di halaman 1 dan tidak pernah muncul dobel di kartu. Nomor halaman di luar rentang dijepit.
+- **Empty state**: kategori tanpa artikel ("Belum ada artikel di kategori ...") dan Portal yang sama sekali kosong. Seed sengaja membuat kategori *Kesehatan Digital* tanpa artikel untuk demo.
+- **Detail artikel** (`/portal/artikel/<slug>`): waktu baca (kolom `read_minutes`, bila kosong diperkirakan dari panjang teks), penulis (bila kosong "Redaksi DKE"), tanggal (WIB), jumlah views, dan hingga 3 **artikel terkait** dari kategori yang sama.
+- **Views**: bertambah lewat `UPDATE articles SET views = views + 1` (atomik). Bawaan: satu kali per sesi peramban untuk tiap artikel supaya muat ulang tidak menggelembungkan angka; HEAD dan 404 tidak dihitung. Untuk menghitung tiap kunjungan, set `COUNT_ONCE_PER_SESSION = False` di `app/portal/routes.py`.
+- **Preferensi kategori** (`/portal/pengaturan`, Member): disimpan di `module_settings` (`portal` / `preferred_categories` = slug dipisah koma). Pengaruhnya pada beranda tanpa filter: artikel featured dari kategori favorit dipilih lebih dulu, kartu kategori favorit tampil lebih dulu (lalu terbaru), dan chip favorit diberi bintang + teks "(favorit)". Preferensi hanya **mengurutkan**, tidak ada artikel yang disembunyikan. Guest diarahkan ke login (UC-PT-04 khusus Member).
+- **Gambar**: semua `<img>` memakai `loading="lazy"`, `decoding="async"`, `width`/`height` (cegah layout bergeser), dan teks `alt` ("Sampul artikel: <judul>"). Sampul lokal ada di `static/img/portal/` (SVG ringan, satu per artikel + `default.svg`); `cover_url` boleh berisi jalur relatif static atau URL http(s), nilai lain (mis. `javascript:`) diganti sampul bawaan. `static/js/portal.js` mengganti gambar yang gagal dimuat dengan sampul bawaan.
+- **Keamanan**: semua teks dari database lewat autoescape Jinja (tanpa `|safe`/`Markup`; tes memindai template).
+
+Uji: `python -m unittest tests.test_portal`; panduan manual: `docs/UJI_MANUAL_PORTAL.md`.
+
 ## Alamat modul
 
 | Blueprint   | URL          | Aksen     |
@@ -251,7 +265,7 @@ paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` ba
 - Filter `modul` yang tidak dikenal diabaikan (bukan error) dan nomor halaman dijepit ke rentang sah.
 - Waktu ditampilkan dalam WIB (UTC+7); database tetap menyimpan UTC ISO-8601.
 
-Tes otomatis: `python -m unittest discover -s tests -v` (103 tes: 55 lama + 48 Control Panel).
+Tes otomatis: `python -m unittest discover -s tests -v` (292 tes, termasuk 62 tes Portal).
 Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 
 ## Roadmap

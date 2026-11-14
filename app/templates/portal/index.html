@@ -1,8 +1,63 @@
 {% extends "portal/layout_portal.html" %}
 {% from "_components/empty_state.html" import empty_state %}
+{% from "portal/_components.html" import hero, card, pagination with context %}
 {% block title %}Portal{% endblock %}
 {% block module_content %}
-  <h1 class="text-2xl font-bold">Portal</h1>
-  <p class="mt-1 text-muted">{{ current_module.desc }}</p>
-  {{ empty_state('Halaman ini sedang disiapkan', 'Konten modul Portal dibangun pada fase berikutnya.', 'Kembali ke Beranda', url_for('main.index')) }}
+  <header class="mb-5">
+    <p class="text-sm font-semibold uppercase tracking-wide pt-text">Portal</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Artikel &amp; Berita Pilihan</h1>
+    <p class="mt-1 text-muted">{{ current_module.desc }}</p>
+  </header>
+
+  {# Filter kategori: tautan biasa (tanpa JS). Angka = jumlah artikel di kategori itu. #}
+  <nav aria-label="Filter kategori" class="mb-5">
+    <div class="flex flex-wrap gap-2">
+      <a href="{{ url_for('portal.index') }}" class="pt-chip {{ 'is-active' if not category }}"
+         {% if not category %}aria-current="true"{% endif %}>Semua <span class="pt-count">({{ all_total }})</span></a>
+      {% for c in chips %}
+        <a href="{{ url_for('portal.index', kategori=c.slug) }}" class="pt-chip {{ 'is-active' if category == c.slug }}"
+           {% if category == c.slug %}aria-current="true"{% endif %}>
+          {% if c.preferred %}<span aria-hidden="true">&#9733;</span>{% endif %}{{ c.name }}
+          {% if c.preferred %}<span class="sr-only">(favorit)</span>{% endif %}
+          <span class="pt-count">({{ c.count }})</span></a>
+      {% endfor %}
+    </div>
+  </nav>
+
+  {% if unknown_filter %}
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">
+      Kategori itu tidak dikenal, jadi semua artikel ditampilkan.
+    </p>
+  {% endif %}
+  {% if preferred_names %}
+    <p class="mb-4 text-sm text-muted">
+      Urutan disesuaikan dengan kategori favorit Anda: <strong class="font-semibold text-ink">{{ preferred_names|join(', ') }}</strong>.
+      <a href="{{ url_for('portal.settings') }}" class="font-semibold pt-text underline underline-offset-2">Ubah preferensi</a>
+    </p>
+  {% endif %}
+
+  {% if featured %}
+    <section class="mb-8" aria-label="Artikel utama">{{ hero(featured, cover_size) }}</section>
+  {% endif %}
+
+  {% if cards %}
+    <section aria-labelledby="pt-more">
+      <h2 id="pt-more" class="mb-4 text-xl font-bold">
+        {% if category_name %}Artikel lainnya di {{ category_name }}{% else %}Artikel lainnya{% endif %}
+      </h2>
+      <div class="card-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {% for a in cards %}{{ card(a, cover_size) }}{% endfor %}
+      </div>
+      {{ pagination(pager) }}
+    </section>
+  {% elif not featured %}
+    {% if category %}
+      {{ empty_state('Belum ada artikel di kategori ' ~ category_name,
+                     'Artikel baru akan muncul di sini. Sementara itu, jelajahi kategori lain.',
+                     'Lihat semua artikel', url_for('portal.index')) }}
+    {% else %}
+      {{ empty_state('Belum ada artikel', 'Artikel baru akan muncul di sini. Sementara itu, jelajahi modul lain.',
+                     'Kembali ke Beranda', url_for('main.index')) }}
+    {% endif %}
+  {% endif %}
 {% endblock %}

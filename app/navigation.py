@@ -66,6 +66,11 @@ def _lesson_title(args):
     return f"{base}: {row['title']}" if row else base
 
 
+def _article_title(args):
+    row = get_db().execute("SELECT title FROM articles WHERE slug = ?", (args["slug"],)).fetchone()
+    return row["title"] if row else "Artikel"
+
+
 def _tutorial_title(args):
     row = get_db().execute("SELECT title FROM tutorials WHERE slug = ?", (args["slug"],)).fetchone()
     return row["title"] if row else "Tutorial"
@@ -93,6 +98,10 @@ node("elearning.settings", "Pengaturan", parent="elearning.index")
 node("etutorial.tutorial", _tutorial_title, parent="etutorial.index")
 node("etutorial.saved", "Tersimpan", parent="etutorial.index")
 node("etutorial.settings", "Pengaturan", parent="etutorial.index")
+
+# Portal: Portal > <judul artikel>; Portal > Pengaturan
+node("portal.article", _article_title, parent="portal.index")
+node("portal.settings", "Pengaturan", parent="portal.index")
 
 
 # Contoh halaman bersarang 3 jenjang (halaman uji /dev/ui-test, hanya bila UI_TEST_PAGE aktif):
