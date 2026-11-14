@@ -1,0 +1,27 @@
+{% extends "forum/layout_forum.html" %}
+{% from "forum/_components.html" import field_error with context %}
+{% block title %}Ubah Balasan{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight">Ubah balasan</h1>
+    <p class="mt-1 text-muted">Di thread: <a href="{{ url_for('forum.thread', thread_id=post.thread_id) }}" class="font-semibold underline underline-offset-2">{{ post.thread_title }}</a></p>
+  </header>
+  <form method="post" action="{{ url_for('forum.edit_post', post_id=post.id) }}" novalidate data-fm-form
+        class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div data-fm-field>
+      <label for="f-edit" class="block text-sm font-semibold">Isi balasan</label>
+      <textarea id="f-edit" name="body" rows="8" required aria-required="true" data-validate data-label="Balasan"
+                data-min="{{ limits.post_min }}" data-max="{{ limits.post_max }}"
+                aria-describedby="err-body" {% if error %}aria-invalid="true"{% endif %}
+                class="fm-field mt-1 block w-full rounded-lg border bg-surface px-3 py-2 leading-relaxed text-ink">{{ body }}</textarea>
+      <div class="mt-1 flex justify-end"><p class="fm-counter text-sm" data-counter-for="body" aria-hidden="true"></p></div>
+      {{ field_error('body', error) }}
+    </div>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <button type="submit" class="fm-btn" data-busy="Menyimpan&hellip;">Simpan perubahan</button>
+      <a href="{{ url_for('forum.thread', thread_id=post.thread_id) }}#balasan-{{ post.id }}" class="btn btn-secondary">Batal</a>
+    </div>
+  </form>
+{% endblock %}

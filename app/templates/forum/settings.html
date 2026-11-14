@@ -1,0 +1,59 @@
+{% extends "forum/layout_forum.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Pengaturan Forum{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight">Pengaturan Forum</h1>
+    <p class="mt-1 text-muted">Atur siapa yang bisa melihat profil Forum Anda dan apakah Anda diberi tahu saat ada yang membalas thread Anda.</p>
+  </header>
+
+  <form method="post" action="{{ url_for('forum.settings') }}" novalidate class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <fieldset aria-describedby="help-privacy">
+      <legend class="text-sm font-semibold">Privasi profil</legend>
+      <p id="help-privacy" class="mt-1 text-sm text-muted">Nama Anda tetap tampil pada thread dan balasan Anda. Pengaturan ini mengatur halaman profil Forum: bio, tanggal bergabung, dan ringkasan aktivitas.</p>
+      <div class="fm-choices mt-3">
+        {% for key, label, note in privacy_choices %}
+          <label class="fm-choice">
+            <input type="radio" name="profile_privacy" value="{{ key }}" {% if privacy == key %}checked{% endif %}>
+            <span class="fm-choice-face">
+              <span class="fm-tick" aria-hidden="true">{{ icon('check', 'h-4 w-4') }}</span>
+              <span class="fm-choice-name">{{ label }}</span>
+              <span class="fm-choice-note">{{ note }}</span>
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <fieldset class="mt-7" aria-describedby="help-notify">
+      <legend class="text-sm font-semibold">Notifikasi balasan</legend>
+      <p id="help-notify" class="mt-1 text-sm text-muted">Bila aktif, Anda mendapat notifikasi di lonceng Top-Bar setiap ada anggota lain yang membalas thread Anda. Balasan Anda sendiri tidak dihitung.</p>
+      <div class="fm-choices mt-3">
+        <label class="fm-choice">
+          <input type="radio" name="notify_reply" value="1" {% if notify_on %}checked{% endif %}>
+          <span class="fm-choice-face">
+            <span class="fm-tick" aria-hidden="true">{{ icon('check', 'h-4 w-4') }}</span>
+            <span class="fm-choice-name">Aktif</span>
+            <span class="fm-choice-note">Beri tahu saya saat ada balasan baru.</span>
+          </span>
+        </label>
+        <label class="fm-choice">
+          <input type="radio" name="notify_reply" value="0" {% if not notify_on %}checked{% endif %}>
+          <span class="fm-choice-face">
+            <span class="fm-tick" aria-hidden="true">{{ icon('check', 'h-4 w-4') }}</span>
+            <span class="fm-choice-name">Nonaktif</span>
+            <span class="fm-choice-note">Jangan kirim notifikasi balasan.</span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="mt-7 flex flex-wrap gap-3">
+      <button type="submit" class="fm-btn">Simpan pengaturan</button>
+      <a href="{{ url_for('forum.index') }}" class="btn btn-secondary">Kembali ke diskusi</a>
+    </div>
+  </form>
+{% endblock %}

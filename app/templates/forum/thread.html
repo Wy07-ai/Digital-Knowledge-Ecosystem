@@ -1,0 +1,140 @@
+{% extends "forum/layout_forum.html" %}
+{% from "_components/_icons.html" import icon %}
+{% from "forum/_components.html" import avatar, solved_badge, field_error with context %}
+{% block title %}{{ thread.title }}{% endblock %}
+{% block main_class %}max-w-4xl{% endblock %}
+{% block module_content %}
+  {# ---------- Thread ---------- #}
+  <article class="fm-thread rounded-2xl border border-line bg-surface p-5 shadow-sm sm:p-7" aria-labelledby="fm-title">
+    <div class="flex flex-wrap items-center gap-2">
+      {% if thread.category_name %}
+        <a href="{{ url_for('forum.index', kategori=thread.category_slug) }}" class="fm-badge hover:underline">{{ thread.category_name }}</a>
+      {% endif %}
+      {% if thread.is_solved %}{{ solved_badge() }}{% endif %}
+    </div>
+    <h1 id="fm-title" class="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-3xl">{{ thread.title }}</h1>
+
+    <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+      <span class="inline-flex items-center gap-2">
+        {{ avatar(thread.initials, 'fm-avatar-sm') }}
+        <a href="{{ url_for('forum.profile', user_id=thread.user_id) }}" class="fm-author font-semibold text-ink">{{ thread.author_name }}</a>
+      </span>
+      <span class="inline-flex items-center gap-1.5">{{ icon('calendar', 'h-4 w-4') }}<time datetime="{{ thread.created_at }}">{{ thread.datetime_label }}</time></span>
+      <span class="inline-flex items-center gap-1.5">{{ icon('eye', 'h-4 w-4') }}<span>{{ thread.views }} dilihat</span></span>
+    </div>
+
+    <div class="fm-prose mt-5">
+      {% for para in thread.paragraphs %}<p>{{ para }}</p>{% endfor %}
+    </div>
+
+    {% if thread.solution_id %}
+      <p class="mt-5 text-sm"><a href="#balasan-{{ thread.solution_id }}" class="fm-text font-semibold underline underline-offset-2">Lihat balasan yang menjadi solusi</a></p>
+    {% elif is_owner and posts %}
+      <p class="mt-5 text-sm text-muted">Bila ada balasan yang menjawab pertanyaan Anda, pilih <strong class="font-semibold text-ink">Tandai sebagai solusi</strong> pada balasan itu.</p>
+    {% endif %}
+  </article>
+
+  {# ---------- Balasan ---------- #}
+  <section class="mt-8" aria-labelledby="fm-replies">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 id="fm-replies" class="text-xl font-bold">{{ thread.reply_count }} balasan</h2>
+      {% if current_user %}<a href="#form-balas" class="btn btn-secondary" data-fm-reply-top>{{ icon('reply', 'h-4 w-4') }}Tulis balasan</a>{% endif %}
+    </div>
+
+    {% if posts %}
+      <ol class="fm-posts mt-4">
+        {% for p in posts %}
+          <li id="balasan-{{ p.id }}" class="fm-post {{ 'is-new animate-slide-up' if p.is_new }}" data-level="{{ p.level }}">
+            <article class="fm-post-card {{ 'is-solution' if p.is_solution }}" aria-label="Balasan dari {{ p.author_name }}">
+              <header class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                {{ avatar(p.initials, 'fm-avatar-sm') }}
+                <a href="{{ url_for('forum.profile', user_id=p.user_id) }}" class="fm-author font-semibold">{{ p.author_name }}</a>
+                {% if p.user_id == thread.user_id %}<span class="fm-badge">Penulis thread</span>{% endif %}
+                {% if p.is_solution %}<span class="fm-solved">{{ icon('success', 'h-3.5 w-3.5') }}Solusi</span>{% endif %}
+                <time class="text-sm text-muted" datetime="{{ p.created_at }}" title="{{ p.datetime_label }}">{{ p.time_label }}</time>
+              </header>
+              {% if p.parent_author %}
+                <p class="mt-1 text-sm text-muted">
+                  <span class="sr-only">Balasan tingkat {{ p.level }}. </span>{{ icon('reply', 'inline h-3.5 w-3.5 align-[-2px]') }}
+                  Membalas <a href="#balasan-{{ p.parent_post_id }}" class="font-semibold underline underline-offset-2">{{ p.parent_author }}</a>
+                </p>
+              {% endif %}
+              <div class="fm-prose mt-2">
+                {% for para in p.paragraphs %}<p>{{ para }}</p>{% endfor %}
+              </div>
+              <footer class="mt-3 flex flex-wrap items-center gap-1">
+                {% if current_user %}
+                  <a href="{{ url_for('forum.thread', thread_id=thread.id, balas=p.id) }}#form-balas" class="fm-act"
+                     data-fm-reply data-post-id="{{ p.id }}" data-author="{{ p.author_name }}" data-excerpt="{{ p.excerpt }}"
+                     aria-controls="form-balas" aria-expanded="false">{{ icon('reply', 'h-4 w-4') }}Balas<span class="sr-only"> {{ p.author_name }}</span></a>
+                {% endif %}
+                {% if is_owner %}
+                  <form method="post" action="{{ url_for('forum.mark_solution', thread_id=thread.id) }}" class="inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if p.is_solution %}
+                      <input type="hidden" name="action" value="unmark">
+                      <button type="submit" class="fm-act">{{ icon('x', 'h-4 w-4') }}Batalkan tanda solusi</button>
+                    {% else %}
+                      <input type="hidden" name="action" value="mark">
+                      <input type="hidden" name="post_id" value="{{ p.id }}">
+                      <button type="submit" class="fm-act fm-act-solve">{{ icon('check', 'h-4 w-4') }}Tandai sebagai solusi</button>
+                    {% endif %}
+                  </form>
+                {% endif %}
+                {% if p.is_mine %}
+                  <a href="{{ url_for('forum.edit_post', post_id=p.id) }}" class="fm-act">{{ icon('pencil', 'h-4 w-4') }}Ubah<span class="sr-only"> balasan Anda</span></a>
+                  <a href="{{ url_for('forum.delete_post', post_id=p.id) }}" class="fm-act fm-act-danger">{{ icon('trash', 'h-4 w-4') }}Hapus<span class="sr-only"> balasan Anda</span></a>
+                {% endif %}
+              </footer>
+            </article>
+          </li>
+        {% endfor %}
+      </ol>
+      {% if posts|selectattr('depth', 'gt', max_level)|list %}
+        <p class="mt-3 text-sm text-muted">Balasan yang bersarang lebih dari {{ max_level }} tingkat ditampilkan sejajar dengan tingkat {{ max_level }} dan diberi keterangan &ldquo;Membalas&rdquo;.</p>
+      {% endif %}
+    {% else %}
+      <p class="mt-4 rounded-lg border border-dashed border-line bg-surface px-4 py-6 text-center text-muted">Belum ada balasan. Jadilah yang pertama membantu.</p>
+    {% endif %}
+  </section>
+
+  {# ---------- Form balas ---------- #}
+  <div id="fm-reply-home" class="mt-6">
+    {% if current_user %}
+      <section id="form-balas" class="fm-form rounded-xl border border-line bg-surface p-5 shadow-sm {{ 'fm-form-in' if reply_parent or reply_error }}" aria-labelledby="fm-form-title">
+        <h2 id="fm-form-title" class="text-lg font-bold">Tulis balasan</h2>
+        <form method="post" action="{{ url_for('forum.reply', thread_id=thread.id) }}" novalidate data-fm-form data-draft-key="thread-{{ thread.id }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="parent_post_id" value="{{ reply_parent.id if reply_parent else '' }}">
+
+          <p class="mt-1 text-sm text-muted" data-fm-context>
+            <span data-fm-ctx-default {% if reply_parent %}hidden{% endif %}>Membalas thread ini.</span>
+            <span data-fm-ctx-parent {% if not reply_parent %}hidden{% endif %}>Membalas <strong class="font-semibold text-ink" data-fm-ctx-name>{{ reply_parent.author_name if reply_parent }}</strong>: <span data-fm-ctx-excerpt>{{ reply_parent.excerpt if reply_parent }}</span></span>
+            <a href="{{ url_for('forum.thread', thread_id=thread.id) }}#form-balas" data-fm-cancel
+               class="ml-1 font-semibold underline underline-offset-2" {% if not reply_parent %}hidden{% endif %}>Batal membalas</a>
+          </p>
+
+          <div class="mt-3" data-fm-field>
+            <label for="f-reply" class="sr-only">Isi balasan</label>
+            <textarea id="f-reply" name="body" rows="5" required aria-required="true" data-validate data-draft data-label="Balasan"
+                      data-min="{{ limits.post_min }}" data-max="{{ limits.post_max }}"
+                      aria-describedby="err-body" {% if reply_error %}aria-invalid="true"{% endif %}
+                      class="fm-field block w-full rounded-lg border bg-surface px-3 py-2 leading-relaxed text-ink placeholder:text-muted"
+                      placeholder="Tulis balasan yang membantu. Teks ditampilkan apa adanya.">{{ reply_body }}</textarea>
+            <div class="mt-1 flex justify-end"><p class="fm-counter text-sm" data-counter-for="body" aria-hidden="true"></p></div>
+            {{ field_error('body', reply_error) }}
+          </div>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button type="submit" class="fm-btn" data-busy="Mengirim&hellip;">Kirim balasan</button>
+          </div>
+        </form>
+      </section>
+    {% else %}
+      <section class="rounded-xl border border-dashed border-line bg-surface p-6 text-center">
+        <h2 class="text-lg font-bold">Ingin ikut membahas?</h2>
+        <p class="mt-1 text-muted">Masuk dulu untuk membalas thread ini. Setelah masuk, Anda kembali ke halaman ini.</p>
+        <a href="{{ login_url() }}" class="fm-btn mt-4">Masuk untuk membalas</a>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

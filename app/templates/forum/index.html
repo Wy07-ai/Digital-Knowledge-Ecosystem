@@ -1,8 +1,67 @@
 {% extends "forum/layout_forum.html" %}
+{% from "_components/_icons.html" import icon %}
 {% from "_components/empty_state.html" import empty_state %}
+{% from "forum/_components.html" import thread_row, pagination with context %}
 {% block title %}Forum{% endblock %}
 {% block module_content %}
-  <h1 class="text-2xl font-bold">Forum</h1>
-  <p class="mt-1 text-muted">{{ current_module.desc }}</p>
-  {{ empty_state('Halaman ini sedang disiapkan', 'Konten modul Forum dibangun pada fase berikutnya.', 'Kembali ke Beranda', url_for('main.index')) }}
+  <header class="mb-5 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">Forum diskusi</h1>
+      <p class="mt-1 text-muted">{{ current_module.desc }}</p>
+    </div>
+    <a href="{{ url_for('forum.new_thread', kategori=category) }}" class="fm-btn">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
+  </header>
+
+  <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+    {# Filter kategori: tautan biasa (tanpa JS). Angka = jumlah thread pada urutan yang sedang dipilih. #}
+    <nav aria-label="Filter kategori" class="min-w-0 flex-1">
+      <div class="flex flex-wrap gap-2">
+        <a href="{{ url_for('forum.index', urut=sort if sort != 'terbaru' else None) }}" class="fm-chip {{ 'is-active' if not category }}"
+           {% if not category %}aria-current="true"{% endif %}>Semua <span class="fm-count-note">({{ all_total }})</span></a>
+        {% for c in chips %}
+          <a href="{{ url_for('forum.index', kategori=c.slug, urut=sort if sort != 'terbaru' else None) }}"
+             class="fm-chip {{ 'is-active' if category == c.slug }}" {% if category == c.slug %}aria-current="true"{% endif %}>
+            {{ c.name }} <span class="fm-count-note">({{ c.count }})</span></a>
+        {% endfor %}
+      </div>
+    </nav>
+    <nav aria-label="Urutan thread">
+      <div class="fm-seg">
+        <a href="{{ url_for('forum.index', kategori=category) }}" class="{{ 'is-active' if sort == 'terbaru' }}"
+           {% if sort == 'terbaru' %}aria-current="true"{% endif %}>Terbaru</a>
+        <a href="{{ url_for('forum.index', kategori=category, urut='belum-terjawab') }}" class="{{ 'is-active' if sort == 'belum-terjawab' }}"
+           {% if sort == 'belum-terjawab' %}aria-current="true"{% endif %}>Belum terjawab</a>
+      </div>
+    </nav>
+  </div>
+
+  {% if unknown_filter %}
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">Kategori itu tidak dikenal, jadi semua thread ditampilkan.</p>
+  {% endif %}
+  {% if unknown_sort %}
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">Urutan itu tidak dikenal, jadi thread diurutkan dari yang terbaru.</p>
+  {% endif %}
+  {% if sort == 'belum-terjawab' and threads %}
+    <p class="mb-4 text-sm text-muted">Menampilkan thread yang belum punya jawaban bertanda solusi. Yang paling sedikit balasannya ada di atas.</p>
+  {% endif %}
+
+  {% if threads %}
+    <section aria-label="Daftar thread">
+      <div class="flex flex-col gap-3">
+        {% for t in threads %}{{ thread_row(t) }}{% endfor %}
+      </div>
+      {{ pagination(pager) }}
+    </section>
+  {% elif sort == 'belum-terjawab' %}
+    {{ empty_state('Semua thread' ~ (' di ' ~ category_name if category_name else '') ~ ' sudah terjawab',
+                   'Tidak ada pertanyaan yang menunggu solusi. Lihat semua thread atau mulai diskusi baru.',
+                   'Lihat semua thread', url_for('forum.index', kategori=category), 'forum') }}
+  {% elif category %}
+    {{ empty_state('Belum ada thread di kategori ' ~ category_name,
+                   'Jadilah yang pertama memulai diskusi di kategori ini.',
+                   'Buat thread', url_for('forum.new_thread', kategori=category), 'forum') }}
+  {% else %}
+    {{ empty_state('Belum ada thread', 'Mulai diskusi pertama: ajukan pertanyaan atau bagikan pengalaman belajar Anda.',
+                   'Buat thread pertama', url_for('forum.new_thread'), 'forum') }}
+  {% endif %}
 {% endblock %}
