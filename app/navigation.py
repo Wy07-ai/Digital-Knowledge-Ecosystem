@@ -76,6 +76,22 @@ def _tutorial_title(args):
     return row["title"] if row else "Tutorial"
 
 
+def _thread_title(args):
+    row = get_db().execute("SELECT title FROM threads WHERE id = ?", (args["thread_id"],)).fetchone()
+    return row["title"] if row else "Thread"
+
+
+def _post_thread_id(args):
+    """Balasan -> thread induknya (untuk halaman ubah/hapus balasan)."""
+    row = get_db().execute("SELECT thread_id FROM posts WHERE id = ?", (args["post_id"],)).fetchone()
+    return {"thread_id": row["thread_id"]} if row else {"thread_id": 0}
+
+
+def _member_name(args):
+    row = get_db().execute("SELECT full_name FROM users WHERE id = ?", (args["user_id"],)).fetchone()
+    return row["full_name"] if row else "Anggota"
+
+
 # --------------------------------------------------------------------------
 # Tabel hierarki
 # --------------------------------------------------------------------------
@@ -102,6 +118,15 @@ node("etutorial.settings", "Pengaturan", parent="etutorial.index")
 # Portal: Portal > <judul artikel>; Portal > Pengaturan
 node("portal.article", _article_title, parent="portal.index")
 node("portal.settings", "Pengaturan", parent="portal.index")
+
+# Forum: Forum > <judul thread>; Forum > <judul thread> > Ubah/Hapus Balasan; Forum > Buat Thread, dst.
+node("forum.thread", _thread_title, parent="forum.index")
+node("forum.new_thread", "Buat Thread", parent="forum.index")
+node("forum.edit_post", "Ubah Balasan", parent="forum.thread", parent_args=_post_thread_id)
+node("forum.delete_post", "Hapus Balasan", parent="forum.thread", parent_args=_post_thread_id)
+node("forum.my_threads", "Thread Saya", parent="forum.index")
+node("forum.settings", "Pengaturan", parent="forum.index")
+node("forum.profile", _member_name, parent="forum.index")
 
 
 # Contoh halaman bersarang 3 jenjang (halaman uji /dev/ui-test, hanya bila UI_TEST_PAGE aktif):

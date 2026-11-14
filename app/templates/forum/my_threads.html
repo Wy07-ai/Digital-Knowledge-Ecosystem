@@ -1,0 +1,28 @@
+{% extends "forum/layout_forum.html" %}
+{% from "_components/_icons.html" import icon %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "forum/_components.html" import thread_row, pagination with context %}
+{% block title %}Thread Saya{% endblock %}
+{% block module_content %}
+  <header class="mb-5 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">Thread saya</h1>
+      <p class="mt-1 text-muted">
+        {% if total %}{{ total }} thread yang Anda mulai, {{ solved }} di antaranya sudah Solved.{% else %}Thread yang Anda mulai akan muncul di sini.{% endif %}
+      </p>
+    </div>
+    <a href="{{ url_for('forum.new_thread') }}" class="fm-btn">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
+  </header>
+
+  {% if threads %}
+    <section aria-label="Daftar thread saya">
+      <div class="flex flex-col gap-3">
+        {% for t in threads %}{{ thread_row(t, show_author=False) }}{% endfor %}
+      </div>
+      {{ pagination(pager) }}
+    </section>
+  {% else %}
+    {{ empty_state('Anda belum membuat thread', 'Punya pertanyaan atau cerita belajar? Mulai diskusi pertama Anda.',
+                   'Buat thread pertama', url_for('forum.new_thread'), 'forum') }}
+  {% endif %}
+{% endblock %}

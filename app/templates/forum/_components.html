@@ -1,0 +1,72 @@
+{# Komponen Forum. Semua teks buatan pengguna dicetak lewat autoescape Jinja (tanpa filter safe).
+   Status tidak hanya warna: lencana Solved selalu memuat ikon centang dan kata "Solved". #}
+{% from "_components/_icons.html" import icon %}
+
+{% macro avatar(initials, cls='') -%}
+<span class="fm-avatar {{ cls }}" aria-hidden="true">{{ initials }}</span>
+{%- endmacro %}
+
+{% macro solved_badge() -%}
+<span class="fm-solved">{{ icon('success', 'h-3.5 w-3.5') }}Solved</span>
+{%- endmacro %}
+
+{# Satu baris thread. Judul adalah tautan yang membentang ke seluruh kartu (target sentuh besar);
+   nama penulis tetap bisa diklik karena diberi z-index di atasnya. #}
+{% macro thread_row(t, show_author=True) -%}
+<article class="fm-row relative flex gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm sm:gap-4">
+  {{ avatar(t.initials) }}
+  <div class="min-w-0 flex-1">
+    <div class="flex flex-wrap items-center gap-2">
+      {% if t.category_name %}<span class="fm-badge">{{ t.category_name }}</span>{% endif %}
+      {% if t.is_solved %}{{ solved_badge() }}{% endif %}
+    </div>
+    <h3 class="mt-1.5 text-lg font-bold leading-snug">
+      <a href="{{ url_for('forum.thread', thread_id=t.id) }}" class="fm-link">{{ t.title }}</a>
+    </h3>
+    <ul class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+      {% if show_author %}
+        <li class="inline-flex items-center gap-1.5">{{ icon('user', 'h-4 w-4') }}
+          <a href="{{ url_for('forum.profile', user_id=t.user_id) }}" class="fm-author">{{ t.author_name }}</a></li>
+      {% endif %}
+      <li class="inline-flex items-center gap-1.5">{{ icon('clock', 'h-4 w-4') }}<time datetime="{{ t.created_at }}" title="{{ t.date_label }}">{{ t.time_label }}</time></li>
+      <li class="inline-flex items-center gap-1.5">{{ icon('eye', 'h-4 w-4') }}<span>{{ t.views }} dilihat</span></li>
+    </ul>
+  </div>
+  <div class="fm-count" title="{{ t.replies_label }}">
+    <span class="fm-count-num">{{ t.reply_count }}</span>
+    <span class="fm-count-label">balasan</span>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro field_error(name, error) -%}
+<p id="err-{{ name }}" data-error-for="{{ name }}" {% if not error %}hidden{% endif %}
+   class="fm-error mt-1 flex items-start gap-1.5 text-sm font-medium">
+  <span class="mt-0.5 flex-none">{{ icon('error', 'h-4 w-4') }}</span>
+  <span data-error-text>{{ error or '' }}</span>
+</p>
+{%- endmacro %}
+
+{% macro pagination(p, noun='thread') -%}
+<div class="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm" data-pagination>
+  <p class="text-muted" aria-live="polite">{% if p.total %}Menampilkan {{ p.first }}&ndash;{{ p.last }} dari {{ p.total }} {{ noun }}{% endif %}</p>
+  {% if p.pages > 1 %}
+  <nav aria-label="Halaman {{ noun }}">
+    <ul class="flex items-center gap-1">
+      <li>{% if p.page > 1 %}<a href="{{ p.url(p.page - 1) }}" rel="prev" class="btn btn-secondary">Sebelumnya</a>
+          {% else %}<span class="btn btn-secondary" aria-disabled="true">Sebelumnya</span>{% endif %}</li>
+      {% for n in p.numbers %}
+        {% if n is none %}<li class="px-1 text-muted" aria-hidden="true">&hellip;</li>
+        {% else %}<li class="dke-hide-mobile">
+          <a href="{{ p.url(n) }}" {% if n == p.page %}aria-current="page"{% endif %}
+             class="btn {{ 'fm-btn' if n == p.page else 'btn-secondary' }} min-w-[44px]"
+             aria-label="Halaman {{ n }}">{{ n }}</a></li>{% endif %}
+      {% endfor %}
+      <li class="px-2 text-muted sm:hidden">{{ p.page }}/{{ p.pages }}</li>
+      <li>{% if p.page < p.pages %}<a href="{{ p.url(p.page + 1) }}" rel="next" class="btn btn-secondary">Berikutnya</a>
+          {% else %}<span class="btn btn-secondary" aria-disabled="true">Berikutnya</span>{% endif %}</li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{%- endmacro %}

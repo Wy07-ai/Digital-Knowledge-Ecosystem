@@ -825,7 +825,8 @@ Jangan lupa unsur sosial. Bergabung di forum atau kelompok belajar membuat Anda 
 # ---------------------------------------------------------------------------
 # DATA: 5 thread forum beserta balasan
 # posts: (label, email_penulis, label_induk atau None, jam_setelah_thread, isi)
-# Balasan bersarang hanya 1 tingkat (induk selalu balasan tingkat atas).
+# Balasan bersarang lewat label induk. Thread 3 sengaja berantai 4 tingkat (t3p1 > t3p5 > t3p6 > t3p7) untuk
+# demo batas tampilan 3 tingkat: balasan tingkat 4 ditampilkan sejajar tingkat 3 dengan keterangan "Membalas".
 # ---------------------------------------------------------------------------
 THREADS = [
     {
@@ -897,6 +898,10 @@ THREADS = [
             ("t3p5", "citra@dke.test", "t3p1", 26,
              "@Pengguna Demo aplikasi daftar tugas sederhana. Fiturnya cuma tambah, centang selesai, dan hapus, "
              "tapi dari situ saya belajar formulir, basis data, dan validasi."),
+            ("t3p6", "budi@dke.test", "t3p5", 28,
+             "Masuk akal, fiturnya kecil tapi mencakup hampir semua dasar. Saya juga mau mulai dari daftar tugas."),
+            ("t3p7", DEMO_EMAIL, "t3p6", 30,
+             "@Budi Santoso silakan, nanti kita bandingkan hasilnya di sini. Semangat!"),
         ],
     },
     {

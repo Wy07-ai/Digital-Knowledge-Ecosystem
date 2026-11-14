@@ -31,7 +31,7 @@ python seed.py --reset    # hapus semua tabel lalu bangun ulang dari nol (data l
 
 Isi seed: kategori per modul, 6 produk (2 bertipe kursus, terhubung ke kursus lewat `course_id`),
 3 kursus (15 pelajaran, 3 kuis, 15 soal; 1 kursus gratis), 5 tutorial (22 langkah dengan snippet kode),
-10 artikel (2 featured), 5 thread dengan 18 balasan, serta data contoh untuk akun demo.
+10 artikel (2 featured), 5 thread dengan 20 balasan (thread 3 sengaja berantai 4 tingkat untuk demo batas tampilan), serta data contoh untuk akun demo.
 Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris tiap tabel.
 
 | Akun  | Email            | Kata sandi bawaan |
@@ -66,6 +66,23 @@ Uji: `python -m unittest tests.test_etutorial`; panduan manual: `docs/UJI_MANUAL
 - **Keamanan**: semua teks dari database lewat autoescape Jinja (tanpa `|safe`/`Markup`; tes memindai template).
 
 Uji: `python -m unittest tests.test_portal`; panduan manual: `docs/UJI_MANUAL_PORTAL.md`.
+
+## Forum (aksen teal `#0D9488`)
+
+- **Daftar thread** (`/forum/`): judul, kategori, penulis, waktu, **jumlah balasan**, dilihat, dan lencana **Solved** (ikon centang + kata, bukan hanya warna). 8 thread per halaman (`?halaman=<n>`).
+- **Filter kategori** (`?kategori=<slug>`) dan **urutan** (`?urut=terbaru` bawaan, atau `?urut=belum-terjawab`). *Belum terjawab* = thread yang belum punya balasan bertanda solusi; yang paling sedikit balasannya tampil lebih dulu. Angka di chip kategori mengikuti urutan terpilih. Nilai tak dikenal diabaikan dengan pemberitahuan.
+- **Buat thread** (`/forum/buat`, Member): kategori, judul (5-150 karakter), isi (10-5000). Validasi dua lapis: inline di peramban (pesan di bawah field, penghitung karakter) dan ulang di server (422, isian dipertahankan). Draf tersimpan sementara di `sessionStorage`.
+- **Detail thread** (`/forum/thread/<id>`): isi thread dan balasan bersarang lewat `posts.parent_post_id`. Di database kedalaman tidak dibatasi, tetapi **tampilan dibatasi 3 tingkat** (`MAX_DISPLAY_LEVEL` di `app/forum/logic.py`): balasan tingkat 4 dst. ditampilkan sejajar tingkat 3 dengan keterangan "Membalas <nama>". Balasan induk harus berada di thread yang sama.
+- **Form balas** (Member): meluncur naik (*slide-up* 250 ms) saat membalas balasan tertentu; balasan baru juga muncul dengan slide-up sekali, disertai toast sukses. Tanpa JavaScript, tautan `?balas=<id>#form-balas` tetap berfungsi. Mengikuti `prefers-reduced-motion`.
+- **Tandai solusi** (`POST /forum/thread/<id>/solusi`): hanya **pemilik thread** (403 untuk yang lain). Satu solusi per thread, bisa dipindah atau dibatalkan.
+- **Ubah/hapus balasan** (`/forum/balasan/<id>/ubah|hapus`): hanya **penulis balasan** (403 untuk orang lain, termasuk pemilik thread). Hapus lewat halaman konfirmasi; balasan anak naik ke induk yang dihapus agar jawaban orang lain tidak hilang, dan bila yang dihapus adalah solusi, thread kembali belum terjawab.
+- **Thread Saya** (`/forum/saya`, Member): daftar thread milik sendiri, jumlah dan jumlah Solved.
+- **Pengaturan** (`/forum/pengaturan`, Member): *privasi profil* (Publik / Hanya anggota / Privat) dan *notifikasi balasan* (Aktif / Nonaktif), disimpan di `module_settings` (`forum` / `profile_privacy` dan `notify_reply`). Privasi mengatur halaman profil Forum `/forum/pengguna/<id>` (bio, tanggal bergabung, ringkasan); nama penulis tetap tampil di thread dan balasannya, email tidak pernah ditampilkan.
+- **Notifikasi**: balasan dari anggota lain membuat baris `notifications` untuk penulis thread (tautan langsung ke balasannya) bila ia mengizinkan; belum diatur dianggap diizinkan. Balasan dari penulis thread sendiri tidak membuat notifikasi. Semuanya dalam satu transaksi dengan penyimpanan balasan.
+- **Keamanan**: semua isi pengguna lewat autoescape Jinja (tanpa `|safe`/`Markup`; JavaScript hanya memakai `textContent`; tes memindai template dan skrip). Setiap POST memeriksa token CSRF, SQL memakai parameter, hak ubah/hapus/solusi diperiksa di server, bukan hanya dengan menyembunyikan tombol.
+- **Aksesibilitas**: tombol dan chip minimal 44 px; teks putih memakai teal `#0F766E` (5,47:1) karena putih di atas `#0D9488` hanya 3,74:1; status tidak hanya warna; fokus terlihat; dukungan Dark Mode dan Mobile View.
+
+Uji: `python -m unittest tests.test_forum`; panduan manual: `docs/UJI_MANUAL_FORUM.md`.
 
 ## Alamat modul
 
@@ -265,10 +282,10 @@ paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` ba
 - Filter `modul` yang tidak dikenal diabaikan (bukan error) dan nomor halaman dijepit ke rentang sah.
 - Waktu ditampilkan dalam WIB (UTC+7); database tetap menyimpan UTC ISO-8601.
 
-Tes otomatis: `python -m unittest discover -s tests -v` (292 tes, termasuk 62 tes Portal).
+Tes otomatis: `python -m unittest discover -s tests -v` (400 tes, termasuk 62 tes Portal dan 108 tes Forum).
 Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 
 ## Roadmap
 
 Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi (selesai) →
-Fase 2: Control Panel Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum → Fase 6 QA dan laporan.
+Fase 2: Control Panel Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum (selesai) → Fase 6 QA dan laporan.

@@ -1,5 +1,17 @@
 {% extends "base.html" %}
-{# Layout modul Forum. Sidebar/tab khusus modul ditambahkan di prompt berikutnya. #}
+{# Layout modul Forum: tab modul (Diskusi, Thread Saya, Pengaturan) + aksen teal #0D9488.
+   Halaman detail mempersempit kolom di dalam template-nya sendiri (block main_class). #}
+{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/forum.js') }}"></script>{% endblock %}
 {% block content %}
+  {% set ep = request.endpoint %}
+  {% set discuss = ep in ('forum.index', 'forum.thread', 'forum.new_thread', 'forum.edit_post', 'forum.delete_post', 'forum.profile') %}
+  <nav class="mb-6 flex flex-wrap items-center gap-2 border-b border-line pb-3" aria-label="Navigasi Forum">
+    <a href="{{ url_for('forum.index') }}" class="fm-nav-link {% if discuss %}is-active{% endif %}"
+       {% if discuss %}aria-current="page"{% endif %}>Diskusi</a>
+    <a href="{{ url_for('forum.my_threads') }}" class="fm-nav-link {% if ep == 'forum.my_threads' %}is-active{% endif %}"
+       {% if ep == 'forum.my_threads' %}aria-current="page"{% endif %}>Thread Saya</a>
+    <a href="{{ url_for('forum.settings') }}" class="fm-nav-link {% if ep == 'forum.settings' %}is-active{% endif %}"
+       {% if ep == 'forum.settings' %}aria-current="page"{% endif %}>Pengaturan</a>
+  </nav>
   {% block module_content %}{% endblock %}
 {% endblock %}
