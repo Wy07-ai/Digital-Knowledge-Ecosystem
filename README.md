@@ -64,8 +64,19 @@ Kelas Saya, Ruang Belajar (materi teks atau embed video + sidebar daftar bab), t
 tanpa reload (progress bar bertransisi 300 ms), navigasi materi sebelumnya/berikutnya, serta tab
 Pengaturan (kecepatan video, target belajar). `progress_percent` selalu dihitung dari `lesson_progress`;
 kursus hasil checkout (`enrollments.source = 'order'`) langsung tampil di Kelas Saya; Ruang Belajar dan API
-progres menolak pengguna yang belum terdaftar. Kuis (UC-EL-05/06) menyusul di bagian 2.
+progres menolak pengguna yang belum terdaftar.
 Uji: `python -m unittest tests.test_elearning`; panduan manual: `docs/UJI_MANUAL_ELEARNING.md`.
+
+E-Learning (bagian 2) menambah kuis (UC-EL-05/06): soal tampil satu per satu dengan indikator nomor,
+jawaban sementara disimpan di `localStorage` browser, dialog konfirmasi bila ada soal kosong, lalu
+dikumpulkan ke server. **Penilaian hanya di server** (`app/elearning/quiz.py: grade()`): server hanya
+menerima pilihan `a/b/c/d` per soal dan mengabaikan skor dari klien. Halaman pengerjaan tidak memuat
+`correct_option` maupun `explanation`; keduanya baru tampil di halaman hasil setelah percobaan
+tersimpan di `quiz_attempts` (`score`, `passed`, `answers_json`). Skor = persen benar dibulatkan ke
+bawah, sehingga `score >= pass_score` selalu sama dengan keputusan lulus. Bila lulus, `enrollments.completed_at`
+diisi (sekali, tidak ditimpa kelulusan berikutnya) dan semua materi kelas ditandai selesai di
+`lesson_progress`, sehingga `progress_percent` yang dihitung menjadi 100%. Gagal tidak mencabut status selesai.
+Uji: `python -m unittest tests.test_quiz`; panduan manual: `docs/UJI_MANUAL_KUIS.md`.
 
 | Rute E-Learning | Fungsi |
 |-----------------|--------|
@@ -74,6 +85,9 @@ Uji: `python -m unittest tests.test_elearning`; panduan manual: `docs/UJI_MANUAL
 | `/elearning/kelas-saya` | Kelas Saya + target belajar hari ini |
 | `/elearning/kelas/<id>/materi/<no>` | Ruang Belajar (UC-EL-03), hanya peserta terdaftar |
 | `POST /elearning/api/materi/<id>/selesai` | Tandai/batalkan selesai (UC-EL-04), JSON + token CSRF |
+| `/elearning/kelas/<id>/kuis` | Mengerjakan kuis, satu soal per layar (UC-EL-05), hanya peserta terdaftar |
+| `POST /elearning/kelas/<id>/kuis/kumpul` | Kumpulkan jawaban; dinilai di server, lalu redirect ke hasil; token CSRF |
+| `/elearning/kelas/<id>/kuis/hasil/<attempt_id>` | Skor, lulus/belum, pembahasan tiap soal, tombol Coba Lagi (UC-EL-06); hanya pemilik percobaan |
 | `/elearning/pengaturan` | Kecepatan video dan target belajar (UC-EL-07) |
 
 ## Struktur folder
@@ -98,7 +112,7 @@ dke/
     │   └── <modul>/        # layout_<modul>.html + halaman modul
     └── static/
         ├── css/custom.css  # token Light/Dark, keyframes, Mobile View, reduced-motion
-        └── js/             # theme.js toast.js switcher.js app.js
+        └── js/             # theme.js toast.js switcher.js app.js elearning.js quiz.js ...
 ```
 
 Aturan: satu blueprint = satu modul = satu folder template = satu `layout_<modul>.html`

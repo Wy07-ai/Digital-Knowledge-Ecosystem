@@ -62,6 +62,15 @@
                 {% if progress.percent >= 100 %}Tinjau ulang{% elif progress.done %}Lanjutkan belajar{% else %}Mulai belajar{% endif %}
               </a>
             {% endif %}
+            {% if quiz %}
+              <a href="{{ url_for('elearning.quiz', course_id=course.id) }}" class="btn btn-secondary mt-3 w-full">
+                {% if quiz.attempts %}Coba kuis lagi{% else %}Kerjakan kuis{% endif %}
+              </a>
+              <p class="mt-2 text-center text-xs text-muted">
+                {{ quiz.question_count }} soal · lulus bila nilai ≥ {{ quiz.pass_score }}
+                {% if quiz.attempts %}<br>Nilai terbaik {{ quiz.best_score }}{{ ' · sudah lulus' if quiz.passed }}{% endif %}
+              </p>
+            {% endif %}
             <p class="mt-3 text-center text-xs text-muted">Anda sudah terdaftar di kelas ini.</p>
           {% elif not lessons %}
             <button type="button" class="el-btn mt-5 w-full" disabled>Belum ada materi</button>

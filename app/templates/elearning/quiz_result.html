@@ -1,0 +1,69 @@
+{% extends "elearning/layout_elearning.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Hasil {{ attempt.quiz_title }} · {{ course.title }}{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{# Hasil kuis dan pembahasan (UC-EL-06). Kunci jawaban baru muncul di halaman ini, yaitu setelah
+   percobaan tersimpan. Halaman hanya bisa dibuka pemilik percobaan. #}
+{% block module_content %}
+  <div data-quiz-result data-storage-key="{{ storage_key }}">
+    <section class="el-result {{ 'is-pass' if passed else 'is-fail' }}" aria-labelledby="judul-hasil">
+      <p class="text-sm font-semibold uppercase tracking-wide">{{ attempt.quiz_title }}</p>
+      <h1 id="judul-hasil" class="mt-1 text-2xl font-bold sm:text-3xl">
+        {{ icon('check' if passed else 'x', 'inline h-7 w-7 align-[-0.2em]') }}
+        {{ 'Lulus' if passed else 'Belum lulus' }}
+      </h1>
+      <p class="el-score" aria-label="Nilai {{ attempt.score }} dari 100">{{ attempt.score }}</p>
+      <p class="text-sm">
+        Benar {{ correct }} dari {{ total }} soal · nilai minimal lulus {{ attempt.pass_score }}
+      </p>
+      {% if passed %}
+        <p class="mt-3 font-semibold">Selamat! Kelas ini ditandai selesai dan progres belajar Anda menjadi 100%.</p>
+      {% else %}
+        <p class="mt-3 font-semibold">Nilai Anda belum mencapai batas lulus. Pelajari pembahasan di bawah, lalu coba lagi.</p>
+      {% endif %}
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a href="{{ url_for('elearning.quiz', course_id=course.id) }}" class="el-btn">Coba Lagi</a>
+        <a href="{{ url_for('elearning.course_detail', course_id=course.id) }}" class="btn btn-secondary">Kembali ke kelas</a>
+      </div>
+    </section>
+
+    <h2 class="mt-8 text-xl font-bold">Pembahasan</h2>
+    <ol class="mt-4 space-y-4">
+      {% for r in review %}
+        <li class="el-review {{ 'is-right' if r.is_correct else 'is-wrong' }}">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="el-q-number">Soal {{ r.number }}</span>
+            {% if r.is_correct %}<span class="el-verdict is-right">{{ icon('check', 'h-4 w-4') }}Benar</span>
+            {% elif r.answered %}<span class="el-verdict is-wrong">{{ icon('x', 'h-4 w-4') }}Salah</span>
+            {% else %}<span class="el-verdict is-wrong">{{ icon('x', 'h-4 w-4') }}Tidak dijawab</span>{% endif %}
+          </div>
+          <p class="el-q-text mt-2">{{ r.question }}</p>
+          <ul class="el-opts mt-3">
+            {% for key, text in r.options %}
+              {% set is_key = key == r.correct_option %}
+              {% set is_mine = key == r.chosen %}
+              <li class="el-opt is-static{{ ' is-key' if is_key }}{{ ' is-mine-wrong' if is_mine and not is_key }}">
+                <span class="el-opt-key" aria-hidden="true">{{ key|upper }}</span>
+                <span class="el-opt-text">{{ text }}
+                  {% if is_key %}<strong class="el-tag">Jawaban benar</strong>{% endif %}
+                  {% if is_mine %}<strong class="el-tag">Jawaban Anda</strong>{% endif %}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+          {% if r.explanation %}
+            <p class="el-explain"><strong>Pembahasan:</strong> {{ r.explanation }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+
+    <div class="mt-8 flex flex-wrap gap-3 border-t border-line pt-5">
+      <a href="{{ url_for('elearning.quiz', course_id=course.id) }}" class="el-btn">Coba Lagi</a>
+      <a href="{{ url_for('elearning.my_courses') }}" class="btn btn-secondary">Kelas Saya</a>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts_extra %}
+  <script src="{{ url_for('static', filename='js/quiz.js') }}" defer></script>
+{% endblock %}

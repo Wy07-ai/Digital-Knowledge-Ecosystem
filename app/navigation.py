@@ -76,8 +76,11 @@ node("infosys.stats", "Statistik Lintas Modul", parent="infosys.index")
 node("infosys.security", "Pengaturan Keamanan", parent="infosys.index")
 
 # E-Learning: E-Learning > <judul kelas> > Materi N: <judul materi>
+#             E-Learning > <judul kelas> > Kuis > Hasil Kuis
 node("elearning.course_detail", _course_title, parent="elearning.index")
 node("elearning.lesson", _lesson_title, parent="elearning.course_detail")
+node("elearning.quiz", "Kuis", parent="elearning.course_detail")
+node("elearning.quiz_result", "Hasil Kuis", parent="elearning.quiz")
 node("elearning.my_courses", "Kelas Saya", parent="elearning.index")
 node("elearning.settings", "Pengaturan", parent="elearning.index")
 
