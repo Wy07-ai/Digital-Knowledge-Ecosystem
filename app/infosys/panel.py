@@ -24,6 +24,7 @@ ACTION_LABELS = {
     "create_thread": "Buat thread",
     "reply": "Balas thread",
     "bookmark": "Simpan tutorial",
+    "unbookmark": "Hapus simpanan tutorial",
 }
 
 

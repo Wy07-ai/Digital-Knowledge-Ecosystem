@@ -1,0 +1,60 @@
+{% extends "etutorial/layout_etutorial.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}Pengaturan E-Tutorial{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
+{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/etutorial.js') }}"></script>{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide et-text">E-Tutorial</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Pengaturan E-Tutorial</h1>
+    <p class="mt-1 text-muted">Pilih ukuran font bacaan tutorial. Pratinjau di bawah berubah langsung saat Anda memilih.</p>
+  </header>
+
+  {% if not current_user %}
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">
+      Anda belum masuk, jadi pilihan ini hanya disimpan di peramban ini.
+      <a href="{{ login_url() }}" class="font-semibold et-text underline underline-offset-2">Masuk</a> agar tersimpan di akun dan ikut ke perangkat lain.
+    </p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('etutorial.settings') }}" novalidate data-et-font-form
+        class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <fieldset aria-describedby="{{ 'font-error' if error else 'font-help' }}">
+      <legend class="text-sm font-semibold">Ukuran font bacaan</legend>
+      <div class="et-choices mt-3" role="radiogroup">
+        {% for key, label in choices %}
+          <label class="et-choice">
+            <input type="radio" name="font_size" value="{{ key }}" {% if font == key %}checked{% endif %}>
+            <span class="et-choice-face">
+              <span class="et-choice-sample et-sample-{{ key }}" aria-hidden="true">Aa</span>
+              <span class="et-choice-name">{{ label }}</span>
+              <span class="et-choice-note">{{ {'sm': '14 px', 'md': '16 px', 'lg': '20 px'}[key] }}</span>
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+      {% if error %}
+        <p id="font-error" class="mt-2 text-sm font-medium text-red-700 dark:text-red-300">{{ error }}</p>
+      {% else %}
+        <p id="font-help" class="mt-2 text-sm text-muted">Berlaku untuk teks langkah dan blok kode di halaman tutorial. Ukuran Besar tetap rapi di layar ponsel.</p>
+      {% endif %}
+    </fieldset>
+
+    <p class="mb-2 mt-6 text-sm font-semibold">Pratinjau</p>
+    <div class="et-reader et-preview rounded-xl border border-line bg-page p-4" data-et-preview data-font="{{ font }}">
+      <p class="et-step-label font-semibold et-text">Step 2</p>
+      <h2 class="et-step-title mt-1 font-bold leading-snug">Pasang Flask</h2>
+      <div class="et-body mt-2">
+        <p>Pasang Flask dengan pip, lalu pastikan terpasang dengan menampilkan informasi paketnya.</p>
+      </div>
+      <figure class="et-code mt-4">
+        <figcaption class="et-code-head"><span class="et-code-lang">bash</span></figcaption>
+        <pre tabindex="0" role="region" aria-label="Contoh kode pratinjau"><code>pip install Flask
+pip show flask</code></pre>
+      </figure>
+    </div>
+
+    <button type="submit" class="et-btn mt-6">Simpan pengaturan</button>
+  </form>
+{% endblock %}

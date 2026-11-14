@@ -1,0 +1,22 @@
+{% extends "etutorial/layout_etutorial.html" %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "etutorial/_tutorial_card.html" import tutorial_card with context %}
+{% block title %}Tersimpan{% endblock %}
+{% block module_content %}
+  <header class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wide et-text">E-Tutorial</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Tersimpan</h1>
+    <p class="mt-1 text-muted">Tutorial yang Anda bookmark, yang terbaru di atas.</p>
+  </header>
+
+  {% if tutorials %}
+    <p class="mb-3 text-sm text-muted" aria-live="polite">{{ tutorials|length }} tutorial tersimpan.</p>
+    <div class="card-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {% for t in tutorials %}
+        {{ tutorial_card(t, saved=True, removable=True, next_url=url_for('etutorial.saved')) }}
+      {% endfor %}
+    </div>
+  {% else %}
+    {{ empty_state('Belum ada tutorial tersimpan', 'Buka sebuah tutorial lalu pilih Simpan tutorial agar mudah ditemukan lagi.', 'Telusuri tutorial', url_for('etutorial.index'), 'inbox') }}
+  {% endif %}
+{% endblock %}

@@ -66,6 +66,11 @@ def _lesson_title(args):
     return f"{base}: {row['title']}" if row else base
 
 
+def _tutorial_title(args):
+    row = get_db().execute("SELECT title FROM tutorials WHERE slug = ?", (args["slug"],)).fetchone()
+    return row["title"] if row else "Tutorial"
+
+
 # --------------------------------------------------------------------------
 # Tabel hierarki
 # --------------------------------------------------------------------------
@@ -83,6 +88,12 @@ node("elearning.quiz", "Kuis", parent="elearning.course_detail")
 node("elearning.quiz_result", "Hasil Kuis", parent="elearning.quiz")
 node("elearning.my_courses", "Kelas Saya", parent="elearning.index")
 node("elearning.settings", "Pengaturan", parent="elearning.index")
+
+# E-Tutorial: E-Tutorial > <judul tutorial> (satu halaman per langkah; indikator Step ada di halaman)
+node("etutorial.tutorial", _tutorial_title, parent="etutorial.index")
+node("etutorial.saved", "Tersimpan", parent="etutorial.index")
+node("etutorial.settings", "Pengaturan", parent="etutorial.index")
+
 
 # Contoh halaman bersarang 3 jenjang (halaman uji /dev/ui-test, hanya bila UI_TEST_PAGE aktif):
 #   E-Learning > <judul kelas> > Materi N: <judul materi>

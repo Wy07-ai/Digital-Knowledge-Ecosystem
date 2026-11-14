@@ -32,7 +32,7 @@ python seed.py --reset    # hapus semua tabel lalu bangun ulang dari nol (data l
 Isi seed: kategori per modul, 6 produk (2 bertipe kursus, terhubung ke kursus lewat `course_id`),
 3 kursus (15 pelajaran, 3 kuis, 15 soal; 1 kursus gratis), 5 tutorial (22 langkah dengan snippet kode),
 10 artikel (2 featured), 5 thread dengan 18 balasan, serta data contoh untuk akun demo.
-Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris setiap tabel.
+Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris tiap tabel.
 
 | Akun  | Email            | Kata sandi bawaan |
 |-------|------------------|-------------------|
@@ -41,6 +41,17 @@ Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris setiap tabel.
 
 Ubah kata sandi bawaan dengan variabel lingkungan `DKE_DEMO_PASSWORD` / `DKE_ADMIN_PASSWORD`
 sebelum seed pertama. Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten forum dan tidak bisa dipakai login.
+
+## E-Tutorial (aksen violet `#7C3AED`)
+
+- **Daftar tutorial** (`/etutorial/`): filter kategori dan tingkat kesulitan (kombinasi AND, angka tombol mengikuti filter lain), estimasi menit, jumlah langkah, penanda Tersimpan.
+- **Halaman tutorial** (`/etutorial/tutorial/<slug>/langkah/<n>`): satu kolom, satu langkah per halaman, stepper Step 1..n dengan tombol Sebelumnya/Berikutnya, bar posisi, dan titik indikator.
+- **Blok kode + Salin** (`static/js/copy.js`): toast "Kode disalin"; memakai Clipboard API dan cadangan `execCommand` untuk http:// non-aman.
+- **Bookmark** (UC-ET-04, Member): POST `/etutorial/tutorial/<slug>/simpan` (CSRF, idempoten, dicatat di activity_logs) dan halaman **Tersimpan** (`/etutorial/tersimpan`).
+- **Ukuran font** Kecil/Sedang/Besar (14/16/20 px): Member di `module_settings` (`etutorial` / `font_size` = `sm|md|lg`), Guest di cookie `dke_et_font`. Besar punya aturan khusus ponsel (layar sempit dan Mobile View): tombol bawah ditumpuk, kode dibungkus baris, target sentuh >= 48 px.
+- **Keamanan**: semua teks dan kode dari database dicetak lewat autoescape Jinja (tanpa `|safe`/`Markup`); tes memindai template agar tetap begitu.
+
+Uji: `python -m unittest tests.test_etutorial`; panduan manual: `docs/UJI_MANUAL_ETUTORIAL.md`.
 
 ## Alamat modul
 
