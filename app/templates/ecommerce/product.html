@@ -31,9 +31,6 @@
           <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
           <button type="submit" class="btn ecom-button w-full">Tambah ke keranjang</button>
         </form>
-        <a href="{{ url_for('ecommerce.index') }}" class="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-muted hover:text-ink">
-          {{ icon('arrow-left', 'h-4 w-4') }}Kembali ke katalog
-        </a>
       </div>
     </div>
   </article>

@@ -285,6 +285,15 @@ paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` ba
 Tes otomatis: `python -m unittest discover -s tests -v` (400 tes, termasuk 62 tes Portal dan 108 tes Forum).
 Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 
+## Integrasi lintas modul (notifikasi, Smart Landing, statistik, pengaturan)
+
+- **Notifikasi Top-Bar.** Lonceng menampilkan jumlah belum dibaca (lencana, `9+` bila lebih), panel berisi notifikasi terbaru beserta modul dan waktunya, dan tautan ke halaman asal. Klik notifikasi bertautan menandainya dibaca sambil membuka halaman asal; notifikasi tanpa tautan berupa tombol yang hanya menandai dibaca. Tombol "Tandai semua dibaca" membersihkan seluruhnya. Endpoint: `POST /api/notifications/read` (`{"id": N}` atau `{"all": true}`, JSON same-origin, hanya milik akun sendiri), klien: `static/js/notif.js`, logika: `utils.mark_notifications_read`.
+- **Smart Landing.** Kontrol di Beranda menampilkan statusnya (aktif/nonaktif). "Tampilkan Beranda" mematikannya; "Lanjutkan modul terakhir" menyalakannya. Tersimpan di `user_settings.landing_mode`.
+- **Statistik Information System** (`/infosys/statistik`) memuat data keenam modul: pesanan, kelas, kemajuan, bookmark, thread, balasan, kuis lulus, artikel Portal (umum), kategori favorit, aktivitas tercatat, dan rincian aktivitas per modul.
+- **Pengaturan per modul** memakai satu pola: `app/module_settings.py` (`get_setting`, `set_setting`, `MSG_SAVE_FAILED`, `msg_saved`). Modul tidak boleh menulis SQL `module_settings` sendiri (dijaga tes). `set_setting(..., None)` menghapus; `commit=False` untuk transaksi gabungan. Setiap simpan tercatat di log aktivitas.
+- **Navigasi.** Setiap halaman GET modul harus punya node di `app/navigation.py` (dijaga `NavigationCoverageTest`); E-Commerce kini ikut.
+- Uji: `python -m unittest tests.test_integration`; panduan manual: `docs/UJI_MANUAL_INTEGRASI.md`; rincian perubahan: `docs/PERUBAHAN_INTEGRASI.md`.
+
 ## Roadmap
 
 Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi (selesai) →

@@ -5,7 +5,8 @@ from datetime import datetime
 from flask import abort, current_app, flash, g, jsonify, redirect, render_template, request, url_for
 
 from ..db import get_db
-from ..utils import csrf_valid, login_required, log_activity, now_iso, notify, safe_next
+from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..utils import MSG_CSRF, csrf_valid, login_required, log_activity, now_iso, notify, safe_next
 from . import bp
 
 MAX_CART_QTY = 99
@@ -20,7 +21,6 @@ SORT_OPTIONS = {
     "price_desc": ("Harga tertinggi", "p.price DESC, p.name COLLATE NOCASE ASC"),
     "name": ("Nama A-Z", "p.name COLLATE NOCASE ASC"),
 }
-MSG_CSRF = "Formulir sudah kedaluwarsa. Muat ulang halaman, lalu coba lagi."
 PAYMENT_METHODS = (
     ("transfer", "Transfer bank (simulasi)"),
     ("e-wallet", "E-Wallet (simulasi)"),
@@ -80,32 +80,17 @@ def _cart_totals(user_id):
 
 
 def _ecommerce_settings(user_id):
-    rows = get_db().execute(
-        "SELECT setting_key, setting_value FROM module_settings "
-        "WHERE user_id = ? AND module_key = 'ecommerce' "
-        "AND setting_key IN (?, ?)",
-        (user_id, *SETTINGS_KEYS.values()),
-    ).fetchall()
-    values = {row["setting_key"]: row["setting_value"] or "" for row in rows}
     return {
-        "address": values.get(SETTINGS_KEYS["address"], ""),
-        "payment_method": values.get(SETTINGS_KEYS["payment"], ""),
+        "address": get_setting(user_id, "ecommerce", SETTINGS_KEYS["address"], ""),
+        "payment_method": get_setting(user_id, "ecommerce", SETTINGS_KEYS["payment"], ""),
     }
 
 
 def _save_ecommerce_settings(user_id, address, payment_method):
-    db = get_db()
-    db.executemany(
-        "INSERT INTO module_settings (user_id, module_key, setting_key, setting_value) "
-        "VALUES (?, 'ecommerce', ?, ?) "
-        "ON CONFLICT(user_id, module_key, setting_key) "
-        "DO UPDATE SET setting_value = excluded.setting_value",
-        (
-            (user_id, SETTINGS_KEYS["address"], address),
-            (user_id, SETTINGS_KEYS["payment"], payment_method),
-        ),
-    )
-    db.commit()
+    set_setting(user_id, "ecommerce", SETTINGS_KEYS["address"], address, commit=False)
+    set_setting(user_id, "ecommerce", SETTINGS_KEYS["payment"], payment_method, commit=False)
+    log_activity("ecommerce", "ecommerce_settings", "Alamat dan metode bayar favorit diperbarui", commit=False)
+    get_db().commit()
 
 
 def _payment_label(value):
@@ -518,7 +503,7 @@ def settings():
         if errors:
             return render_template(
                 "ecommerce/settings.html",
-                page_title="Pengaturan",
+                page_title="Pengaturan E-Commerce",
                 values={"address": address, "payment_method": payment_method},
                 payment_methods=PAYMENT_METHODS,
                 errors=errors,
@@ -531,14 +516,14 @@ def settings():
                 "Gagal menyimpan pengaturan E-Commerce untuk user_id=%s",
                 g.user["id"],
             )
-            flash("Pengaturan belum bisa disimpan. Coba lagi sebentar lagi.", "error")
+            flash(MSG_SAVE_FAILED, "error")
             return redirect(url_for("ecommerce.settings"))
-        flash("Pengaturan E-Commerce berhasil disimpan.", "success")
+        flash(msg_saved("E-Commerce"), "success")
         return redirect(url_for("ecommerce.settings"))
 
     return render_template(
         "ecommerce/settings.html",
-        page_title="Pengaturan",
+        page_title="Pengaturan E-Commerce",
         values=values,
         payment_methods=PAYMENT_METHODS,
         errors=errors,

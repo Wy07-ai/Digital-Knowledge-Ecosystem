@@ -5,13 +5,16 @@ Guest tidak memakai endpoint ini (disimpan di localStorage).
 Body JSON (sebagian atau semua kolom):
     {"theme": "light|dark|system", "view_mode": "desktop|mobile",
      "landing_mode": "launcher|last_module"}
+
+POST /api/notifications/read menandai notifikasi Member sebagai dibaca (dipanggil notif.js):
+    {"id": <id notifikasi>}  atau  {"all": true}   ->  {"ok": true, "unread": <sisa belum dibaca>}
 """
 import sqlite3
 
 from flask import g, jsonify, request
 
 from .. import db
-from ..utils import now_iso
+from ..utils import mark_notifications_read, now_iso
 from . import bp
 
 # Daftar putih kolom -> nilai yang diizinkan. Nama kolom TIDAK pernah berasal dari input.
@@ -28,8 +31,8 @@ def _json_error(message, status):
     return resp
 
 
-@bp.post("/api/settings/global")
-def update_global_settings():
+def _api_guard():
+    """Penjaga bersama endpoint JSON Member: kembalikan respons error, atau None bila lolos."""
     if g.get("user") is None:
         return _json_error("Silakan masuk terlebih dahulu.", 401)
 
@@ -40,6 +43,37 @@ def update_global_settings():
         return _json_error("Permintaan ditolak.", 403)
     if not request.is_json:
         return _json_error("Gunakan Content-Type application/json.", 415)
+    return None
+
+
+@bp.post("/api/notifications/read")
+def read_notifications():
+    denied = _api_guard()
+    if denied is not None:
+        return denied
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or not data:
+        return _json_error("Data notifikasi tidak valid.", 400)
+    if data.get("all") is True:
+        notification_id = None
+    else:
+        notification_id = data.get("id")
+        if not isinstance(notification_id, int) or isinstance(notification_id, bool):
+            return _json_error("Sebutkan id notifikasi atau all: true.", 400)
+    try:
+        unread = mark_notifications_read(g.user["id"], notification_id)
+    except sqlite3.Error:
+        return _json_error("Notifikasi belum bisa diperbarui. Coba lagi sebentar lagi.", 503)
+    resp = jsonify(ok=True, unread=unread)
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
+@bp.post("/api/settings/global")
+def update_global_settings():
+    denied = _api_guard()
+    if denied is not None:
+        return denied
 
     data = request.get_json(silent=True)
     if not isinstance(data, dict) or not data:

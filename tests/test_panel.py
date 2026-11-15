@@ -389,7 +389,8 @@ class StatistikTest(PanelTestCase):
         self.login()
         html = self.html("/infosys/statistik")
         values = re.findall(r'data-stat-value>([^<]+)<', html)
-        self.assertEqual(values, ["2", "2", "75%", "1", "2", "3"])
+        # enam kartu semula + Kuis lulus, Artikel Portal, Kategori favorit, Aktivitas tercatat
+        self.assertEqual(values, ["2", "2", "75%", "1", "2", "3", "0", "0", "0", "0"])
         self.assertIn("Total belanja Rp 100.000", html)           # hanya pesanan paid milik Rina
         self.assertIn("2 dari 4 materi", html)
         self.assertIn("4 dari 4 materi", html)

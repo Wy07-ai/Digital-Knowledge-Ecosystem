@@ -23,7 +23,8 @@ import sqlite3
 from flask import abort, current_app, flash, g, redirect, render_template, request, session, url_for
 
 from ..db import get_db
-from ..utils import csrf_valid, log_activity, login_required, notify, now_iso
+from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..utils import MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso
 from . import bp
 from . import logic as lg
 
@@ -36,7 +37,6 @@ VIEWED_KEY = "dke_fm_viewed"
 VIEWED_MAX = 100
 NEW_POST_KEY = "dke_fm_new_post"   # id balasan yang baru dikirim: dianimasikan slide-up sekali di halaman berikutnya
 
-MSG_CSRF = "Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi."
 MSG_DB = "Perubahan belum bisa disimpan. Coba lagi sebentar lagi."
 
 LIMITS = {
@@ -78,20 +78,12 @@ def _thread_view(row):
 
 
 def _get_setting(db, user_id, key):
-    row = db.execute(
-        "SELECT setting_value FROM module_settings WHERE user_id = ? AND module_key = ? AND setting_key = ?",
-        (user_id, MODULE_KEY, key),
-    ).fetchone()
-    return row["setting_value"] if row else None
+    return get_setting(user_id, MODULE_KEY, key, db=db)
 
 
 def _save_setting(db, user_id, key, value):
     """Upsert tanpa commit (dipanggil di dalam transaksi pemanggil)."""
-    db.execute(
-        "INSERT INTO module_settings (user_id, module_key, setting_key, setting_value) VALUES (?, ?, ?, ?) "
-        "ON CONFLICT(user_id, module_key, setting_key) DO UPDATE SET setting_value = excluded.setting_value",
-        (user_id, MODULE_KEY, key, value),
-    )
+    set_setting(user_id, MODULE_KEY, key, value, db=db, commit=False)
 
 
 def _get_thread_or_404(db, thread_id, extra=""):
@@ -533,9 +525,9 @@ def settings():
         except sqlite3.Error:
             db.rollback()
             current_app.logger.exception("Gagal menyimpan pengaturan Forum user_id=%s", uid)
-            flash(MSG_DB, "error")
+            flash(MSG_SAVE_FAILED, "error")
             return redirect(url_for("forum.settings"))
-        flash("Pengaturan Forum disimpan.", "success")
+        flash(msg_saved("Forum"), "success")
         return redirect(url_for("forum.settings"))
 
     return render_template(

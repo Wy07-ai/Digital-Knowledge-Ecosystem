@@ -6,6 +6,9 @@ jalur untuk membaca data milik pengguna lain (IDOR).
 """
 from datetime import datetime, timedelta, timezone
 
+from .. import MODULES
+from ..module_settings import get_setting
+
 PER_PAGE = 10
 WIB = timezone(timedelta(hours=7))
 
@@ -31,6 +34,9 @@ ACTION_LABELS = {
     "bookmark": "Simpan tutorial",
     "unbookmark": "Hapus simpanan tutorial",
     "portal_preferences": "Ubah preferensi Portal",
+    "ecommerce_settings": "Ubah pengaturan E-Commerce",
+    "elearning_settings": "Ubah pengaturan E-Learning",
+    "etutorial_settings": "Ubah pengaturan E-Tutorial",
 }
 
 
@@ -138,6 +144,12 @@ def course_progress(db, user_id):
     return result
 
 
+def module_activity(db, user_id):
+    """Jumlah log aktivitas akun ini untuk KEENAM modul (0 bila belum ada): [(modul, jumlah)]."""
+    counts = module_counts(db, user_id)
+    return [(m, counts.get(m["key"], 0)) for m in MODULES]
+
+
 def user_stats(db, user_id):
     """Angka statistik lintas modul milik satu pengguna."""
     orders = db.execute(
@@ -154,6 +166,14 @@ def user_stats(db, user_id):
         "bookmarks": one("SELECT COUNT(*) FROM tutorial_bookmarks WHERE user_id = ?"),
         "threads": one("SELECT COUNT(*) FROM threads WHERE user_id = ?"),
         "posts": one("SELECT COUNT(*) FROM posts WHERE user_id = ?"),
+        # E-Learning: kuis yang sudah lulus (dihitung per kuis, bukan per percobaan)
+        "quizzes_passed": one("SELECT COUNT(DISTINCT quiz_id) FROM quiz_attempts WHERE user_id = ? AND passed = 1"),
+        # Portal: artikel itu konten publik (bukan data pribadi), kategori favorit milik sendiri
+        "articles": db.execute("SELECT COUNT(*) FROM articles").fetchone()[0],
+        "fav_categories": len([s for s in get_setting(user_id, "portal", "preferred_categories", "", db=db).split(",") if s.strip()]),
+        # Information System: seluruh aktivitas dan jumlah login akun ini
+        "activities": count_logs(db, user_id),
+        "logins": count_logs(db, user_id, action="login"),
     }
     stats["is_empty"] = not any(stats[k] for k in ("orders", "courses", "bookmarks", "threads", "posts"))
     return stats, courses

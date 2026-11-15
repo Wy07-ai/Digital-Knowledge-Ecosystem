@@ -24,7 +24,8 @@ from datetime import datetime, timedelta, timezone
 from flask import abort, current_app, flash, g, redirect, render_template, request, session, url_for
 
 from ..db import get_db
-from ..utils import csrf_valid, log_activity, login_required
+from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..utils import MSG_CSRF, csrf_valid, log_activity, login_required
 from . import bp
 
 MODULE_KEY = "portal"
@@ -43,7 +44,6 @@ DEFAULT_COVER = "img/portal/default.svg"
 COVER_WIDTH, COVER_HEIGHT = 1200, 630
 ANON_AUTHOR = "Redaksi DKE"
 
-MSG_CSRF = "Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi."
 
 WIB = timezone(timedelta(hours=7))
 _BULAN = ("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des")
@@ -168,12 +168,9 @@ def get_preferred(valid_slugs):
     """Slug kategori favorit Member (hanya yang masih ada), selain itu daftar kosong. Guest: kosong."""
     if g.get("user") is None:
         return []
-    row = get_db().execute(
-        "SELECT setting_value FROM module_settings WHERE user_id = ? AND module_key = ? AND setting_key = ?",
-        (g.user["id"], MODULE_KEY, SETTING_CATEGORIES),
-    ).fetchone()
+    stored = get_setting(g.user["id"], MODULE_KEY, SETTING_CATEGORIES, "")
     chosen = []
-    for part in ((row["setting_value"] if row else "") or "").split(","):
+    for part in stored.split(","):
         slug = part.strip().lower()
         if slug in valid_slugs and slug not in chosen:
             chosen.append(slug)
@@ -182,20 +179,11 @@ def get_preferred(valid_slugs):
 
 def save_preferred(user_id, slugs):
     """Simpan (atau hapus bila kosong) preferensi kategori di module_settings."""
-    db = get_db()
-    if slugs:
-        db.execute(
-            "INSERT INTO module_settings (user_id, module_key, setting_key, setting_value) "
-            "VALUES (?, ?, ?, ?) "
-            "ON CONFLICT(user_id, module_key, setting_key) DO UPDATE SET setting_value = excluded.setting_value",
-            (user_id, MODULE_KEY, SETTING_CATEGORIES, ",".join(slugs)),
-        )
-    else:
-        db.execute(
-            "DELETE FROM module_settings WHERE user_id = ? AND module_key = ? AND setting_key = ?",
-            (user_id, MODULE_KEY, SETTING_CATEGORIES),
-        )
-    db.commit()
+    set_setting(user_id, MODULE_KEY, SETTING_CATEGORIES, ",".join(slugs) if slugs else None, commit=False)
+    log_activity(MODULE_KEY, "portal_preferences",
+                 ("Kategori favorit: " + ", ".join(slugs)) if slugs else "Preferensi kategori dihapus",
+                 commit=False)
+    get_db().commit()
 
 
 def _preference_rank(preferred):
@@ -375,16 +363,14 @@ def settings():
         chosen = [] if action == "reset" else [c["slug"] for c in categories if c["slug"] in submitted]
         try:
             save_preferred(g.user["id"], chosen)
-            log_activity(MODULE_KEY, "portal_preferences",
-                         ("Kategori favorit: " + ", ".join(chosen)) if chosen else "Preferensi kategori dihapus")
         except sqlite3.Error:
             db.rollback()
             current_app.logger.exception("Gagal menyimpan preferensi Portal user_id=%s", g.user["id"])
-            flash("Preferensi belum bisa disimpan. Coba lagi sebentar lagi.", "error")
+            flash(MSG_SAVE_FAILED, "error")
             return redirect(url_for("portal.settings"))
         if chosen:
             names = ", ".join(c["name"] for c in categories if c["slug"] in chosen)
-            flash(f"Preferensi disimpan. Beranda Portal kini mendahulukan: {names}.", "success")
+            flash(msg_saved("Portal", f"Beranda Portal kini mendahulukan: {names}."), "success")
         else:
             flash("Preferensi dihapus. Beranda Portal kembali diurutkan dari yang terbaru.", "success")
         return redirect(url_for("portal.settings"))

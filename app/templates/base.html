@@ -8,13 +8,15 @@
                              lalu ditimpa localStorage oleh skrip anti-kedip)
     data-member            : "1" bila login -> sumber kebenaran = server, bukan localStorage
     data-settings-url      : endpoint POST pengaturan global
+    data-notif-url         : endpoint POST tandai notifikasi dibaca
 #}
 {% from '_components/breadcrumb.html' import page_nav %}
 <html lang="id"
       data-theme="{{ settings.theme if settings.theme in ('light', 'dark', 'system') else 'system' }}"
       data-view="{{ settings.view_mode if settings.view_mode in ('desktop', 'mobile') else 'desktop' }}"
       data-member="{{ '1' if current_user else '0' }}"
-      data-settings-url="{{ url_for('main.update_global_settings') }}">
+      data-settings-url="{{ url_for('main.update_global_settings') }}"
+      data-notif-url="{{ url_for('main.read_notifications') }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -75,6 +77,7 @@
   <script defer src="{{ url_for('static', filename='js/toast.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/switcher.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% if current_user %}<script defer src="{{ url_for('static', filename='js/notif.js') }}"></script>{% endif %}
 </head>
 <body class="flex min-h-screen flex-col bg-page font-sans text-ink antialiased" style="--accent: {{ accent }}">
   <a href="#konten" class="skip-link">Lewati ke konten utama</a>

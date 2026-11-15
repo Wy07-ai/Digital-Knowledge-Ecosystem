@@ -18,10 +18,13 @@
     return on ? on.dataset.landingOption : 'launcher';
   }
 
+  var state = section.querySelector('[data-landing-state]');
+
   function show(value) {
     buttons.forEach(function (b) {
       b.setAttribute('aria-pressed', String(b.dataset.landingOption === value));
     });
+    if (state) state.textContent = value === 'last_module' ? 'aktif' : 'nonaktif';
   }
 
   function notify(message, type) {
@@ -46,7 +49,7 @@
       if (!res.ok) { var err = new Error('HTTP ' + res.status); err.status = res.status; throw err; }
       notify(next === 'last_module'
         ? 'Berikutnya DKE akan membuka modul terakhir Anda.'
-        : 'Berikutnya DKE akan membuka Beranda.', 'success');
+        : 'Smart Landing dimatikan. Berikutnya DKE akan membuka Beranda.', 'success');
     }).catch(function (err) {
       show(previous);
       notify(err && err.status === 401

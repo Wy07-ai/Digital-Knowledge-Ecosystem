@@ -1,10 +1,10 @@
 {% extends "infosys/_panel.html" %}
 {% from "_components/empty_state.html" import empty_state %}
-{% from "infosys/_panel_macros.html" import stat_card with context %}
+{% from "infosys/_panel_macros.html" import stat_card, badge_module with context %}
 {% block title %}Statistik Lintas Modul{% endblock %}
 {% block panel %}
-  <h1 class="text-2xl font-bold">Statistik Lintas Modul</h1>
-  <p class="mt-1 text-muted">Angka dari E-Commerce, E-Learning, E-Tutorial, dan Forum. Hanya mencakup akun Anda.</p>
+  <h1 class="text-3xl font-bold tracking-tight">Statistik Lintas Modul</h1>
+  <p class="mt-1 text-muted">Angka dari keenam modul DKE. Semuanya mencakup akun Anda, kecuali jumlah artikel Portal yang bersifat umum.</p>
 
   {% if stats.is_empty %}
     {{ empty_state('Belum ada statistik', 'Angka akan muncul setelah Anda berbelanja, mengikuti kelas, menyimpan tutorial, atau berdiskusi di forum.', 'Jelajahi modul', url_for('main.index'), 'chart') }}
@@ -16,7 +16,24 @@
       {{ stat_card('Tutorial tersimpan', stats.bookmarks, 'Tutorial yang Anda bookmark.' if stats.bookmarks else 'Belum ada tutorial tersimpan.', 'etutorial', url_for('etutorial.index')) }}
       {{ stat_card('Thread dibuat', stats.threads, 'Topik yang Anda mulai di forum.' if stats.threads else 'Belum membuat thread.', 'forum', url_for('forum.index')) }}
       {{ stat_card('Balasan', stats.posts, 'Balasan yang Anda tulis di forum.' if stats.posts else 'Belum membalas thread.', 'forum', url_for('forum.index')) }}
+      {{ stat_card('Kuis lulus', stats.quizzes_passed, 'Kuis kelas yang sudah Anda lulusi.' if stats.quizzes_passed else 'Belum lulus kuis.', 'elearning', url_for('elearning.my_courses')) }}
+      {{ stat_card('Artikel Portal', stats.articles, 'Artikel tersedia untuk dibaca.' if stats.articles else 'Belum ada artikel.', 'portal', url_for('portal.index')) }}
+      {{ stat_card('Kategori favorit', stats.fav_categories, 'Kategori Portal yang Anda dahulukan.' if stats.fav_categories else 'Belum memilih kategori favorit.', 'portal', url_for('portal.settings')) }}
+      {{ stat_card('Aktivitas tercatat', stats.activities, (stats.logins ~ ' kali login.') if stats.logins else 'Belum ada login tercatat.', 'infosys', url_for('infosys.activity')) }}
     </div>
+
+    <section class="mt-6" aria-labelledby="h-modul">
+      <h2 id="h-modul" class="text-lg font-semibold">Aktivitas per modul</h2>
+      <ul class="mt-3 divide-y divide-line rounded-xl border border-line bg-surface" data-module-activity>
+        {% for m, n in activity %}
+          <li class="flex items-center justify-between gap-3 px-4 py-3">
+            {{ badge_module(m.key) }}
+            {% if n %}<a href="{{ url_for('infosys.activity', modul=m.key) }}" class="text-sm font-semibold text-primary underline underline-offset-2">{{ n }} aktivitas</a>
+            {% else %}<span class="text-sm text-muted">Belum ada aktivitas</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
 
     <section class="mt-6" aria-labelledby="h-progres">
       <h2 id="h-progres" class="text-lg font-semibold">Progres per kelas</h2>

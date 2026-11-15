@@ -1081,11 +1081,14 @@ def seed_forum(conn, cats, users):
         others = [p for p in t["posts"] if p[1] != t["author"]]
         for idx, (label, email, _parent, hours, _body) in enumerate(others):
             unread = t["author"] == DEMO_EMAIL and idx >= len(others) - 2  # 2 terakhir milik demo belum dibaca
+            # created_at ikut kunci: satu orang bisa membalas berkali-kali dengan pesan yang sama,
+            # dan tiap balasan harus jadi notifikasinya sendiri (kalau tidak, yang belum dibaca tertimpa).
             ensure(conn, "notifications", {
                 "user_id": author_id,
                 "message": f"{name_of[email]} membalas thread Anda: {t['title']}",
+                "created_at": ts(t["days_ago"], hours=hours),
             }, {"module_key": "forum", "link_url": f"/forum/thread/{thread_id}"},
-                fixed={"is_read": 0 if unread else 1, "created_at": ts(t["days_ago"], hours=hours)})
+                fixed={"is_read": 0 if unread else 1})
     return thread_ids
 
 

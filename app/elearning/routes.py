@@ -19,7 +19,8 @@ from flask import (abort, current_app, flash, g, jsonify, make_response, redirec
                    request, session, url_for)
 
 from ..db import get_db
-from ..utils import CSRF_SESSION_KEY, csrf_valid, log_activity, login_required, notify, now_iso
+from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..utils import CSRF_SESSION_KEY, MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso
 from . import bp, quiz as quizlib
 
 LEVELS = (("pemula", "Pemula"), ("menengah", "Menengah"), ("lanjut", "Lanjut"))
@@ -36,7 +37,6 @@ SETTING_GOAL = "daily_goal_min"
 # "Hari ini" untuk target belajar dihitung dalam WIB (UTC+7); stempel waktu disimpan dalam UTC.
 LOCAL_OFFSET = "+7 hours"
 
-MSG_CSRF = "Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi."
 
 
 # --------------------------------------------------------------------------
@@ -166,17 +166,11 @@ def minutes_studied_today(user_id):
 # Pengaturan modul (kecepatan video, target belajar)
 # --------------------------------------------------------------------------
 def get_settings(user_id):
-    rows = get_db().execute(
-        "SELECT setting_key, setting_value FROM module_settings "
-        "WHERE user_id = ? AND module_key = 'elearning' AND setting_key IN (?, ?)",
-        (user_id, SETTING_SPEED, SETTING_GOAL),
-    ).fetchall()
-    stored = {r["setting_key"]: r["setting_value"] for r in rows}
-    speed = stored.get(SETTING_SPEED)
+    speed = get_setting(user_id, "elearning", SETTING_SPEED)
     if speed not in SPEED_CHOICES:
         speed = DEFAULT_SPEED
     try:
-        goal = int(stored.get(SETTING_GOAL) or DEFAULT_GOAL)
+        goal = int(get_setting(user_id, "elearning", SETTING_GOAL) or DEFAULT_GOAL)
     except (TypeError, ValueError):
         goal = DEFAULT_GOAL
     if not GOAL_MIN <= goal <= GOAL_MAX:
@@ -185,14 +179,11 @@ def get_settings(user_id):
 
 
 def save_settings(user_id, speed, goal):
-    db = get_db()
-    db.executemany(
-        "INSERT INTO module_settings (user_id, module_key, setting_key, setting_value) "
-        "VALUES (?, 'elearning', ?, ?) "
-        "ON CONFLICT(user_id, module_key, setting_key) DO UPDATE SET setting_value = excluded.setting_value",
-        ((user_id, SETTING_SPEED, speed), (user_id, SETTING_GOAL, str(goal))),
-    )
-    db.commit()
+    set_setting(user_id, "elearning", SETTING_SPEED, speed, commit=False)
+    set_setting(user_id, "elearning", SETTING_GOAL, goal, commit=False)
+    log_activity("elearning", "elearning_settings",
+                 f"Kecepatan video {speed_label(speed)}; target belajar {goal} menit/hari", commit=False)
+    get_db().commit()
 
 
 def speed_label(speed):
@@ -522,7 +513,7 @@ def api_lesson_complete(lesson_id):
     expected = session.get(CSRF_SESSION_KEY)
     sent = request.headers.get("X-CSRF-Token", "")
     if not expected or sent != expected:
-        return _json_error("Sesi kedaluwarsa. Muat ulang halaman lalu coba lagi.", 403)
+        return _json_error(MSG_CSRF, 403)
 
     data = request.get_json(silent=True)
     completed = data.get("completed", True) if isinstance(data, dict) else None
@@ -749,9 +740,9 @@ def settings():
         except sqlite3.Error:
             get_db().rollback()
             current_app.logger.exception("Gagal menyimpan pengaturan E-Learning user_id=%s", user_id)
-            flash("Pengaturan belum bisa disimpan. Coba lagi sebentar lagi.", "error")
+            flash(MSG_SAVE_FAILED, "error")
             return redirect(url_for("elearning.settings"))
-        flash("Pengaturan E-Learning berhasil disimpan.", "success")
+        flash(msg_saved("E-Learning"), "success")
         return redirect(url_for("elearning.settings"))
 
     return render_template(

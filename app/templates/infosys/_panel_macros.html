@@ -42,7 +42,7 @@
   </div>
   {% if hint %}<p id="hint-{{ id }}" class="mt-1 text-sm text-muted">{{ hint }}</p>{% endif %}
   <p id="err-{{ id }}" data-error-for="{{ id }}" {% if not error %}hidden{% endif %}
-     class="mt-1 flex items-start gap-1.5 text-sm font-medium text-red-600 dark:text-red-400">
+     class="mt-1 flex items-start gap-1.5 text-sm font-medium text-red-700 dark:text-red-300">
     <span class="mt-0.5 flex-none">{{ icon('error', 'h-4 w-4') }}</span>
     <span data-error-text>{{ error or '' }}</span>
   </p>

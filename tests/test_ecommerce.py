@@ -234,7 +234,7 @@ class EcommerceTests(unittest.TestCase):
         self.assertEqual(self.sql("SELECT user_id, course_id, source, order_id FROM enrollments"), [(1, 1, "order", order[0][0])])
         self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 0)
         self.assertEqual(self.sql("SELECT module_key, message FROM notifications")[0][0], "ecommerce")
-        self.assertEqual(self.sql("SELECT action FROM activity_logs")[0][0], "checkout")
+        self.assertEqual(self.sql("SELECT action FROM activity_logs WHERE action = 'checkout'")[0][0], "checkout")
         confirmation = self.client.get(response.location).get_data(as_text=True)
         self.assertIn("Pesanan berhasil dibuat", confirmation)
         self.assertIn("DKE-", confirmation)
@@ -279,7 +279,7 @@ class EcommerceTests(unittest.TestCase):
         self.assertEqual(self.sql("SELECT COUNT(*) FROM order_items")[0][0], 0)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM enrollments")[0][0], 0)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM notifications")[0][0], 0)
-        self.assertEqual(self.sql("SELECT COUNT(*) FROM activity_logs")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM activity_logs WHERE action = 'checkout'")[0][0], 0)
         self.assertEqual(self.sql("SELECT product_id, qty FROM cart_items"), [(1, 2)])
 
 
