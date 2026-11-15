@@ -95,6 +95,7 @@ def login_required(view):
 # CSRF (token per sesi, tanpa ekstensi tambahan)
 # --------------------------------------------------------------------------
 CSRF_SESSION_KEY = "_csrf_token"
+MSG_CSRF = "Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi."  # satu kalimat untuk semua modul
 
 
 def csrf_token():
@@ -181,10 +182,28 @@ def current_login_url():
     return _login_url(_origin_path())
 
 
+def mark_notifications_read(user_id, notification_id=None):
+    """Tandai notifikasi milik user_id sebagai dibaca (satu bila notification_id diisi, selain itu semua).
+
+    Selalu memakai `WHERE user_id = ?`, sehingga id milik orang lain tidak berpengaruh.
+    Mengembalikan jumlah notifikasi yang masih belum dibaca.
+    """
+    db = get_db()
+    sql, params = "UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0", [user_id]
+    if notification_id is not None:
+        sql += " AND id = ?"
+        params.append(notification_id)
+    db.execute(sql, params)
+    db.commit()
+    return db.execute(
+        "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0", (user_id,)
+    ).fetchone()[0]
+
+
 def notification_summary(limit=5):
     """Jumlah notifikasi belum dibaca dan `limit` notifikasi terbaru milik Member.
 
-    Dikembalikan sebagai dict {"unread": int, "rows": [{message, link, is_read}]}.
+    Dikembalikan sebagai dict {"unread": int, "rows": [{id, message, link, is_read, module, when}]}.
     Hasil disimpan di g agar pemanggilan berulang dalam satu permintaan tidak mengulang kueri.
     """
     cached = g.get("_notif_summary")
@@ -198,14 +217,21 @@ def notification_summary(limit=5):
             summary["unread"] = db.execute(
                 "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0", (uid,)
             ).fetchone()[0]
+            from . import MODULE_BY_KEY  # impor lokal: app/__init__ mengimpor utils lebih dulu
+            from .main.launcher import friendly_when
+
             for row in db.execute(
-                "SELECT message, link_url, is_read FROM notifications "
+                "SELECT id, module_key, message, link_url, is_read, created_at FROM notifications "
                 "WHERE user_id = ? ORDER BY created_at DESC, id DESC LIMIT ?", (uid, limit)
             ):
                 link = row["link_url"] if is_safe_next(row["link_url"]) else None
-                summary["rows"].append(
-                    {"message": row["message"], "link": link, "is_read": bool(row["is_read"])}
-                )
+                module = MODULE_BY_KEY.get(row["module_key"])
+                summary["rows"].append({
+                    "id": row["id"], "message": row["message"], "link": link,
+                    "is_read": bool(row["is_read"]),
+                    "module": module["name"] if module else None,
+                    "when": friendly_when(row["created_at"]),
+                })
         except Exception:  # tabel belum ada / DB belum di-seed: lonceng tetap tampil kosong
             pass
     g._notif_summary = summary

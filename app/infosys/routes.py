@@ -20,7 +20,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .. import DEFAULT_SETTINGS, MODULE_BY_KEY
 from ..db import get_db
-from ..utils import csrf_valid, log_activity, login_required, notify, now_iso, safe_next
+from ..utils import MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso, safe_next
 from . import bp, panel
 from .validation import (
     MSG_ACCOUNT_INACTIVE,
@@ -39,7 +39,6 @@ from .validation import (
 )
 
 MODULE = "infosys"
-MSG_CSRF = "Formulir sudah kedaluwarsa. Muat ulang halaman, lalu coba lagi."
 
 # Hash tiruan: dipakai saat email tidak ditemukan agar waktu respons login tidak
 # membocorkan apakah email itu terdaftar.
@@ -269,9 +268,10 @@ def activity():
 @bp.route("/statistik")
 @login_required
 def stats():
-    stats_, courses = panel.user_stats(get_db(), _uid())
+    db = get_db()
+    stats_, courses = panel.user_stats(db, _uid())
     return _panel("infosys/stats.html", "statistik", "Statistik Lintas Modul",
-                  stats=stats_, courses=courses)
+                  stats=stats_, courses=courses, activity=panel.module_activity(db, _uid()))
 
 
 # --------------------------------------------------------------------------

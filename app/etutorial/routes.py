@@ -19,7 +19,8 @@ import sqlite3
 from flask import abort, current_app, flash, g, redirect, render_template, request, url_for
 
 from ..db import get_db
-from ..utils import csrf_valid, is_safe_next, log_activity, login_required, now_iso
+from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..utils import MSG_CSRF, csrf_valid, is_safe_next, log_activity, login_required, now_iso
 from . import bp
 
 DIFFICULTIES = (("mudah", "Mudah"), ("menengah", "Menengah"), ("sulit", "Sulit"))
@@ -34,7 +35,6 @@ SETTING_FONT = "font_size"
 FONT_COOKIE = "dke_et_font"  # hanya untuk Guest
 FONT_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
-MSG_CSRF = "Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi."
 _LANG_OK = re.compile(r"^[a-z0-9+#.\-]{1,20}$")
 
 
@@ -110,26 +110,16 @@ def format_minutes(minutes):
 def get_font_size():
     """Ukuran font aktif: Member dari module_settings, Guest dari cookie, selain itu 'md'."""
     if g.get("user") is not None:
-        row = get_db().execute(
-            "SELECT setting_value FROM module_settings "
-            "WHERE user_id = ? AND module_key = ? AND setting_key = ?",
-            (g.user["id"], MODULE_KEY, SETTING_FONT),
-        ).fetchone()
-        value = row["setting_value"] if row else None
+        value = get_setting(g.user["id"], MODULE_KEY, SETTING_FONT)
     else:
         value = request.cookies.get(FONT_COOKIE)
     return value if value in FONT_LABEL else DEFAULT_FONT
 
 
 def save_font_size(user_id, font):
-    db = get_db()
-    db.execute(
-        "INSERT INTO module_settings (user_id, module_key, setting_key, setting_value) "
-        "VALUES (?, ?, ?, ?) "
-        "ON CONFLICT(user_id, module_key, setting_key) DO UPDATE SET setting_value = excluded.setting_value",
-        (user_id, MODULE_KEY, SETTING_FONT, font),
-    )
-    db.commit()
+    set_setting(user_id, MODULE_KEY, SETTING_FONT, font, commit=False)
+    log_activity(MODULE_KEY, "etutorial_settings", f"Ukuran font bacaan: {FONT_LABEL[font].lower()}", commit=False)
+    get_db().commit()
 
 
 # --------------------------------------------------------------------------
@@ -318,11 +308,11 @@ def settings():
             except sqlite3.Error:
                 get_db().rollback()
                 current_app.logger.exception("Gagal menyimpan font_size user_id=%s", g.user["id"])
-                flash("Pengaturan belum bisa disimpan. Coba lagi sebentar lagi.", "error")
+                flash(MSG_SAVE_FAILED, "error")
                 return response
         else:
             response.set_cookie(FONT_COOKIE, font, max_age=FONT_COOKIE_MAX_AGE, samesite="Lax", httponly=True)
-        flash(f"Ukuran font {FONT_LABEL[font].lower()} disimpan.", "success")
+        flash(msg_saved("E-Tutorial", f"Ukuran font bacaan: {FONT_LABEL[font].lower()}."), "success")
         return response
 
     return render_template(

@@ -3,7 +3,7 @@
 {# Tidak ada pemanggilan breadcrumb() di sini: breadcrumb dan tombol Kembali muncul otomatis di atas
    halaman ini karena endpoint-nya terdaftar di app/navigation.py (lihat node(...) "main.nav_demo_*"). #}
 {% block content %}
-  <h1 class="text-2xl font-bold">
+  <h1 class="text-3xl font-bold tracking-tight">
     {% if order_no %}Contoh halaman jenjang 3: Materi {{ order_no }}{% else %}Contoh halaman jenjang 2: Kelas {{ course_id }}{% endif %}
   </h1>
   <p class="mt-2 text-muted">

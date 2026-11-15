@@ -76,6 +76,11 @@ def _tutorial_title(args):
     return row["title"] if row else "Tutorial"
 
 
+def _product_name(args):
+    row = get_db().execute("SELECT name FROM products WHERE slug = ?", (args["slug"],)).fetchone()
+    return row["name"] if row else "Produk"
+
+
 def _thread_title(args):
     row = get_db().execute("SELECT title FROM threads WHERE id = ?", (args["thread_id"],)).fetchone()
     return row["title"] if row else "Thread"
@@ -100,6 +105,14 @@ node("infosys.profile", "Profil & Pengaturan", parent="infosys.index")
 node("infosys.activity", "Log Aktivitas", parent="infosys.index")
 node("infosys.stats", "Statistik Lintas Modul", parent="infosys.index")
 node("infosys.security", "Pengaturan Keamanan", parent="infosys.index")
+
+# E-Commerce: E-Commerce > <nama produk>; E-Commerce > Keranjang > Checkout; E-Commerce > Pesanan Saya > <kode>
+node("ecommerce.product", _product_name, parent="ecommerce.index")
+node("ecommerce.cart", "Keranjang", parent="ecommerce.index")
+node("ecommerce.checkout", "Checkout", parent="ecommerce.cart")
+node("ecommerce.orders", "Pesanan Saya", parent="ecommerce.index")
+node("ecommerce.order_detail", lambda args: args["order_code"], parent="ecommerce.orders")
+node("ecommerce.settings", "Pengaturan", parent="ecommerce.index")
 
 # E-Learning: E-Learning > <judul kelas> > Materi N: <judul materi>
 #             E-Learning > <judul kelas> > Kuis > Hasil Kuis

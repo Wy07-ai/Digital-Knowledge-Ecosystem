@@ -1,5 +1,6 @@
 {% extends "elearning/layout_elearning.html" %}
 {% block title %}Pengaturan E-Learning{% endblock %}
+{% block main_class %}max-w-3xl{% endblock %}
 {% block module_content %}
   <header class="mb-6">
     <p class="text-sm font-semibold uppercase tracking-wide el-text">E-Learning</p>
@@ -8,7 +9,7 @@
   </header>
 
   <form method="post" action="{{ url_for('elearning.settings') }}" novalidate
-        class="max-w-2xl rounded-xl border border-line bg-surface p-6 shadow-sm">
+        class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <fieldset aria-describedby="{{ 'speed-error' if errors.get('playback_speed') else 'speed-help' }}">
