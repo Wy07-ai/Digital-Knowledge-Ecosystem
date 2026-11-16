@@ -388,5 +388,35 @@ class WaktuTests(unittest.TestCase):
         self.assertIsNone(friendly_when("bukan tanggal"))
 
 
+class HeroMobileCssTests(unittest.TestCase):
+    """Hero Beranda: aturan Mobile View harus ada di CSS (bukan hanya media query)."""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(ROOT, "app", "static", "css", "custom.css"), encoding="utf-8") as f:
+            cls.css = f.read()
+
+    def _rule(self, selector):
+        m = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", self.css)
+        self.assertIsNotNone(m, f"aturan {selector} tidak ditemukan di custom.css")
+        return re.sub(r"\s+", " ", m.group(1))
+
+    def test_orbit_disembunyikan_di_mobile_view(self):
+        self.assertIn("display: none", self._rule("html[data-view='mobile'] .home-orbit"))
+
+    def test_hero_menjadi_blok_di_mobile_view(self):
+        body = self._rule("html[data-view='mobile'] .home-hero")
+        self.assertIn("display: block", body)
+        self.assertIn("min-height: 0", body)
+
+    def test_judul_dan_cta_mobile_view(self):
+        self.assertIn("max-width: none", self._rule("html[data-view='mobile'] .home-hero h1"))
+        self.assertIn("min-height: 44px", self._rule("html[data-view='mobile'] .home-hero-cta"))
+
+    def test_media_query_sempit_memuat_aturan_yang_sama(self):
+        m = re.search(r"@media \(max-width: 767px\) \{\s*\.home-hero \{[^}]*display: block[^}]*\}\s*\.home-orbit \{ display: none; \}", self.css)
+        self.assertIsNotNone(m)
+
+
 if __name__ == "__main__":
     unittest.main()

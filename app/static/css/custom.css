@@ -554,6 +554,31 @@ html.dark .ecom-product-art { background: linear-gradient(135deg, #422006, #713f
   .fm-row:is(article) { border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 }
 
+/* ---------- 8b. Hero Beranda di Mobile View dan layar sempit ----------
+   Pola ganda seperti bagian 6: media query untuk layar sungguhan, html[data-view='mobile'] untuk
+   Mobile View di desktop (lebar viewport tidak berubah). Ditaruh di luar blok hover di atas dan
+   sesudahnya, agar urutan sumber mengalahkan aturan hero dasar dan rentang 640-767 px. */
+html[data-view='mobile'] .home-hero { display: block; min-height: 0; padding: 1.25rem; }
+html[data-view='mobile'] .home-orbit { display: none; }
+html[data-view='mobile'] .home-hero h1 {
+  max-width: none; margin-top: .4rem; font-size: 1.625rem; line-height: 1.2; letter-spacing: -.025em;
+}
+html[data-view='mobile'] .home-hero-copy > p:not(.home-eyebrow) {
+  max-width: none; margin-top: .5rem; font-size: .9375rem; line-height: 1.5;
+}
+html[data-view='mobile'] .home-hero-cta { display: flex; width: 100%; min-height: 44px; margin-top: .875rem; }
+html[data-view='mobile'] .home-hero-cta > .truncate { flex: 0 1 auto; }
+html[data-view='mobile'] .home-apps { margin-top: 1.5rem; }
+@media (max-width: 767px) {
+  .home-hero { display: block; min-height: 0; padding: 1.25rem; }
+  .home-orbit { display: none; }
+  .home-hero h1 { max-width: none; margin-top: .4rem; font-size: 1.625rem; line-height: 1.2; letter-spacing: -.025em; }
+  .home-hero-copy > p:not(.home-eyebrow) { max-width: none; margin-top: .5rem; font-size: .9375rem; line-height: 1.5; }
+  .home-hero-cta { display: flex; width: 100%; min-height: 44px; margin-top: .875rem; }
+  .home-hero-cta > .truncate { flex: 0 1 auto; }
+  .home-apps { margin-top: 1.5rem; }
+}
+
 /* ---------- 9. Control Panel Information System ----------
    Sidebar tab di kiri, panel di kanan (Blueprint 5.3). Di layar sempit dan Mobile View paksa,
    sidebar menjadi deretan tab horizontal yang bisa digeser. Aksen indigo mengikuti token --c-primary. */
