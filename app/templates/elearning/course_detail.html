@@ -54,7 +54,7 @@
             <div class="mt-5">
               <div class="flex justify-between text-sm font-semibold"><span>{{ progress.done }} dari {{ progress.total }} materi</span><span>{{ progress.percent }}%</span></div>
               <div class="el-progress mt-1" role="progressbar" aria-label="Progres belajar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress.percent }}">
-                <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%"></div>
+                <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="--progress: {{ progress.percent / 100 }}"></div>
               </div>
             </div>
             {% if resume %}

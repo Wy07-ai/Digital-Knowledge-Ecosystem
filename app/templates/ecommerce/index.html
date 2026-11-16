@@ -74,7 +74,7 @@
   {% if products %}
     <div class="product-grid grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
       {% for product in products %}
-        <article class="flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <article class="flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
           <a href="{{ url_for('ecommerce.product', slug=product.slug) }}"
              class="ecom-product-art flex h-44 items-center justify-center overflow-hidden bg-amber-100 text-amber-950"
              aria-label="Lihat {{ product.name }}">

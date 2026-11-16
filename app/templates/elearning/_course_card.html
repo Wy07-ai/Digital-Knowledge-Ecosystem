@@ -31,7 +31,7 @@
         </div>
         <div class="el-progress mt-1" role="progressbar" aria-label="Progres {{ course.title }}"
              aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ prog.percent }}">
-          <div class="el-progress-fill{{ ' is-complete' if prog.percent >= 100 }}" style="width: {{ prog.percent }}%"></div>
+          <div class="el-progress-fill{{ ' is-complete' if prog.percent >= 100 }}" style="--progress: {{ prog.percent / 100 }}"></div>
         </div>
       </div>
     {% endif %}

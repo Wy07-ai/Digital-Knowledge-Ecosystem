@@ -16,6 +16,10 @@
 
 /* ---------- 1. Design token ---------- */
 :root {
+  /* Micro-interactions: durasi 150-300 ms dan easing bersama (Blueprint 5.4). */
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --dur-fast: 180ms;
+  --dur-base: 240ms;
   --c-page:        248 250 252;   /* #F8FAFC */
   --c-surface:     255 255 255;   /* #FFFFFF */
   --c-ink:         15 23 42;      /* #0F172A */
@@ -131,11 +135,23 @@ html[data-theme-animating] [data-theme-option] { pointer-events: none; }
 .menu-item[aria-checked='true'] { font-weight: 600; }
 
 /* Panel popover (App Switcher, tema, notifikasi, profil) */
-.popover-enter { animation: slide-up 150ms ease-out; }
+.popover-enter {
+  transform-origin: top right;
+  animation: popover-in var(--dur-fast) var(--ease-out) backwards;
+}
+.popover-exit {
+  pointer-events: none;
+  transform-origin: top right;
+  animation: popover-out var(--dur-fast) var(--ease-out) forwards;
+}
 
 /* ---------- 4. Keyframes ---------- */
 @keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes card-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popover-in { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes popover-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-4px) scale(.98); } }
+@keyframes check-pop { from { opacity: .5; transform: scale(.65); } to { opacity: 1; transform: scale(1); } }
 @keyframes toast-in  { from { opacity: 0; transform: translateX(1.5rem); } to { opacity: 1; transform: translateX(0); } }
 @keyframes toast-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(1.5rem); } }
 @keyframes theme-spin { from { transform: rotate(-180deg) scale(.5); opacity: 0; } to { transform: rotate(0) scale(1); opacity: 1; } }
@@ -145,6 +161,45 @@ html[data-theme-animating] [data-theme-option] { pointer-events: none; }
 .page-enter       { animation: fade-in 300ms ease-out backwards, slide-up 300ms ease-out backwards; }
 .toast-in  { animation: toast-in 200ms ease-out; }
 .toast-out { animation: toast-out 200ms ease-in forwards; }
+
+/* Kartu halaman: masuk bertahap ringan; hanya transform dan opacity yang dianimasikan. */
+.launcher-grid > *, .card-grid > *, .product-grid > *, .fm-row {
+  animation: card-enter var(--dur-base) var(--ease-out) backwards;
+}
+.launcher-grid > :nth-child(2), .card-grid > :nth-child(2), .product-grid > :nth-child(2), .fm-row:nth-child(2) { animation-delay: 50ms; }
+.launcher-grid > :nth-child(3), .card-grid > :nth-child(3), .product-grid > :nth-child(3), .fm-row:nth-child(3) { animation-delay: 100ms; }
+.launcher-grid > :nth-child(4), .card-grid > :nth-child(4), .product-grid > :nth-child(4), .fm-row:nth-child(4) { animation-delay: 150ms; }
+.launcher-grid > :nth-child(5), .card-grid > :nth-child(5), .product-grid > :nth-child(5), .fm-row:nth-child(5) { animation-delay: 200ms; }
+.launcher-grid > :nth-child(n+11), .card-grid > :nth-child(n+11), .product-grid > :nth-child(n+11), .fm-row:nth-child(n+11) { animation-delay: 500ms; }
+.launcher-grid > :nth-child(6), .card-grid > :nth-child(6), .product-grid > :nth-child(6), .fm-row:nth-child(6) { animation-delay: 250ms; }
+.launcher-grid > :nth-child(7), .card-grid > :nth-child(7), .product-grid > :nth-child(7), .fm-row:nth-child(7) { animation-delay: 300ms; }
+.launcher-grid > :nth-child(8), .card-grid > :nth-child(8), .product-grid > :nth-child(8), .fm-row:nth-child(8) { animation-delay: 350ms; }
+.launcher-grid > :nth-child(9), .card-grid > :nth-child(9), .product-grid > :nth-child(9), .fm-row:nth-child(9) { animation-delay: 400ms; }
+.launcher-grid > :nth-child(10), .card-grid > :nth-child(10), .product-grid > :nth-child(10), .fm-row:nth-child(10) { animation-delay: 450ms; }
+
+/* Garis navigasi tumbuh dengan transform tanpa menggeser layout. */
+:is(.ecommerce-nav-link, .el-nav-link, .et-nav-link, .pt-nav-link, .fm-nav-link) {
+  position: relative;
+}
+:is(.ecommerce-nav-link, .el-nav-link, .et-nav-link, .pt-nav-link, .fm-nav-link)::after {
+  content: "";
+  position: absolute;
+  inset-inline: .75rem;
+  bottom: 0;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+:is(.ecommerce-nav-link, .el-nav-link, .et-nav-link, .pt-nav-link, .fm-nav-link):hover::after,
+:is(.ecommerce-nav-link, .el-nav-link, .et-nav-link, .pt-nav-link, .fm-nav-link):focus-visible::after,
+:is(.ecommerce-nav-link, .el-nav-link, .et-nav-link, .pt-nav-link, .fm-nav-link).is-active::after {
+  transform: scaleX(1);
+}
+:is(.ecommerce-nav-link, .el-nav-link, .et-nav-link, .pt-nav-link, .fm-nav-link).is-active {
+  border-bottom-color: transparent;
+}
 
 /* ---------- 5. Toast root dan breadcrumb ---------- */
 #toast-root {
@@ -210,10 +265,10 @@ html[data-view='mobile'] #toast-root {
    sungguhan, supaya kartu tidak "menempel" naik setelah disentuh di ponsel. Aksen kartu
    dikirim lewat variabel --card-accent (lihat _components/module_card.html). */
 .launcher-card {
-  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
 @media (hover: hover) {
-  .launcher-card:hover {
+  .launcher-card:hover, .launcher-card:focus-within {
     transform: translateY(-4px);
     box-shadow: 0 12px 24px -8px rgb(79 70 229 / .30), 0 4px 10px -4px rgb(0 0 0 / .12);   /* cadangan */
     box-shadow: 0 12px 24px -8px color-mix(in srgb, var(--card-accent) 45%, transparent),
@@ -221,6 +276,17 @@ html[data-view='mobile'] #toast-root {
   }
 }
 .launcher-card:active { transform: translateY(-1px) scale(.99); }
+
+/* Kartu produk: hover lift tidak memakai utility "transition" (yang mencakup semua properti). */
+.product-grid > article {
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) {
+  .product-grid > article:hover, .product-grid > article:focus-within {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -10px rgb(180 83 9 / .30), 0 4px 10px -4px rgb(0 0 0 / .12);
+  }
+}
 
 /* ---------- 9. Control Panel Information System ----------
    Sidebar tab di kiri, panel di kanan (Blueprint 5.3). Di layar sempit dan Mobile View paksa,
@@ -367,16 +433,18 @@ html.dark .el-badge-paid { background: #78350f; color: #fef3c7; }
 .el-cover > * { position: relative; z-index: 1; }
 .el-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 
-.el-card { transition: transform 200ms ease-out, box-shadow 200ms ease-out; }
+.el-card { transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out); }
 @media (hover: hover) {
-  .el-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgb(37 99 235 / .35), 0 4px 10px -4px rgb(0 0 0 / .12); }
+  .el-card:hover, .el-card:focus-within { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgb(37 99 235 / .35), 0 4px 10px -4px rgb(0 0 0 / .12); }
 }
 
-/* Progress bar: lebar bertransisi 300 ms */
+/* Progress bar memakai transform supaya pengisian tidak memicu layout ulang. */
 .el-progress { height: .5rem; width: 100%; overflow: hidden; border-radius: 9999px; background: rgb(var(--el-track)); }
 .el-progress-fill {
-  height: 100%; border-radius: 9999px; background: rgb(var(--el-accent));
-  transition: width 300ms ease-out;
+  width: 100%; height: 100%; border-radius: 9999px; background: rgb(var(--el-accent));
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out);
 }
 .el-progress-fill.is-complete { background: rgb(var(--c-success-fill)); }
 
@@ -397,9 +465,12 @@ html.dark .el-badge-paid { background: #78350f; color: #fef3c7; }
   flex: none; display: inline-flex; align-items: center; justify-content: center;
   width: 1.5rem; height: 1.5rem; margin-top: .0625rem; border-radius: 9999px;
   border: 2px solid rgb(var(--c-muted) / .55); color: transparent; font-size: .75rem; font-weight: 700;
-  transition: background-color 300ms ease-out, border-color 300ms ease-out, color 300ms ease-out;
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
-.el-chapter.is-done .el-mark { background: rgb(var(--c-success-fill)); border-color: rgb(var(--c-success-fill)); color: #064e3b; }
+.el-chapter.is-done .el-mark {
+  background: rgb(var(--c-success-fill)); border-color: rgb(var(--c-success-fill)); color: #064e3b;
+  animation: check-pop var(--dur-fast) var(--ease-out);
+}
 .el-chapter.is-current:not(.is-done) .el-mark { border-color: rgb(var(--el-accent)); }
 .el-chapters-toggle { display: none; }
 
@@ -560,9 +631,9 @@ html.dark .et-badge { color: #ddd6fe; }
 .et-badge-saved { background: rgb(var(--c-border) / .7); color: rgb(var(--c-ink)); }
 html:not(.dark) .et-badge-saved, html.dark .et-badge-saved { color: rgb(var(--c-ink)); }
 
-.et-card { border-top: 4px solid rgb(var(--et-edge)); transition: transform 200ms ease-out, box-shadow 200ms ease-out; }
+.et-card { border-top: 4px solid rgb(var(--et-edge)); transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out); }
 @media (hover: hover) {
-  .et-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgb(124 58 237 / .35), 0 4px 10px -4px rgb(0 0 0 / .12); }
+  .et-card:hover, .et-card:focus-within { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgb(124 58 237 / .35), 0 4px 10px -4px rgb(0 0 0 / .12); }
 }
 
 /* ----- Pembaca: ukuran font Kecil / Sedang / Besar -----
@@ -588,7 +659,11 @@ html:not(.dark) .et-badge-saved, html.dark .et-badge-saved { color: rgb(var(--c-
 /* Stepper */
 .et-stepcount { font-size: max(1rem, var(--et-fs)); }
 .et-progress { height: .5rem; width: 100%; overflow: hidden; border-radius: 9999px; background: rgb(var(--et-track)); }
-.et-progress-fill { height: 100%; border-radius: 9999px; background: rgb(var(--et-accent)); transition: width 300ms ease-out; }
+.et-progress-fill {
+  width: 100%; height: 100%; border-radius: 9999px; background: rgb(var(--et-accent));
+  transform: scaleX(var(--progress, 0)); transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out);
+}
 .et-dots { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; }
 .et-dot {
   display: inline-flex; align-items: center; justify-content: center;
@@ -744,14 +819,14 @@ html.dark .pt-badge { color: #fecdd3; }
 .pt-cover img { display: block; }
 
 /* Kartu artikel: garis atas rose, hover lift 200 ms (hanya perangkat dengan hover) */
-.pt-card { border-top: 4px solid rgb(var(--pt-edge)); transition: transform 200ms ease-out, box-shadow 200ms ease-out; }
+.pt-card { border-top: 4px solid rgb(var(--pt-edge)); transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out); }
 .pt-card .pt-link { color: inherit; text-decoration: none; }
 .pt-card .pt-link::after { content: ""; position: absolute; inset: 0; }   /* seluruh kartu bisa diklik */
 .pt-card:hover .pt-link { text-decoration: underline; }
 .pt-card:focus-within { outline: 2px solid rgb(var(--pt-edge)); outline-offset: 2px; }
 .pt-card .pt-link:focus-visible { outline: none; }
 @media (hover: hover) {
-  .pt-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgb(225 29 72 / .35), 0 4px 10px -4px rgb(0 0 0 / .12); }
+  .pt-card:hover, .pt-card:focus-within { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgb(225 29 72 / .35), 0 4px 10px -4px rgb(0 0 0 / .12); }
 }
 .pt-hero { border-top: 4px solid rgb(var(--pt-edge)); }
 @media (min-width: 768px) {
@@ -876,7 +951,7 @@ html:not(.dark) .fm-solved { background: #D1FAE5; color: #065F46; }
 .fm-author:hover { text-decoration: underline; }
 
 /* Baris thread: garis kiri teal, hover lift 200 ms (hanya perangkat dengan hover) */
-.fm-row { border-left: 4px solid rgb(var(--fm-edge)); transition: transform 200ms ease-out, box-shadow 200ms ease-out; }
+.fm-row { border-left: 4px solid rgb(var(--fm-edge)); transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out); }
 .fm-row .fm-link { color: inherit; text-decoration: none; }
 .fm-row .fm-link::after { content: ""; position: absolute; inset: 0; border-radius: .75rem; }   /* seluruh baris bisa diklik */
 .fm-row:hover .fm-link { text-decoration: underline; }
@@ -884,7 +959,7 @@ html:not(.dark) .fm-solved { background: #D1FAE5; color: #065F46; }
 .fm-row .fm-link:focus-visible { outline: none; }
 .fm-row .fm-author { position: relative; z-index: 1; }
 @media (hover: hover) {
-  .fm-row:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgb(13 148 136 / .4), 0 4px 10px -4px rgb(0 0 0 / .12); }
+  .fm-row:hover, .fm-row:focus-within { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgb(13 148 136 / .4), 0 4px 10px -4px rgb(0 0 0 / .12); }
 }
 .fm-count {
   flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 3.75rem;
@@ -912,8 +987,8 @@ html:not(.dark) .fm-solved { background: #D1FAE5; color: #065F46; }
 .fm-post-card { border: 1px solid rgb(var(--c-border)); border-radius: .75rem; background: rgb(var(--c-surface)); padding: 1rem; }
 .fm-post-card.is-solution { border-color: rgb(var(--c-success-fill)); border-left-width: 4px; background: rgb(var(--c-success-fill) / .08); }
 .fm-post:target > .fm-post-card { box-shadow: 0 0 0 2px rgb(var(--fm-edge)); }
-.fm-post.is-new > .fm-post-card { animation: fm-flash 1800ms ease-out; }
-@keyframes fm-flash { 0% { box-shadow: 0 0 0 3px rgb(var(--fm-edge)); } 100% { box-shadow: 0 0 0 3px rgb(var(--fm-edge) / 0); } }
+.fm-post.is-new > .fm-post-card { animation: fm-flash var(--dur-base) var(--ease-out); }
+@keyframes fm-flash { from { opacity: .75; transform: scale(.99); } to { opacity: 1; transform: scale(1); } }
 
 .fm-act {
   display: inline-flex; align-items: center; gap: .375rem; min-height: 44px; padding: .25rem .625rem; border-radius: .5rem;
