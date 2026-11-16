@@ -36,7 +36,7 @@
     room.querySelectorAll('[data-progress-text]').forEach(function (el) { el.textContent = text; });
     room.querySelectorAll('[data-progress-bar]').forEach(function (el) { el.setAttribute('aria-valuenow', String(percent)); });
     room.querySelectorAll('[data-progress-fill]').forEach(function (el) {
-      el.style.width = percent + '%';
+      el.style.setProperty('--progress', String(percent / 100));
       el.classList.toggle('is-complete', percent >= 100);
     });
     if (banner) banner.hidden = percent < 100;

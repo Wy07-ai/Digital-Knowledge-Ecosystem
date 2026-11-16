@@ -24,7 +24,7 @@
         </div>
         <div class="el-progress mt-1" role="progressbar" aria-label="Progres kelas" aria-valuemin="0" aria-valuemax="100"
              aria-valuenow="{{ progress.percent }}" data-progress-bar>
-          <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%" data-progress-fill></div>
+          <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="--progress: {{ progress.percent / 100 }}" data-progress-fill></div>
         </div>
       </div>
 
@@ -98,7 +98,7 @@
         <p class="mt-1 text-xs text-muted" data-progress-text>{{ progress.done }} dari {{ progress.total }} materi · {{ progress.percent }}%</p>
         <div class="el-progress mt-2" role="progressbar" aria-label="Progres kelas" aria-valuemin="0" aria-valuemax="100"
              aria-valuenow="{{ progress.percent }}" data-progress-bar>
-          <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="width: {{ progress.percent }}%" data-progress-fill></div>
+          <div class="el-progress-fill{{ ' is-complete' if progress.percent >= 100 }}" style="--progress: {{ progress.percent / 100 }}" data-progress-fill></div>
         </div>
         {% if quiz %}
           <a href="{{ url_for('elearning.quiz', course_id=course.id) }}" class="btn btn-secondary mt-3 w-full">

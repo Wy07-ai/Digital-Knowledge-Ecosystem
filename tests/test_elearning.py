@@ -319,7 +319,7 @@ class ElearningTests(unittest.TestCase):
         room = self.client.get("/elearning/kelas/1/materi/4").get_data(as_text=True)
         self.assertIn("3 dari 4 materi · 75%", room)
         self.assertIn('aria-valuenow="75"', room)
-        self.assertIn("width: 75%", room)
+        self.assertIn("--progress: 0.75", room)
         self.assertIn("3 dari 4 materi", self.client.get("/elearning/kelas-saya").get_data(as_text=True))
         self.assertIn("75%", self.client.get("/elearning/kelas/1").get_data(as_text=True))
         # Progres pengguna lain tidak ikut terhitung

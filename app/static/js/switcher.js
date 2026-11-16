@@ -7,9 +7,16 @@
   'use strict';
 
   var openPop = null;
+  var closeTimers = new WeakMap();
 
   function toggleOf(p) { return p.querySelector('[data-popover-toggle]'); }
   function panelOf(p) { return p.querySelector('[data-popover-panel]'); }
+  function finishClose(panel) {
+    panel.hidden = true;
+    panel.inert = false;
+    panel.removeAttribute('aria-hidden');
+    panel.classList.remove('popover-exit');
+  }
   function itemsOf(p) {
     return Array.prototype.filter.call(
       panelOf(p).querySelectorAll('[data-popover-item]'),
@@ -18,15 +25,35 @@
 
   function close(p, returnFocus) {
     if (!p) return;
-    panelOf(p).hidden = true;
+    var panel = panelOf(p);
+    var timer = closeTimers.get(panel);
+    if (timer) window.clearTimeout(timer);
     toggleOf(p).setAttribute('aria-expanded', 'false');
     if (openPop === p) openPop = null;
+    panel.setAttribute('aria-hidden', 'true');
+    panel.inert = true;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finishClose(panel);
+    } else {
+      panel.classList.add('popover-exit');
+      closeTimers.set(panel, window.setTimeout(function () {
+        finishClose(panel);
+        closeTimers.delete(panel);
+      }, 180));
+    }
     if (returnFocus) toggleOf(p).focus();
   }
 
   function open(p, focusFirst) {
     if (openPop && openPop !== p) close(openPop);
-    panelOf(p).hidden = false;
+    var panel = panelOf(p);
+    var timer = closeTimers.get(panel);
+    if (timer) window.clearTimeout(timer);
+    closeTimers.delete(panel);
+    panel.hidden = false;
+    panel.inert = false;
+    panel.removeAttribute('aria-hidden');
+    panel.classList.remove('popover-exit');
     toggleOf(p).setAttribute('aria-expanded', 'true');
     openPop = p;
     if (focusFirst) {

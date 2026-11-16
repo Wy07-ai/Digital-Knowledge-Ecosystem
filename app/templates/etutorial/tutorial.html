@@ -53,7 +53,7 @@
       <div class="et-progress mt-2" role="progressbar" aria-label="Posisi langkah"
            aria-valuemin="1" aria-valuemax="{{ total }}" aria-valuenow="{{ current }}"
            aria-valuetext="Step {{ current }} dari {{ total }}">
-        <div class="et-progress-fill" style="width: {{ percent }}%"></div>
+        <div class="et-progress-fill" style="--progress: {{ percent / 100 }}"></div>
       </div>
       <ol class="et-dots mt-3" data-et-dots>
         {% for s in steps %}

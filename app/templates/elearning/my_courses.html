@@ -19,7 +19,7 @@
       {% else %}{{ studied }} dari {{ goal }} menit. Tandai materi selesai untuk menambah menit belajar.{% endif %}
     </p>
     <div class="el-progress mt-2" role="progressbar" aria-label="Target belajar harian" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ goal_percent }}">
-      <div class="el-progress-fill{{ ' is-complete' if goal_percent >= 100 }}" style="width: {{ goal_percent }}%"></div>
+      <div class="el-progress-fill{{ ' is-complete' if goal_percent >= 100 }}" style="--progress: {{ goal_percent / 100 }}"></div>
     </div>
   </section>
 

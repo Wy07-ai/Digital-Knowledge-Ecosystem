@@ -13,7 +13,7 @@ Akun: `demo@dke.test` / `Demo12345` (sudah terdaftar di kelas gratis "Prinsip De
 | 6 | Buka `/elearning/kelas/<id kelas yang belum diikuti>/materi/1` | Kembali ke detail kelas + toast merah "Anda belum terdaftar di kelas ini..." |
 | 7 | Daftar Kelas: kartu kelas yang sudah diikuti | Menampilkan progress bar dan tombol Lanjutkan belajar |
 | 8 | Buka Kelas Saya | Kartu kelas + progres, kartu "Target belajar hari ini" |
-| 9 | Ruang Belajar materi 3: klik Tandai Selesai | Tanpa reload: tombol jadi "Selesai · Batalkan", bab 3 tercentang, progress bar naik 40% → 60% dalam 300 ms, toast hijau |
+| 9 | Ruang Belajar materi 3: klik Tandai Selesai | Tanpa reload: tombol jadi "Selesai · Batalkan", bab 3 tercentang, progress bar naik 40% → 60% dalam 240 ms, toast hijau |
 | 10 | Klik tombol sekali lagi | Tanda selesai dibatalkan, progres kembali 40%, toast biru |
 | 11 | Klik Sebelumnya / Berikutnya, lalu materi pertama dan terakhir | Tombol di ujung menjadi nonaktif ("Ini materi terakhir") |
 | 12 | Muat ulang halaman setelah menandai selesai | Progres dan centang bab bertahan (dibaca dari database) |
@@ -22,3 +22,4 @@ Akun: `demo@dke.test` / `Demo12345` (sudah terdaftar di kelas gratis "Prinsip De
 | 15 | Pengaturan: target 0 atau "abc" | Pesan inline, data tidak tersimpan |
 | 16 | Mobile View / layar sempit | Satu kolom; daftar bab menjadi tombol "Daftar bab" yang bisa dibuka |
 | 17 | Mode gelap | Semua kartu, sidebar, dan progress bar tetap terbaca |
+| 18 | Aktifkan Reduce motion di sistem/peramban lalu buka Mobile View | Kartu, progress, centang, dan popover tidak bergerak; tombol, Escape, dan klik di luar popover tetap langsung berfungsi |
