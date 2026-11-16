@@ -3,19 +3,22 @@
    Guest: [Tema] [Mobile] [Masuk] [Daftar]. #}
 {% from '_components/_icons.html' import icon %}
 {% set page_heading = current_module.name if current_module else (page_title or 'Beranda') %}
-<header class="topbar sticky top-0 z-40 bg-header text-white" style="border-bottom: 3px solid var(--accent)">
+<header class="topbar sticky top-0 z-40 text-white" style="border-bottom: 3px solid var(--accent)">
   <div class="mx-auto flex h-14 max-w-6xl items-center gap-1 px-3">
 
     {% include '_components/app_switcher.html' %}
 
-    <a href="{{ url_for('main.index') }}" class="tb-btn font-bold tracking-tight"
+    <a href="{{ url_for('main.index') }}" class="tb-btn brand-link"
        aria-label="Beranda DKE"
        {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
-      <span class="rounded-md bg-white/15 px-2 py-0.5 text-base">DKE</span>
+      <span class="brand-mark">{{ icon('home', 'h-4 w-4') }}</span>
+      <span>DKE</span>
     </a>
 
-    <p class="ml-1 flex min-w-0 items-center gap-2 border-l border-white/25 pl-3 text-sm font-semibold">
-      <span class="h-2.5 w-2.5 flex-none rounded-full ring-2 ring-white/70" style="background: var(--accent)" aria-hidden="true"></span>
+    <p class="topbar-current ml-1 flex min-w-0 items-center gap-2 border-l border-white/25 pl-3 text-sm font-semibold">
+      {% if current_module %}
+        <span class="topbar-module-icon" aria-hidden="true">{{ icon(current_module.key, 'h-4 w-4') }}</span>
+      {% endif %}
       <span class="truncate">{{ page_heading }}</span>
     </p>
 
@@ -134,8 +137,8 @@
           </div>
         </div>
       {% else %}
-        <a href="{{ login_url() }}" class="tb-btn">Masuk</a>
-        <a href="{{ safe_url('infosys.register', '/infosys/register') }}" class="dke-hide-mobile ml-1 inline-flex min-h-[44px] items-center rounded-lg bg-white px-3 text-sm font-semibold text-header transition-transform duration-150 hover:bg-white/90 active:scale-95">Daftar</a>
+        <a href="{{ login_url() }}" class="tb-btn auth-action auth-login">Masuk</a>
+        <a href="{{ safe_url('infosys.register', '/infosys/register') }}" class="tb-btn auth-action auth-register dke-hide-mobile">Daftar</a>
       {% endif %}
     </div>
   </div>

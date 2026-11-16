@@ -4,14 +4,14 @@
 {% block title %}Information System{% endblock %}
 
 {% block guest %}
-  <h1 class="text-3xl font-bold tracking-tight">Information System</h1>
+  <h1 class="page-title font-bold tracking-tight">Information System</h1>
   <p class="mt-1 text-muted">{{ current_module.desc }}</p>
   {{ empty_state('Masuk untuk membuka Control Panel', 'Profil, log aktivitas, statistik dari semua aplikasi, dan pengaturan keamanan hanya tersedia setelah Anda masuk.', 'Masuk', login_url()) }}
   <p class="text-center text-sm text-muted">Belum punya akun? <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('infosys.register') }}">Daftar gratis</a></p>
 {% endblock %}
 
 {% block panel %}
-  <h1 class="text-3xl font-bold tracking-tight">Ringkasan</h1>
+  <h1 class="page-title font-bold tracking-tight">Ringkasan</h1>
   <p class="mt-1 text-muted">Gambaran singkat akun dan aktivitas Anda di seluruh aplikasi DKE.</p>
 
   <section class="mt-5 flex items-center gap-4 rounded-xl border border-line bg-surface p-5 shadow-sm stack-mobile" aria-label="Akun">

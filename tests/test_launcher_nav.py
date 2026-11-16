@@ -92,15 +92,17 @@ class BerandaGuestTests(LauncherTestCase):
     def test_kartu_memuat_nama_dan_aksen_modul(self):
         html = self.html("/")
         for key, name, accent in (("infosys", "Information System", "#4F46E5"), ("forum", "Forum", "#0D9488")):
-            card = re.search(rf'data-module="{key}".*?</a>', html, re.S).group(0)
+            card = re.search(rf'<a [^>]*data-module="{key}".*?</a>', html, re.S).group(0)
             self.assertIn(name, card)
             self.assertIn(accent, card)
 
-    def test_css_hover_lift_200ms(self):
+    def test_css_hover_lift_uses_shared_design_tokens(self):
         with open(os.path.join(ROOT, "app", "static", "css", "custom.css"), encoding="utf-8") as f:
             css = f.read()
-        self.assertRegex(css, r"\.launcher-card\s*\{[^}]*transform 200ms")
+        self.assertRegex(css, r"\.launcher-card\s*\{[^}]*transform var\(--dur-fast\)")
         self.assertIn("translateY(-4px)", css)
+        self.assertIn("--radius-card:", css)
+        self.assertIn("--text-hero:", css)
 
     def test_guest_tanpa_lanjutkan_dan_tanpa_pengaturan_landing(self):
         html = self.html("/")
@@ -130,16 +132,14 @@ class BerandaGuestTests(LauncherTestCase):
         self.assertIn("Satu akun, enam aplikasi.", html)
         self.assertNotIn("modul", re.sub(r"data-module|module", "", html.lower().split("<main")[1].split("launcher-grid")[0]))
 
-    def test_deskripsi_tidak_tampil_di_kartu_tetapi_ada_di_tooltip_dan_aria(self):
+    def test_deskripsi_tampil_di_kartu_dan_direferensikan_oleh_aria(self):
         html = self.html("/")
         for key, desc in (("infosys", "Profil, log aktivitas, dan statistik dari semua aplikasi."),
                           ("forum", "Diskusi, tanya jawab, dan balasan komunitas.")):
             card = re.search(rf'<a [^>]*data-module="{key}".*?</a>', html, re.S).group(0)
             self.assertIn(f'title="{desc}"', card)
             self.assertIn(f'aria-describedby="card-desc-{key}"', card)
-            self.assertIn(f'id="card-desc-{key}" class="sr-only"', card)
-            visible = re.sub(r'<span id="card-desc-[^>]*>.*?</span>', "", card, flags=re.S)
-            self.assertEqual(re.sub(r"<[^>]+>", "", visible).count(desc), 0)
+            self.assertIn(f'id="card-desc-{key}" class="module-card-desc">{desc}</span>', card)
 
     def test_kartu_maksimal_dua_baris_teks_selain_nama_dan_tanpa_pengulangan(self):
         self.seed_content()

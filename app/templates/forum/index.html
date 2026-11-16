@@ -6,7 +6,7 @@
 {% block module_content %}
   <header class="mb-5 flex flex-wrap items-end justify-between gap-4">
     <div>
-      <h1 class="text-3xl font-bold tracking-tight">Forum diskusi</h1>
+      <h1 class="page-title font-bold tracking-tight">Forum diskusi</h1>
       <p class="mt-1 text-muted">{{ current_module.desc }}</p>
     </div>
     <a href="{{ url_for('forum.new_thread', kategori=category) }}" class="fm-btn">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>

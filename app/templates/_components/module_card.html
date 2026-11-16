@@ -7,27 +7,26 @@
      progress : 0-100 untuk progress bar (opsional, mis. E-Learning)
      empty    : True bila datanya kosong; teks tampil redup (bukan angka 0 yang membingungkan)
      cta      : True untuk ajakan Guest ("Lihat kelas"); tampil sebagai aksi, bukan data
-   Struktur: ikon + nama aplikasi + SATU baris metrik. Deskripsi panjang tidak tampil di kartu; ia ada di
-   title (tooltip) dan aria-describedby. Zona metrik menempel di dasar kartu (mt-auto) dengan tinggi
-   tetap, sehingga garis dan teks sejajar antarkartu di desktop, tablet, dan mobile.
-   Aksen warna hanya garis atas dan ikon; nama aplikasi selalu tertulis (warna bukan satu-satunya pembeda).
+   Struktur: ikon, nama, deskripsi ringkas, dan satu baris metrik. Deskripsi penuh juga ada di
+   title dan aria-describedby. Zona metrik menempel di dasar kartu (mt-auto) dengan tinggi tetap.
+   Nama dan deskripsi aplikasi selalu tertulis (warna bukan satu-satunya pembeda).
    Seluruh kartu adalah satu tautan (target sentuh jauh di atas 44 px).
-   Hover lift 4 px + glow aksen 200 ms ada di custom.css (.launcher-card), nonaktif di layar sentuh
+   Hover lift + bayangan aksen ada di custom.css (.launcher-card), nonaktif di layar sentuh
    dan saat prefers-reduced-motion. Beri grid pembungkus kelas "launcher-grid". #}
 {% from '_components/_icons.html' import icon %}
 {% macro module_card(module, value=None, label=None, progress=None, href=None, empty=False, cta=False) -%}
 <a href="{{ href or url_for(module.key ~ '.index') }}"
-   class="launcher-card group flex h-full flex-col rounded-xl border border-line bg-surface p-5 shadow-sm"
-   style="--card-accent: {{ module.accent }}; border-top: 4px solid {{ module.accent }}"
+   class="launcher-card group flex h-full flex-col border border-line p-5"
+   style="--card-accent: {{ module.accent }}"
    data-module="{{ module.key }}"
    {% if module.desc %}title="{{ module.desc }}" aria-describedby="card-desc-{{ module.key }}"{% endif %}>
-  <div class="flex items-center gap-3">
-    <span class="flex h-11 w-11 flex-none items-center justify-center rounded-lg text-white" style="background: {{ module.accent }}" aria-hidden="true">
+  <div class="module-card-heading">
+    <span class="module-card-icon" aria-hidden="true">
       {{ icon(module.key, 'h-6 w-6') }}
     </span>
-    <h3 class="text-lg font-semibold leading-snug text-ink">{{ module.name }}</h3>
+    <h3>{{ module.name }}</h3>
   </div>
-  {% if module.desc %}<span id="card-desc-{{ module.key }}" class="sr-only">{{ module.desc }}</span>{% endif %}
+  {% if module.desc %}<span id="card-desc-{{ module.key }}" class="module-card-desc">{{ module.desc }}</span>{% endif %}
   {% if label or value is not none or progress is not none %}
     <div class="mt-auto pt-4">
       <div class="h-16 border-t border-line pt-3" data-widget{% if empty %} data-widget-empty{% endif %}>
