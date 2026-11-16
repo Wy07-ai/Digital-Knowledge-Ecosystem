@@ -129,10 +129,21 @@ class HtmlErrorTest(ErrorPageCase):
     def test_halaman_galat_memakai_kelas_token_tema_bukan_warna_tetap(self):
         with open(os.path.join(ROOT, "app", "templates", "main", "error.html"), encoding="utf-8") as f:
             source = f.read()
-        for token in ("bg-surface", "text-ink", "text-muted", "border-line", "btn btn-primary"):
+        for token in ("bg-surface", "text-ink", "text-muted", "border-line", "btn btn--primary"):
             self.assertIn(token, source)                   # token berubah otomatis di Light/Dark
         for tetap in ("bg-white", "text-black", "text-gray-", "bg-gray-"):
             self.assertNotIn(tetap, source)
+
+    def test_ui_test_memperlihatkan_varian_primitif_bersama(self):
+        html = self.get("/dev/ui-test", 200).get_data(as_text=True)
+        for variant in (
+            "btn--primary", "btn--secondary", "btn--ghost", "btn--danger",
+            "card--accent", "card--edge-left", "card--lift", "card--clickable",
+            "badge--accent", "badge--solid", "badge--outline", "badge--muted",
+            "chip", "field",
+        ):
+            with self.subTest(variant=variant):
+                self.assertIn(variant, html)
 
     def test_kode_lain_tetap_bawaan_untuk_halaman_html(self):
         r = self.get("/uji/salah", 400)

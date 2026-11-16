@@ -72,14 +72,14 @@
         {% endif %}
 
         <button type="button" data-complete-btn aria-pressed="{{ 'true' if is_done else 'false' }}"
-                class="el-btn{{ ' is-done' if is_done }}">
+                class="btn btn--primary{{ ' is-done' if is_done }}">
           {{ icon('check', 'h-5 w-5') }}
           <span data-complete-label>{{ 'Selesai · Batalkan' if is_done else 'Tandai Selesai' }}</span>
         </button>
 
         {% if next_lesson %}
           <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=next_lesson.order_no) }}"
-             class="{{ 'el-btn' if is_done else 'btn btn-secondary' }}" rel="next" data-next-btn>
+             class="{{ 'btn btn--primary' if is_done else 'btn btn-secondary' }}" rel="next" data-next-btn>
             <span>Berikutnya<span class="dke-hide-mobile">: {{ next_lesson.title|truncate(28) }}</span></span>{{ icon('chevron-right', 'h-4 w-4') }}
           </a>
         {% else %}

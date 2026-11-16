@@ -331,7 +331,7 @@ class EtutorialTests(unittest.TestCase):
         self.login()
         self.bookmark("pandas-csv")
         html = self.get("/etutorial/")
-        self.assertEqual(html.count("et-badge-saved"), 1)
+        self.assertEqual(html.count("badge--muted"), 1)
         self.assertIn("Tersimpan</span>", html)
 
     # ---- UC-ET-05: ukuran font di module_settings ----

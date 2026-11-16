@@ -21,13 +21,13 @@
 
 {# Artikel featured besar di atas beranda. Tanpa penanda "Featured" bila artikelnya bukan featured. #}
 {% macro hero(a, size) -%}
-<article class="pt-hero overflow-hidden rounded-2xl border border-line bg-surface shadow-sm" aria-labelledby="pt-hero-title">
+<article class="card card--accent overflow-hidden rounded-2xl border border-line bg-surface shadow-sm" aria-labelledby="pt-hero-title">
   <div class="grid md:grid-cols-5">
     {{ cover(a, size, 'md:col-span-3 pt-cover-hero') }}
     <div class="flex flex-col justify-center gap-3 p-5 sm:p-7 md:col-span-2">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="pt-badge pt-badge-solid">{{ 'Featured' if a.is_featured else 'Terbaru' }}</span>
-        {% if a.category_name %}<span class="pt-badge">{{ a.category_name }}</span>{% endif %}
+        <span class="badge badge--solid">{{ 'Featured' if a.is_featured else 'Terbaru' }}</span>
+        {% if a.category_name %}<span class="badge badge--accent">{{ a.category_name }}</span>{% endif %}
       </div>
       <h2 id="pt-hero-title" class="text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
         <a href="{{ url_for('portal.article', slug=a.slug) }}" class="hover:underline">{{ a.title }}</a>
@@ -35,7 +35,7 @@
       {% if a.excerpt %}<p class="text-base leading-relaxed text-muted">{{ a.excerpt }}</p>{% endif %}
       {{ meta(a) }}
       <div class="pt-2">
-        <a href="{{ url_for('portal.article', slug=a.slug) }}" class="pt-btn">Baca artikel {{ icon('arrow-right', 'h-4 w-4') }}</a>
+        <a href="{{ url_for('portal.article', slug=a.slug) }}" class="btn btn--primary">Baca artikel {{ icon('arrow-right', 'h-4 w-4') }}</a>
       </div>
     </div>
   </div>
@@ -44,12 +44,12 @@
 
 {# Kartu artikel. Judul adalah tautan yang membentang ke seluruh kartu (target sentuh besar). #}
 {% macro card(a, size, level=3) -%}
-<article class="pt-card relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+<article class="card card--accent card--lift card--clickable relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
   {{ cover(a, size) }}
   <div class="flex flex-1 flex-col gap-2 p-4">
-    {% if a.category_name %}<div><span class="pt-badge">{{ a.category_name }}</span></div>{% endif %}
+    {% if a.category_name %}<div><span class="badge badge--accent">{{ a.category_name }}</span></div>{% endif %}
     <h{{ level }} class="text-lg font-bold leading-snug">
-      <a href="{{ url_for('portal.article', slug=a.slug) }}" class="pt-link">{{ a.title }}</a>
+      <a href="{{ url_for('portal.article', slug=a.slug) }}" class="card-link">{{ a.title }}</a>
     </h{{ level }}>
     {% if a.excerpt %}<p class="line-clamp-3 text-sm leading-relaxed text-muted">{{ a.excerpt }}</p>{% endif %}
     <div class="mt-auto pt-2">{{ meta(a) }}</div>
@@ -69,7 +69,7 @@
         {% if n is none %}<li class="px-1 text-muted" aria-hidden="true">&hellip;</li>
         {% else %}<li class="dke-hide-mobile">
           <a href="{{ p.url(n) }}" {% if n == p.page %}aria-current="page"{% endif %}
-             class="btn {{ 'pt-btn' if n == p.page else 'btn-secondary' }} min-w-[44px]"
+             class="btn {{ 'btn--primary' if n == p.page else 'btn-secondary' }} min-w-[44px]"
              aria-label="Halaman {{ n }}">{{ n }}</a></li>{% endif %}
       {% endfor %}
       <li class="px-2 text-muted sm:hidden">{{ p.page }}/{{ p.pages }}</li>

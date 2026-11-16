@@ -58,7 +58,9 @@
   <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% if current_user %}<script defer src="{{ url_for('static', filename='js/notif.js') }}"></script>{% endif %}
 </head>
-<body class="flex min-h-screen flex-col bg-page font-sans text-ink antialiased" style="--accent: {{ accent }}">
+<body class="flex min-h-screen flex-col bg-page font-sans text-ink antialiased"
+      data-app-key="{{ current_module.key if current_module else 'launcher' }}"
+      style="--accent: {{ accent }}">
   <a href="#konten" class="skip-link">Lewati ke konten utama</a>
 
   {% include '_components/topbar.html' %}

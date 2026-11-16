@@ -34,7 +34,7 @@
         </p>
       </fieldset>
       <div class="mt-6 flex flex-wrap gap-3">
-        <button type="submit" name="action" value="save" class="pt-btn">Simpan pengaturan</button>
+        <button type="submit" name="action" value="save" class="btn btn--primary">Simpan pengaturan</button>
         {% if preferred %}<button type="submit" name="action" value="reset" class="btn btn-secondary">Hapus preferensi</button>{% endif %}
         <a href="{{ url_for('portal.index') }}" class="btn btn-secondary">Lihat beranda Portal</a>
       </div>

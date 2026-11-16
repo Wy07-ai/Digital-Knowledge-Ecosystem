@@ -28,7 +28,7 @@
     btn.classList.toggle('is-done', done);
     if (label) label.textContent = done ? 'Selesai · Batalkan' : 'Tandai Selesai';
     // "Berikutnya" menjadi tombol utama setelah materi selesai.
-    if (next) next.className = done ? 'el-btn' : 'btn btn-secondary';
+    if (next) next.className = done ? 'btn btn--primary' : 'btn btn--secondary';
   }
 
   function paintProgress(done, total, percent) {

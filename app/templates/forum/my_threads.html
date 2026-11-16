@@ -11,7 +11,7 @@
         {% if total %}{{ total }} thread yang Anda mulai, {{ solved }} di antaranya sudah Solved.{% else %}Thread yang Anda mulai akan muncul di sini.{% endif %}
       </p>
     </div>
-    <a href="{{ url_for('forum.new_thread') }}" class="fm-btn">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
+    <a href="{{ url_for('forum.new_thread') }}" class="btn btn--primary">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
   </header>
 
   {% if threads %}

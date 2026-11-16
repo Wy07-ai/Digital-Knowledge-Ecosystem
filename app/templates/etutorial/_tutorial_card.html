@@ -1,12 +1,12 @@
 {# Kartu tutorial. Parameter: t (dict tutorial), saved (bool), remove_next (URL kembali bila tombol hapus dipakai). #}
 {% from "_components/_icons.html" import icon %}
 {% macro tutorial_card(t, saved=False, removable=False, next_url=None) -%}
-<article class="et-card flex flex-col rounded-xl border border-line bg-surface p-4 shadow-sm">
+<article class="card card--accent card--lift flex flex-col rounded-xl border border-line bg-surface p-4 shadow-sm">
   <div class="flex flex-wrap items-center gap-2">
-    {% if t.category_name %}<span class="et-badge">{{ t.category_name }}</span>{% endif %}
-    <span class="et-badge et-badge-diff">{{ t.difficulty_label }}</span>
+    {% if t.category_name %}<span class="badge badge--accent">{{ t.category_name }}</span>{% endif %}
+    <span class="badge badge--outline">{{ t.difficulty_label }}</span>
     {% if saved and not removable %}
-      <span class="et-badge et-badge-saved">{{ icon('bookmark', 'h-3.5 w-3.5') }}Tersimpan</span>
+      <span class="badge badge--muted">{{ icon('bookmark', 'h-3.5 w-3.5') }}Tersimpan</span>
     {% endif %}
   </div>
   <h2 class="mt-3 text-lg font-bold leading-snug">
@@ -20,7 +20,7 @@
     <span>{{ t.step_count }} langkah</span>
   </p>
   <div class="mt-auto flex flex-wrap gap-2 pt-4">
-    <a href="{{ url_for('etutorial.tutorial', slug=t.slug) }}" class="et-btn">Mulai tutorial</a>
+    <a href="{{ url_for('etutorial.tutorial', slug=t.slug) }}" class="btn btn--primary">Mulai tutorial</a>
     {% if removable %}
       <form method="post" action="{{ url_for('etutorial.bookmark', slug=t.slug) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

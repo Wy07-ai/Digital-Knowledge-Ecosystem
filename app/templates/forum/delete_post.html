@@ -14,7 +14,7 @@
     </ul>
     <form method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}" class="mt-6 flex flex-wrap gap-3">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" class="fm-btn fm-btn-danger" data-busy="Menghapus&hellip;">{{ icon('trash', 'h-5 w-5') }}Ya, hapus balasan</button>
+      <button type="submit" class="btn btn--danger" data-busy="Menghapus&hellip;">{{ icon('trash', 'h-5 w-5') }}Ya, hapus balasan</button>
       <a href="{{ url_for('forum.thread', thread_id=post.thread_id) }}#balasan-{{ post.id }}" class="btn btn-secondary">Batal</a>
     </form>
   </section>

@@ -12,14 +12,14 @@
   {# Filter kategori: tautan biasa (tanpa JS). Angka = jumlah artikel di kategori itu. #}
   <nav aria-label="Filter kategori" class="mb-5">
     <div class="flex flex-wrap gap-2">
-      <a href="{{ url_for('portal.index') }}" class="pt-chip {{ 'is-active' if not category }}"
-         {% if not category %}aria-current="true"{% endif %}>Semua <span class="pt-count">({{ all_total }})</span></a>
+      <a href="{{ url_for('portal.index') }}" class="chip {{ 'is-active' if not category }}"
+         {% if not category %}aria-current="true"{% endif %}>Semua <span class="chip-count">({{ all_total }})</span></a>
       {% for c in chips %}
-        <a href="{{ url_for('portal.index', kategori=c.slug) }}" class="pt-chip {{ 'is-active' if category == c.slug }}"
+        <a href="{{ url_for('portal.index', kategori=c.slug) }}" class="chip {{ 'is-active' if category == c.slug }}"
            {% if category == c.slug %}aria-current="true"{% endif %}>
           {% if c.preferred %}<span aria-hidden="true">&#9733;</span>{% endif %}{{ c.name }}
           {% if c.preferred %}<span class="sr-only">(favorit)</span>{% endif %}
-          <span class="pt-count">({{ c.count }})</span></a>
+          <span class="chip-count">({{ c.count }})</span></a>
       {% endfor %}
     </div>
   </nav>

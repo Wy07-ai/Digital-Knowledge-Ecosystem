@@ -18,7 +18,7 @@
         {% for s in speeds %}
           <label class="cursor-pointer">
             <input type="radio" name="playback_speed" value="{{ s }}" class="peer sr-only" {% if values.speed == s %}checked{% endif %}>
-            <span class="el-pill peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#2563EB]">{{ speed_label(s) }}</span>
+            <span class="chip peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#2563EB]">{{ speed_label(s) }}</span>
           </label>
         {% endfor %}
       </div>
@@ -41,6 +41,6 @@
       <p id="goal-help" class="mt-1 text-sm text-muted">{{ goal_min }}–{{ goal_max }} menit. Menit belajar dihitung dari durasi materi yang Anda tandai selesai hari ini.</p>
     {% endif %}
 
-    <button type="submit" class="el-btn mt-6">Simpan pengaturan</button>
+    <button type="submit" class="btn btn--primary mt-6">Simpan pengaturan</button>
   </form>
 {% endblock %}

@@ -20,10 +20,10 @@
       <button type="button" class="btn bg-amber-700 text-white" data-toast="Koneksi lambat. Perubahan akan disimpan saat tersambung kembali." data-toast-type="warning">{{ icon('warning', 'h-5 w-5') }}Peringatan</button>
     </div>
     <div class="mt-3 flex flex-wrap gap-3">
-      <button type="button" class="btn btn-secondary" data-toast-all>Keempat jenis sekaligus</button>
-      <button type="button" class="btn btn-secondary" data-toast="Pesanan DKE-20261112-0001 berhasil dibuat. Struk dan rincian pesanan sudah dikirim ke email Anda, silakan periksa kotak masuk atau folder spam." data-toast-type="success">Pesan panjang</button>
-      <button type="button" class="btn btn-secondary" data-toast="Toast ini tidak hilang otomatis. Tutup dengan tombol x." data-toast-type="info" data-toast-ms="0">Tanpa auto-hide</button>
-      <button type="button" class="btn btn-secondary" data-toast-clear>Tutup semua</button>
+      <button type="button" class="btn btn--secondary" data-toast-all>Keempat jenis sekaligus</button>
+      <button type="button" class="btn btn--secondary" data-toast="Pesanan DKE-20261112-0001 berhasil dibuat. Struk dan rincian pesanan sudah dikirim ke email Anda, silakan periksa kotak masuk atau folder spam." data-toast-type="success">Pesan panjang</button>
+      <button type="button" class="btn btn--secondary" data-toast="Toast ini tidak hilang otomatis. Tutup dengan tombol x." data-toast-type="info" data-toast-ms="0">Tanpa auto-hide</button>
+      <button type="button" class="btn btn--secondary" data-toast-clear>Tutup semua</button>
     </div>
   </section>
 
@@ -31,7 +31,7 @@
   <section class="mt-10" aria-labelledby="h-flash">
     <h2 id="h-flash" class="text-xl font-semibold">2. Pesan <code>flash()</code> Flask</h2>
     <p class="mt-1 text-sm text-muted">Memicu 5 pesan flash di server (success, error, info, warning, dan kategori bawaan), lalu halaman dimuat ulang. Semuanya harus tampil sebagai toast.</p>
-    <a href="{{ url_for('main.ui_test_flash') }}" class="btn btn-primary mt-4">Kirim flash dari server</a>
+    <a href="{{ url_for('main.ui_test_flash') }}" class="btn btn--primary mt-4">Kirim flash dari server</a>
   </section>
 
   {# ---------------- Tema dan tampilan ---------------- #}
@@ -57,8 +57,8 @@
       </div>
       <p class="text-sm text-muted">Contoh langsung dengan data dari database (hierarki dibaca dari <code>app/navigation.py</code>):</p>
       <div class="mt-3 flex flex-wrap gap-3">
-        <a class="btn btn-primary text-sm" href="{{ url_for('main.nav_demo_lesson', course_id=1, order_no=1) }}">Buka halaman bersarang (3 jenjang)</a>
-        <a class="btn btn-secondary text-sm" href="{{ url_for('infosys.profile') }}">Profil &amp; Pengaturan (2 jenjang, perlu login)</a>
+        <a class="btn btn--primary text-sm" href="{{ url_for('main.nav_demo_lesson', course_id=1, order_no=1) }}">Buka halaman bersarang (3 jenjang)</a>
+        <a class="btn btn--secondary text-sm" href="{{ url_for('infosys.profile') }}">Profil &amp; Pengaturan (2 jenjang, perlu login)</a>
       </div>
     </div>
   </section>
@@ -76,5 +76,41 @@
   <section class="mt-10" aria-labelledby="h-empty">
     <h2 id="h-empty" class="text-xl font-semibold">6. Empty state</h2>
     {{ empty_state('Keranjang masih kosong', 'Jelajahi katalog untuk mulai.', 'Lihat katalog', url_for('ecommerce.index'), 'ecommerce') }}
+  </section>
+
+  <section class="mt-10" aria-labelledby="h-primitives">
+    <h2 id="h-primitives" class="text-xl font-semibold">7. Komponen UI bersama</h2>
+    <p class="mt-1 text-sm text-muted">Aksen mengikuti aplikasi aktif; varian tetap dibedakan oleh bentuk, teks, dan status.</p>
+    <div class="mt-4 flex flex-wrap gap-3">
+      <button type="button" class="btn btn--primary">Primary</button>
+      <button type="button" class="btn btn--secondary">Secondary</button>
+      <button type="button" class="btn btn--ghost">Ghost</button>
+      <button type="button" class="btn btn--danger">Danger</button>
+    </div>
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      <article class="card card--accent p-4">
+        <h3 class="font-semibold">Card dengan aksen atas</h3>
+        <p class="mt-1 text-sm text-muted">Komponen dasar untuk permukaan konten.</p>
+      </article>
+      <article class="card card--edge-left card--lift card--clickable p-4">
+        <h3 class="font-semibold"><a href="{{ url_for('main.index') }}" class="card-link">Card interaktif</a></h3>
+        <p class="mt-1 text-sm text-muted">Hover lift hanya aktif pada perangkat yang mendukung hover.</p>
+      </article>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <span class="badge badge--accent">Accent</span>
+      <span class="badge badge--solid">Solid</span>
+      <span class="badge badge--outline">Outline</span>
+      <span class="badge badge--muted">Muted</span>
+      <span class="badge badge--success">Sukses</span>
+      <span class="badge badge--warning">Peringatan</span>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <a href="{{ url_for('main.index') }}" class="chip">Filter</a>
+      <a href="{{ url_for('main.index') }}" class="chip is-active" aria-current="true">Filter aktif</a>
+      <label class="text-sm font-semibold">Field
+        <input type="text" class="field mt-1 block rounded-lg border bg-surface px-3 py-2 text-ink" value="Contoh isian">
+      </label>
+    </div>
   </section>
 {% endblock %}
