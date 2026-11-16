@@ -5,7 +5,7 @@ Akun: `demo@dke.test` / `Demo12345` (terdaftar di kelas gratis "Prinsip Desain A
 
 | # | Langkah | Hasil yang diharapkan |
 |---|---------|-----------------------|
-| 1 | Sebagai Guest buka `/elearning/kelas/<id>/kuis` | Diarahkan ke login (`?next=`) |
+| 1 | Sebagai Guest buka `/elearning/kelas/<id>/kuis` | Diarahkan ke halaman masuk (`?next=`) |
 | 2 | Masuk sebagai demo, buka detail kelas yang diikuti | Tombol "Kerjakan kuis" dengan keterangan jumlah soal dan nilai lulus |
 | 3 | Buka halaman kuis kelas yang belum diikuti (mis. kelas berbayar) | Kembali ke detail kelas + toast merah "Anda belum terdaftar..." |
 | 4 | Buka halaman kuis | Hanya satu soal tampil; indikator nomor 1-5 di atas; teks "Soal 1 dari 5 · terjawab 0 dari 5"; Sebelumnya nonaktif |
@@ -30,4 +30,4 @@ Akun: `demo@dke.test` / `Demo12345` (terdaftar di kelas gratis "Prinsip Desain A
 | 23 | Buka URL hasil milik pengguna lain (ganti angka `hasil/<id>`) | 404 |
 | 24 | Matikan JavaScript, buka halaman kuis | Semua soal tampil berurutan; tombol "Kumpulkan jawaban" tetap bisa dipakai |
 | 25 | Mobile View / layar sempit, mode gelap | Indikator nomor membungkus rapi; opsi dan hasil tetap terbaca; Benar/Salah punya ikon dan teks, bukan hanya warna |
-| 26 | Navigasi: tombol Kembali dan breadcrumb | Kuis: E-Learning > judul kelas > Kuis; hasil: ... > Kuis > Hasil Kuis; Kembali menuju induk langsung |
+| 26 | Navigasi: tombol Kembali dan jejak halaman | Kuis: E-Learning > judul kelas > Kuis; hasil: ... > Kuis > Hasil Kuis; Kembali menuju induk langsung |

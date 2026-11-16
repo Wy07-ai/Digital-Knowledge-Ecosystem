@@ -72,7 +72,7 @@ def _login_detail(email):
     """Teks `detail` baris login_failed. Email diubah jadi hash HMAC (kunci = SECRET_KEY)."""
     key = str(current_app.config["SECRET_KEY"]).encode()
     ref = hmac.new(key, email.encode(), hashlib.sha256).hexdigest()[:24]
-    return f"Percobaan login gagal (ref {ref})"
+    return f"Percobaan masuk gagal (ref {ref})"
 
 
 def login_blocked(email):

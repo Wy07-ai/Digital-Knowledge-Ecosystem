@@ -7,7 +7,7 @@
   <header class="mb-6">
     <p class="text-sm font-semibold uppercase tracking-wide et-text">E-Tutorial</p>
     <h1 class="mt-1 text-3xl font-bold tracking-tight">Pengaturan E-Tutorial</h1>
-    <p class="mt-1 text-muted">Pilih ukuran font bacaan tutorial. Pratinjau di bawah berubah langsung saat Anda memilih.</p>
+    <p class="mt-1 text-muted">Pilih ukuran huruf untuk membaca tutorial. Pratinjau berubah langsung.</p>
   </header>
 
   {% if not current_user %}
@@ -21,7 +21,7 @@
         class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <fieldset aria-describedby="{{ 'font-error' if error else 'font-help' }}">
-      <legend class="text-sm font-semibold">Ukuran font bacaan</legend>
+      <legend class="text-sm font-semibold">Ukuran huruf bacaan</legend>
       <div class="et-choices mt-3" role="radiogroup">
         {% for key, label in choices %}
           <label class="et-choice">
@@ -43,7 +43,7 @@
 
     <p class="mb-2 mt-6 text-sm font-semibold">Pratinjau</p>
     <div class="et-reader et-preview rounded-xl border border-line bg-page p-4" data-et-preview data-font="{{ font }}">
-      <p class="et-step-label font-semibold et-text">Step 2</p>
+      <p class="et-step-label font-semibold et-text">Langkah 2</p>
       <h2 class="et-step-title mt-1 font-bold leading-snug">Pasang Flask</h2>
       <div class="et-body mt-2">
         <p>Pasang Flask dengan pip, lalu pastikan terpasang dengan menampilkan informasi paketnya.</p>

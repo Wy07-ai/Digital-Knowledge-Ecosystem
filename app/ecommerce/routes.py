@@ -6,6 +6,7 @@ from flask import abort, current_app, flash, g, jsonify, redirect, render_templa
 
 from ..db import get_db
 from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..messages import MSG_ADDED_TO_CART, MSG_CART_EMPTY, MSG_CART_ITEM_MISSING
 from ..utils import MSG_CSRF, csrf_valid, login_required, log_activity, now_iso, notify, safe_next
 from . import bp
 
@@ -106,7 +107,7 @@ def _new_order_code(db, order_date):
     ).fetchone()
     sequence = row[0] + 1
     if sequence > 9999:
-        raise ValueError("Nomor pesanan hari ini sudah mencapai batas.")
+        raise ValueError("Batas pesanan hari ini sudah tercapai. Coba lagi besok.")
     return f"{prefix}{sequence:04d}"
 
 
@@ -238,7 +239,7 @@ def add_to_cart(product_id):
     if product is None or not product["is_active"]:
         abort(404)
     if g.get("user") is None:
-        flash("Silakan masuk untuk menambahkan produk ke keranjang.", "warning")
+        flash("Masuk dulu untuk menambahkan produk ke keranjang.", "warning")
         return redirect(url_for("infosys.login", next=url_for("ecommerce.product", slug=product["slug"])))
     if not csrf_valid():
         flash(MSG_CSRF, "error")
@@ -257,7 +258,7 @@ def add_to_cart(product_id):
         db.rollback()
         raise
 
-    flash("Produk ditambahkan ke keranjang.", "success")
+    flash(MSG_ADDED_TO_CART, "success")
     next_url = safe_next(request.form.get("next"))
     return redirect(next_url or url_for("ecommerce.product", slug=product["slug"]))
 
@@ -270,7 +271,7 @@ def update_cart_quantity(item_id):
     try:
         quantity = int(request.form.get("qty", ""))
     except (TypeError, ValueError):
-        return _invalid_cart_request("Masukkan jumlah produk yang valid.")
+        return _invalid_cart_request("Jumlah produk belum valid. Masukkan angka bulat.")
     if not 1 <= quantity <= MAX_CART_QTY:
         return _invalid_cart_request(f"Jumlah harus antara 1 dan {MAX_CART_QTY}.")
 
@@ -281,7 +282,7 @@ def update_cart_quantity(item_id):
     )
     if result.rowcount == 0:
         if _wants_json():
-            return jsonify(success=False, message="Item keranjang tidak ditemukan."), 404
+            return jsonify(success=False, message=MSG_CART_ITEM_MISSING), 404
         abort(404)
     db.commit()
 
@@ -316,7 +317,7 @@ def remove_cart_item(item_id):
     )
     if result.rowcount == 0:
         if _wants_json():
-            return jsonify(success=False, message="Item keranjang tidak ditemukan."), 404
+            return jsonify(success=False, message=MSG_CART_ITEM_MISSING), 404
         abort(404)
     db.commit()
 
@@ -345,7 +346,7 @@ def checkout():
         (user_id,),
     ).fetchall()
     if not items:
-        flash("Keranjang masih kosong. Tambahkan produk sebelum checkout.", "warning")
+        flash(MSG_CART_EMPTY, "warning")
         return redirect(url_for("ecommerce.cart"))
 
     subtotal = sum(item["price"] * item["qty"] for item in items)
@@ -361,7 +362,7 @@ def checkout():
             return redirect(url_for("ecommerce.checkout"))
 
         if not address:
-            errors["address"] = "Alamat wajib diisi sebelum melakukan pembayaran."
+            errors["address"] = "Alamat penerima belum diisi. Isi alamat sebelum membayar."
         elif len(address) > MAX_ADDRESS_LENGTH:
             errors["address"] = f"Alamat maksimal {MAX_ADDRESS_LENGTH} karakter."
         if payment_method not in dict(PAYMENT_METHODS):
@@ -369,7 +370,7 @@ def checkout():
         if errors:
             return render_template(
                 "ecommerce/checkout.html",
-                page_title="Checkout",
+                page_title="Pembayaran",
                 items=items,
                 subtotal=subtotal,
                 total=subtotal,
@@ -390,11 +391,11 @@ def checkout():
             ).fetchall()
             if not items:
                 db.rollback()
-                flash("Keranjang masih kosong. Tambahkan produk sebelum checkout.", "warning")
+                flash(MSG_CART_EMPTY, "warning")
                 return redirect(url_for("ecommerce.cart"))
             if any(not item["is_active"] for item in items):
                 db.rollback()
-                flash("Hapus produk yang sudah tidak tersedia sebelum checkout.", "error")
+                flash("Hapus produk yang sudah tidak tersedia dari keranjang, lalu bayar lagi.", "error")
                 return redirect(url_for("ecommerce.cart"))
             if any(
                 item["product_type"] == "course" and item["course_id"] is None
@@ -402,7 +403,7 @@ def checkout():
             ):
                 db.rollback()
                 flash(
-                    "Kursus di keranjang belum terhubung ke kelas. Hubungi administrator.",
+                    "Ada kursus di keranjang yang belum terhubung ke kelas. Hubungi admin.",
                     "error",
                 )
                 return redirect(url_for("ecommerce.cart"))
@@ -464,7 +465,7 @@ def checkout():
                 "Checkout gagal untuk user_id=%s", user_id
             )
             flash(
-                "Pembayaran simulasi gagal diproses. Keranjang Anda tetap tersimpan; silakan coba lagi.",
+                "Pembayaran simulasi belum berhasil. Keranjang Anda aman. Coba lagi sebentar lagi.",
                 "error",
             )
             return redirect(url_for("ecommerce.checkout"))
@@ -474,7 +475,7 @@ def checkout():
 
     return render_template(
         "ecommerce/checkout.html",
-        page_title="Checkout",
+        page_title="Pembayaran",
         items=items,
         subtotal=subtotal,
         total=subtotal,

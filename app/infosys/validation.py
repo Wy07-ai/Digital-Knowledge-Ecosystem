@@ -1,28 +1,20 @@
 """Validasi form autentikasi (UC-IS-01 dan UC-IS-02) dan katalog pesannya.
 
-Teks pesan mengikuti Blueprint 5.5 (Perancangan Pesan). Dua pesan pertama
-diambil persis dari tabel Blueprint; sisanya ditulis dengan prinsip yang sama:
-spesifik, ramah, menyebutkan solusi, tidak menyalahkan, Bahasa Indonesia.
+Teks pesan ada di app/messages.py dan mengikuti Blueprint 5.5 (Perancangan Pesan): spesifik,
+ramah, menyebutkan solusi, tidak menyalahkan, Bahasa Indonesia sederhana.
 
 Aturan di sini HARUS sama dengan static/js/auth.js (validasi inline di peramban).
 Server tetap menjadi penentu akhir: JS hanya mempercepat umpan balik.
 """
 import re
 
-# --- Blueprint 5.5 (persis) -------------------------------------------------
-MSG_EMAIL_INVALID = "Email belum valid. Contoh: nama@email.com"
-MSG_PASSWORD_MIN = "Kata sandi minimal 8 karakter."
-MSG_LOGIN_FAILED = "Email atau kata sandi salah. Periksa kembali dan coba lagi."  # toast merah
-MSG_LOGIN_THROTTLED = "Terlalu banyak percobaan. Coba lagi dalam beberapa menit."  # status 429
-
-# --- Pesan tambahan, gaya sama --------------------------------------------
-MSG_NAME_REQUIRED = "Nama lengkap wajib diisi."
-MSG_NAME_TOO_LONG = "Nama lengkap maksimal 100 karakter."
-MSG_PASSWORD_MAX = "Kata sandi maksimal 128 karakter."
-MSG_CONFIRM_MISMATCH = "Konfirmasi kata sandi belum sama. Ketik ulang kata sandi yang sama."
-MSG_PASSWORD_REQUIRED = "Kata sandi wajib diisi."
-MSG_EMAIL_TAKEN = "Email ini sudah terdaftar. Silakan masuk atau gunakan email lain."
-MSG_ACCOUNT_INACTIVE = "Akun ini dinonaktifkan. Hubungi admin untuk mengaktifkannya kembali."
+# Kalimat pesan ada di app/messages.py (satu sumber). Nama di bawah diimpor ulang di sini
+# supaya `from .validation import MSG_...` tetap berfungsi.
+from ..messages import (  # noqa: F401
+    MSG_ACCOUNT_INACTIVE, MSG_CONFIRM_MISMATCH, MSG_EMAIL_INVALID, MSG_EMAIL_TAKEN,
+    MSG_LOGIN_FAILED, MSG_LOGIN_THROTTLED, MSG_NAME_REQUIRED, MSG_NAME_TOO_LONG,
+    MSG_PASSWORD_MAX, MSG_PASSWORD_MIN, MSG_PASSWORD_REQUIRED,
+)
 
 NAME_MAX = 100
 EMAIL_MAX = 254
@@ -86,17 +78,13 @@ def validate_login(email, password):
 
 
 # --------------------------------------------------------------------------
-# Control Panel (UC-IS-04 profil, UC-IS-05 ganti kata sandi)
+# Akun Saya (UC-IS-04 profil, UC-IS-05 ganti kata sandi)
 # Aturan di sini HARUS sama dengan static/js/panel.js.
 # --------------------------------------------------------------------------
-MSG_BIO_TOO_LONG = "Bio maksimal 300 karakter."
-MSG_AVATAR_INVALID = "Tautan avatar belum valid. Gunakan alamat gambar yang diawali https://"
-MSG_AVATAR_TOO_LONG = "Tautan avatar maksimal 500 karakter."
-MSG_CURRENT_REQUIRED = "Kata sandi saat ini wajib diisi."
-MSG_CURRENT_WRONG = "Kata sandi saat ini salah. Periksa kembali dan coba lagi."
-MSG_NEW_SAME = "Kata sandi baru harus berbeda dari kata sandi saat ini."
-MSG_NEW_CONFIRM_MISMATCH = "Konfirmasi kata sandi baru belum sama. Ketik ulang kata sandi yang sama."
-MSG_PASSWORD_LOCKED = "Terlalu banyak percobaan. Tunggu beberapa menit, lalu coba lagi."
+from ..messages import (  # noqa: E402,F401
+    MSG_AVATAR_INVALID, MSG_AVATAR_TOO_LONG, MSG_BIO_TOO_LONG, MSG_CURRENT_REQUIRED,
+    MSG_CURRENT_WRONG, MSG_NEW_CONFIRM_MISMATCH, MSG_NEW_SAME, MSG_PASSWORD_LOCKED,
+)
 
 BIO_MAX = 300
 AVATAR_MAX = 500

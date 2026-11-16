@@ -14,6 +14,9 @@ import sqlite3
 from flask import g, jsonify, request
 
 from .. import db
+from ..messages import (
+    MSG_API_LOGIN_REQUIRED, MSG_DATA_INVALID, MSG_JSON_REQUIRED, MSG_REQUEST_REJECTED, MSG_SAVE_FAILED,
+)
 from ..utils import mark_notifications_read, now_iso
 from . import bp
 
@@ -34,15 +37,15 @@ def _json_error(message, status):
 def _api_guard():
     """Penjaga bersama endpoint JSON Member: kembalikan respons error, atau None bila lolos."""
     if g.get("user") is None:
-        return _json_error("Silakan masuk terlebih dahulu.", 401)
+        return _json_error(MSG_API_LOGIN_REQUIRED, 401)
 
     # Perlindungan CSRF ringan tanpa token: hanya JSON same-origin. Browser tidak bisa
     # mengirim Content-Type application/json lintas situs tanpa preflight CORS (yang
     # tidak kita aktifkan); Sec-Fetch-Site menolak permintaan lintas situs secara eksplisit.
     if request.headers.get("Sec-Fetch-Site") == "cross-site":
-        return _json_error("Permintaan ditolak.", 403)
+        return _json_error(MSG_REQUEST_REJECTED, 403)
     if not request.is_json:
-        return _json_error("Gunakan Content-Type application/json.", 415)
+        return _json_error(MSG_JSON_REQUIRED, 415)
     return None
 
 
@@ -53,13 +56,13 @@ def read_notifications():
         return denied
     data = request.get_json(silent=True)
     if not isinstance(data, dict) or not data:
-        return _json_error("Data notifikasi tidak valid.", 400)
+        return _json_error("Data notifikasi belum sesuai. Muat ulang halaman lalu coba lagi.", 400)
     if data.get("all") is True:
         notification_id = None
     else:
         notification_id = data.get("id")
         if not isinstance(notification_id, int) or isinstance(notification_id, bool):
-            return _json_error("Sebutkan id notifikasi atau all: true.", 400)
+            return _json_error("Pilih notifikasi yang akan ditandai dibaca.", 400)
     try:
         unread = mark_notifications_read(g.user["id"], notification_id)
     except sqlite3.Error:
@@ -77,14 +80,14 @@ def update_global_settings():
 
     data = request.get_json(silent=True)
     if not isinstance(data, dict) or not data:
-        return _json_error("Data pengaturan tidak valid.", 400)
+        return _json_error(MSG_DATA_INVALID, 400)
 
     unknown = sorted(set(data) - set(ALLOWED))
     if unknown:
         return _json_error(f"Pengaturan tidak dikenal: {', '.join(unknown)}.", 400)
     for key, value in data.items():
         if value not in ALLOWED[key]:
-            return _json_error(f"Nilai {key} tidak valid. Pilihan: {', '.join(ALLOWED[key])}.", 400)
+            return _json_error(f"Nilai {key} belum sesuai. Pilih salah satu: {', '.join(ALLOWED[key])}.", 400)
 
     columns = list(data)                                   # sudah lolos daftar putih
     placeholders = ", ".join("?" for _ in columns)
@@ -99,7 +102,7 @@ def update_global_settings():
         )
         conn.commit()
     except sqlite3.Error:
-        return _json_error("Pengaturan belum bisa disimpan. Coba lagi sebentar lagi.", 503)
+        return _json_error(MSG_SAVE_FAILED, 503)
 
     resp = jsonify(ok=True, saved=data)
     resp.headers["Cache-Control"] = "no-store"

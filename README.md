@@ -9,6 +9,8 @@ autentikasi: **Information System, E-Commerce, E-Learning, E-Tutorial, Portal, F
 
 **Istilah antarmuka:** untuk pengguna, tiap bagian DKE disebut **aplikasi** (bukan "modul"). Di kode tetap `module_key`, `MODULES`, dan sejenisnya. Daftar istilah baku, keputusan, dan istilah Inggris yang dihindari ada di [`docs/GLOSARIUM_TEKS.md`](docs/GLOSARIUM_TEKS.md).
 
+**Teks antarmuka:** panduan gaya (nada, "Anda", subjudul maks. 15 kata, empty state satu kalimat, pesan galat dengan solusi), istilah terlarang, dan katalog pesan ada di `docs/GLOSARIUM_TEKS.md`. Kalimat bersama ditulis sekali di `app/messages.py`. Untuk meninjau semua teks tampilan: `python scripts/inventaris_teks.py --cari "kata"` atau `--csv docs/INVENTARIS_TEKS.csv`. Tes: `tests/test_teks_ui.py`.
+
 ## Menjalankan
 
 ```bash
@@ -103,7 +105,7 @@ npm run build:fonts         # hanya bila ingin menyalin ulang Inter ke app/stati
 
 ## Admin minimal (UC-AD-01 dan UC-AD-02, prioritas C)
 
-Hanya akun `users.role = 'admin'` (seed membuat `admin@dke.test`). Tab **Admin** muncul di sidebar Control Panel
+Hanya akun `users.role = 'admin'` (seed membuat `admin@dke.test`). Tab **Admin** muncul di sidebar Akun Saya
 hanya untuk admin. Guest diarahkan ke login; Member biasa mendapat **403** di semua rute admin (GET maupun POST).
 
 | URL | Fungsi |
@@ -269,6 +271,7 @@ dke/
     ├── __init__.py         # create_app (+ cek SECRET_KEY), MODULES, registrasi blueprint, hook, context processor
     ├── db.py               # get_db, close_db, init_app
     ├── security.py         # cookie sesi, ProxyFix opsional, header keamanan + CSP (nonce)
+    ├── messages.py         # satu sumber kalimat pesan bersama (MSG_*), dipakai Python dan dicek terhadap JS
     ├── utils.py            # login_required, log_activity, notify, slugify
     ├── main/               # Beranda, API pengaturan global (api.py), halaman uji
     ├── infosys/ ecommerce/ elearning/ etutorial/ portal/ forum/
@@ -340,7 +343,7 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 | `/infosys/register` | GET, POST | Registrasi: membuat `users` + `user_settings` + log `register` dalam satu transaksi |
 | `/infosys/login`    | GET, POST | Login; mendukung `?next=<halaman asal>`; mencatat `activity_logs` dan `last_login_at` |
 | `/infosys/logout`   | POST      | Logout (mencatat `activity_logs`); GET hanya mengarahkan ke Beranda |
-| `/infosys/profil`   | GET, POST | Tab Profil di Control Panel (lihat bagian "Control Panel" di bawah) |
+| `/infosys/profil`   | GET, POST | Tab Profil di Akun Saya (lihat bagian "Akun Saya" di bawah) |
 
 - Validasi inline (Blueprint 5.5) ada di `app/infosys/validation.py` (server) dan `static/js/auth.js` (peramban); aturannya harus sama.
 - Kata sandi: `werkzeug.security.generate_password_hash`; kredensial salah memberi pesan sama untuk email tak dikenal dan kata sandi salah.
@@ -416,7 +419,7 @@ node("elearning.lesson", _lesson_title, parent="elearning.course_detail")
 Contoh langsung 3 jenjang (E-Learning > judul kelas > Materi N): http://127.0.0.1:5000/dev/ui-test/navigasi/kelas/1/materi/1
 (ikut dimatikan oleh `DKE_UI_TEST=0`). Contoh nyata 2 jenjang: Information System > Profil & Pengaturan.
 
-## Control Panel Information System (Fase 2, UC-IS-04..08)
+## Akun Saya Information System (Fase 2, UC-IS-04..08)
 
 Layout **sidebar tab di kiri, panel di kanan**, aksen indigo (`#4F46E5`). Di layar sempit dan Mobile View
 paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` bagian 9).
@@ -477,5 +480,5 @@ Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 ## Roadmap
 
 Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi (selesai) →
-Fase 2: Control Panel Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum (selesai) →
+Fase 2: Akun Saya Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum (selesai) →
 Tailwind statis/offline dan Admin minimal (selesai) → Fase 6 QA dan laporan.

@@ -26,7 +26,7 @@
     {{ cover(a, size, 'md:col-span-3 pt-cover-hero') }}
     <div class="flex flex-col justify-center gap-3 p-5 sm:p-7 md:col-span-2">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="badge badge--solid">{{ 'Featured' if a.is_featured else 'Terbaru' }}</span>
+        <span class="badge badge--solid">{{ 'Pilihan' if a.is_featured else 'Terbaru' }}</span>
         {% if a.category_name %}<span class="badge badge--accent">{{ a.category_name }}</span>{% endif %}
       </div>
       <h2 id="pt-hero-title" class="text-2xl font-bold leading-tight tracking-tight sm:text-3xl">

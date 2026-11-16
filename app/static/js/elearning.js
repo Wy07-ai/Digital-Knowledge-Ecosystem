@@ -26,7 +26,7 @@
   function paintButton(done) {
     btn.setAttribute('aria-pressed', done ? 'true' : 'false');
     btn.classList.toggle('is-done', done);
-    if (label) label.textContent = done ? 'Selesai · Batalkan' : 'Tandai Selesai';
+    if (label) label.textContent = done ? 'Selesai · Batalkan' : 'Tandai selesai';
     // "Berikutnya" menjadi tombol utama setelah materi selesai.
     if (next) next.className = done ? 'btn btn--primary' : 'btn btn--secondary';
   }
@@ -75,7 +75,7 @@
       try { data = await res.json(); } catch (e) { data = null; }
       if (!res.ok || !data || !data.ok) {
         var msg = (data && data.error) || 'Progres belum bisa disimpan. Coba lagi sebentar lagi.';
-        if (res.status === 401) msg = 'Sesi Anda berakhir. Silakan masuk lagi, lalu ulangi.';
+        if (res.status === 401) msg = 'Sesi Anda berakhir. Masuk lagi, lalu ulangi.';
         say(msg, 'error');
         return;
       }
@@ -88,7 +88,7 @@
         say('Tanda selesai dibatalkan.', 'info');
       }
     } catch (err) {
-      say('Koneksi bermasalah. Progres belum tersimpan, coba lagi.', 'warning');
+      say('Koneksi terputus. Progres belum tersimpan. Coba lagi.', 'warning');
     } finally {
       setBusy(false);
       btn.focus({ preventScroll: true });

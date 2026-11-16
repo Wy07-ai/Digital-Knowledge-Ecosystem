@@ -9,7 +9,7 @@
     <a href="{{ url_for('forum.index') }}" class="fm-nav-link {% if discuss %}is-active{% endif %}"
        {% if discuss %}aria-current="page"{% endif %}>Diskusi</a>
     <a href="{{ url_for('forum.my_threads') }}" class="fm-nav-link {% if ep == 'forum.my_threads' %}is-active{% endif %}"
-       {% if ep == 'forum.my_threads' %}aria-current="page"{% endif %}>Thread Saya</a>
+       {% if ep == 'forum.my_threads' %}aria-current="page"{% endif %}>Topik Saya</a>
     <a href="{{ url_for('forum.settings') }}" class="fm-nav-link {% if ep == 'forum.settings' %}is-active{% endif %}"
        {% if ep == 'forum.settings' %}aria-current="page"{% endif %}>Pengaturan</a>
   </nav>

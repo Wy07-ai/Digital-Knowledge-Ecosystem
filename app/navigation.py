@@ -83,7 +83,7 @@ def _product_name(args):
 
 def _thread_title(args):
     row = get_db().execute("SELECT title FROM threads WHERE id = ?", (args["thread_id"],)).fetchone()
-    return row["title"] if row else "Thread"
+    return row["title"] if row else "Topik"
 
 
 def _post_thread_id(args):
@@ -106,7 +106,7 @@ node("infosys.activity", "Log Aktivitas", parent="infosys.index")
 node("infosys.stats", "Statistik Semua Aplikasi", parent="infosys.index")
 node("infosys.security", "Pengaturan Keamanan", parent="infosys.index")
 node("infosys.admin", "Admin", parent="infosys.index")
-node("infosys.admin_delete_thread", "Hapus Thread", parent="infosys.admin")
+node("infosys.admin_delete_thread", "Hapus Topik", parent="infosys.admin")
 node("infosys.admin_delete_post", "Hapus Balasan", parent="infosys.admin")
 node("infosys.admin_deactivate_user", "Nonaktifkan Akun", parent="infosys.admin")
 node("infosys.admin_activate_user", "Aktifkan Akun", parent="infosys.admin")
@@ -114,7 +114,7 @@ node("infosys.admin_activate_user", "Aktifkan Akun", parent="infosys.admin")
 # E-Commerce: E-Commerce > <nama produk>; E-Commerce > Keranjang > Checkout; E-Commerce > Pesanan Saya > <kode>
 node("ecommerce.product", _product_name, parent="ecommerce.index")
 node("ecommerce.cart", "Keranjang", parent="ecommerce.index")
-node("ecommerce.checkout", "Checkout", parent="ecommerce.cart")
+node("ecommerce.checkout", "Pembayaran", parent="ecommerce.cart")
 node("ecommerce.orders", "Pesanan Saya", parent="ecommerce.index")
 node("ecommerce.order_detail", lambda args: args["order_code"], parent="ecommerce.orders")
 node("ecommerce.settings", "Pengaturan", parent="ecommerce.index")
@@ -139,10 +139,10 @@ node("portal.settings", "Pengaturan", parent="portal.index")
 
 # Forum: Forum > <judul thread>; Forum > <judul thread> > Ubah/Hapus Balasan; Forum > Buat Thread, dst.
 node("forum.thread", _thread_title, parent="forum.index")
-node("forum.new_thread", "Buat Thread", parent="forum.index")
+node("forum.new_thread", "Buat Topik", parent="forum.index")
 node("forum.edit_post", "Ubah Balasan", parent="forum.thread", parent_args=_post_thread_id)
 node("forum.delete_post", "Hapus Balasan", parent="forum.thread", parent_args=_post_thread_id)
-node("forum.my_threads", "Thread Saya", parent="forum.index")
+node("forum.my_threads", "Topik Saya", parent="forum.index")
 node("forum.settings", "Pengaturan", parent="forum.index")
 node("forum.profile", _member_name, parent="forum.index")
 

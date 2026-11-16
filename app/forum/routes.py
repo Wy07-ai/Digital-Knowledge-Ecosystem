@@ -24,6 +24,7 @@ from flask import abort, current_app, flash, g, redirect, render_template, reque
 
 from ..db import get_db
 from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..messages import MSG_CHANGE_FAILED
 from ..utils import MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso
 from . import bp
 from . import logic as lg
@@ -37,7 +38,6 @@ VIEWED_KEY = "dke_fm_viewed"
 VIEWED_MAX = 100
 NEW_POST_KEY = "dke_fm_new_post"   # id balasan yang baru dikirim: dianimasikan slide-up sekali di halaman berikutnya
 
-MSG_DB = "Perubahan belum bisa disimpan. Coba lagi sebentar lagi."
 
 LIMITS = {
     "title_min": lg.TITLE_MIN, "title_max": lg.TITLE_MAX,
@@ -228,7 +228,7 @@ def index():
 # --------------------------------------------------------------------------
 def _render_new_thread(categories, values, errors, status=200):
     return render_template(
-        "forum/new_thread.html", page_title="Buat Thread", categories=categories,
+        "forum/new_thread.html", page_title="Buat Topik", categories=categories,
         values=values, errors=errors, limits=LIMITS), status
 
 
@@ -263,10 +263,10 @@ def new_thread():
     except sqlite3.Error:
         db.rollback()
         current_app.logger.exception("Gagal membuat thread user_id=%s", g.user["id"])
-        flash(MSG_DB, "error")
+        flash(MSG_CHANGE_FAILED, "error")
         return _render_new_thread(categories, values, {}, status=500)
 
-    flash("Thread berhasil dibuat. Tunggu balasan dari anggota lain.", "success")
+    flash("Topik berhasil dibuat. Tunggu balasan dari anggota lain.", "success")
     return redirect(url_for("forum.thread", thread_id=thread_id))
 
 
@@ -360,7 +360,7 @@ def reply(thread_id):
         post_id = cur.lastrowid
         db.execute("UPDATE threads SET updated_at = ? WHERE id = ?", (now, thread_id))
         if row["user_id"] != g.user["id"] and lg.notify_enabled(_get_setting(db, row["user_id"], lg.SETTING_NOTIFY)):
-            notify(row["user_id"], f"{g.user['full_name']} membalas thread Anda", row["title"],
+            notify(row["user_id"], f"{g.user['full_name']} membalas topik Anda", row["title"],
                    link=url_for("forum.thread", thread_id=thread_id) + f"#balasan-{post_id}",
                    module=MODULE_KEY, commit=False)
         log_activity(MODULE_KEY, "reply", _short(row["title"], 120), commit=False)
@@ -368,8 +368,8 @@ def reply(thread_id):
     except sqlite3.Error:
         db.rollback()
         current_app.logger.exception("Gagal menyimpan balasan thread_id=%s", thread_id)
-        flash(MSG_DB, "error")
-        return _render_thread(db, row, reply_error=MSG_DB, reply_body=body, reply_parent_id=parent_id,
+        flash(MSG_CHANGE_FAILED, "error")
+        return _render_thread(db, row, reply_error=MSG_CHANGE_FAILED, reply_body=body, reply_parent_id=parent_id,
                               status=500, pop_new=False)
 
     session[NEW_POST_KEY] = post_id
@@ -399,23 +399,23 @@ def mark_solution(thread_id):
             db.execute("UPDATE threads SET is_solved = 0, accepted_post_id = NULL, updated_at = ? WHERE id = ?",
                        (now_iso(), thread_id))
             log_activity(MODULE_KEY, "unmark_solution", _short(row["title"], 120), commit=False)
-            message = "Tanda solusi dibatalkan. Thread kembali berstatus belum terjawab."
+            message = "Tanda solusi dibatalkan. Topik kembali berstatus belum terjawab."
         else:
             post_id = _parse_int(request.form.get("post_id"))
             post = db.execute("SELECT id FROM posts WHERE id = ? AND thread_id = ?", (post_id, thread_id)).fetchone() \
                 if post_id is not None else None
             if post is None:
-                flash("Balasan yang dipilih tidak ditemukan di thread ini.", "error")
+                flash("Balasan yang dipilih tidak ditemukan di topik ini.", "error")
                 return redirect(url_for("forum.thread", thread_id=thread_id))
             db.execute("UPDATE threads SET is_solved = 1, accepted_post_id = ?, updated_at = ? WHERE id = ?",
                        (post_id, now_iso(), thread_id))
             log_activity(MODULE_KEY, "mark_solution", _short(row["title"], 120), commit=False)
-            message = "Balasan ditandai sebagai solusi. Thread kini berlabel Solved."
+            message = "Balasan ditandai sebagai solusi. Topik kini berlabel Terjawab."
         db.commit()
     except sqlite3.Error:
         db.rollback()
         current_app.logger.exception("Gagal mengubah status solusi thread_id=%s", thread_id)
-        flash(MSG_DB, "error")
+        flash(MSG_CHANGE_FAILED, "error")
         return redirect(url_for("forum.thread", thread_id=thread_id))
 
     flash(message, "success")
@@ -444,7 +444,7 @@ def edit_post(post_id):
             except sqlite3.Error:
                 db.rollback()
                 current_app.logger.exception("Gagal mengubah balasan id=%s", post_id)
-                flash(MSG_DB, "error")
+                flash(MSG_CHANGE_FAILED, "error")
                 return redirect(url_for("forum.edit_post", post_id=post_id))
             flash("Balasan diperbarui.", "success")
             return redirect(url_for("forum.thread", thread_id=post["thread_id"]) + f"#balasan-{post_id}")
@@ -471,7 +471,7 @@ def delete_post(post_id):
         except sqlite3.Error:
             db.rollback()
             current_app.logger.exception("Gagal menghapus balasan id=%s", post_id)
-            flash(MSG_DB, "error")
+            flash(MSG_CHANGE_FAILED, "error")
             return redirect(url_for("forum.thread", thread_id=post["thread_id"]))
         flash("Balasan dihapus.", "success")
         return redirect(url_for("forum.thread", thread_id=post["thread_id"]))
@@ -495,7 +495,7 @@ def my_threads():
         _thread_select() + " WHERE t.user_id = ? ORDER BY datetime(t.created_at) DESC, t.id DESC LIMIT ? OFFSET ?",
         (uid, info["per_page"], info["offset"])).fetchall() if total else []
     return render_template(
-        "forum/my_threads.html", page_title="Thread Saya", threads=[_thread_view(r) for r in rows],
+        "forum/my_threads.html", page_title="Topik Saya", threads=[_thread_view(r) for r in rows],
         total=total, solved=solved, pager=_pager(info, "forum.my_threads"))
 
 

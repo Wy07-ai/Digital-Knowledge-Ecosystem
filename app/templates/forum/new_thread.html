@@ -1,10 +1,10 @@
 {% extends "forum/layout_forum.html" %}
 {% from "forum/_components.html" import field_error with context %}
-{% block title %}Buat Thread{% endblock %}
+{% block title %}Buat Topik{% endblock %}
 {% block main_class %}max-w-3xl{% endblock %}
 {% block module_content %}
   <header class="mb-6">
-    <h1 class="text-3xl font-bold tracking-tight">Buat thread baru</h1>
+    <h1 class="text-3xl font-bold tracking-tight">Buat topik baru</h1>
     <p class="mt-1 text-muted">Tulis judul yang jelas dan jelaskan konteksnya, supaya anggota lain mudah membantu.</p>
   </header>
 
@@ -42,8 +42,8 @@
     </div>
 
     <div class="mt-5" data-fm-field>
-      <label for="f-body" class="block text-sm font-semibold">Isi thread</label>
-      <textarea id="f-body" name="body" rows="9" required aria-required="true" data-validate data-draft data-label="Isi thread"
+      <label for="f-body" class="block text-sm font-semibold">Isi topik</label>
+      <textarea id="f-body" name="body" rows="9" required aria-required="true" data-validate data-draft data-label="Isi topik"
                 data-min="{{ limits.thread_min }}" data-max="{{ limits.thread_max }}"
                 aria-describedby="hint-body err-body" {% if errors.body %}aria-invalid="true"{% endif %}
                 class="field mt-1 block w-full rounded-lg border bg-surface px-3 py-2 leading-relaxed text-ink placeholder:text-muted"
@@ -56,7 +56,7 @@
     </div>
 
     <div class="mt-6 flex flex-wrap gap-3">
-      <button type="submit" class="btn btn--primary" data-busy="Membuat thread&hellip;">Buat thread</button>
+      <button type="submit" class="btn btn--primary" data-busy="Membuat topik&hellip;">Buat topik</button>
       <a href="{{ url_for('forum.index') }}" class="btn btn-secondary">Batal</a>
     </div>
   </form>

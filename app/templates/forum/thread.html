@@ -49,7 +49,7 @@
               <header class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {{ avatar(p.initials, 'fm-avatar-sm') }}
                 <a href="{{ url_for('forum.profile', user_id=p.user_id) }}" class="fm-author font-semibold">{{ p.author_name }}</a>
-                {% if p.user_id == thread.user_id %}<span class="badge badge--accent">Penulis thread</span>{% endif %}
+                {% if p.user_id == thread.user_id %}<span class="badge badge--accent">Penulis topik</span>{% endif %}
                 {% if p.is_solution %}<span class="fm-solved">{{ icon('success', 'h-3.5 w-3.5') }}Solusi</span>{% endif %}
                 <time class="text-sm text-muted" datetime="{{ p.created_at }}" title="{{ p.datetime_label }}">{{ p.time_label }}</time>
               </header>
@@ -108,7 +108,7 @@
           <input type="hidden" name="parent_post_id" value="{{ reply_parent.id if reply_parent else '' }}">
 
           <p class="mt-1 text-sm text-muted" data-fm-context>
-            <span data-fm-ctx-default {% if reply_parent %}hidden{% endif %}>Membalas thread ini.</span>
+            <span data-fm-ctx-default {% if reply_parent %}hidden{% endif %}>Membalas topik ini.</span>
             <span data-fm-ctx-parent {% if not reply_parent %}hidden{% endif %}>Membalas <strong class="font-semibold text-ink" data-fm-ctx-name>{{ reply_parent.author_name if reply_parent }}</strong>: <span data-fm-ctx-excerpt>{{ reply_parent.excerpt if reply_parent }}</span></span>
             <a href="{{ url_for('forum.thread', thread_id=thread.id) }}#form-balas" data-fm-cancel
                class="ml-1 font-semibold underline underline-offset-2" {% if not reply_parent %}hidden{% endif %}>Batal membalas</a>
@@ -132,7 +132,7 @@
     {% else %}
       <section class="rounded-xl border border-dashed border-line bg-surface p-6 text-center">
         <h2 class="text-lg font-bold">Ingin ikut membahas?</h2>
-        <p class="mt-1 text-muted">Masuk dulu untuk membalas thread ini. Setelah masuk, Anda kembali ke halaman ini.</p>
+        <p class="mt-1 text-muted">Masuk dulu untuk membalas topik ini. Setelah masuk, Anda kembali ke halaman ini.</p>
         <a href="{{ login_url() }}" class="btn btn--primary mt-4">Masuk untuk membalas</a>
       </section>
     {% endif %}

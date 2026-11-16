@@ -31,7 +31,7 @@
     var value = normalized(el);
     var min = parseInt(el.getAttribute('data-min'), 10) || 0;
     var max = parseInt(el.getAttribute('data-max'), 10) || 0;
-    if (!value) return el.getAttribute('data-empty') || (label + ' wajib diisi.');
+    if (!value) return el.getAttribute('data-empty') || (label + ' belum diisi.');
     if (min && value.length < min) return label + ' terlalu pendek. Tulis minimal ' + min + ' karakter.';
     if (max && value.length > max) return label + ' terlalu panjang. Maksimal ' + max + ' karakter (sekarang ' + value.length + ').';
     return '';

@@ -93,8 +93,8 @@ class EtutorialTests(unittest.TestCase):
         html = self.get("/etutorial/")
         for title in ("Flask Pertama", "Pandas CSV", "SQLite Python", "Tutorial Kosong"):
             self.assertIn(title, html)
-        self.assertIn("Estimasi 20 menit", html)
-        self.assertIn("Estimasi 1 jam 30 menit", html)  # 90 menit
+        self.assertIn("Perkiraan waktu 20 menit", html)
+        self.assertIn("Perkiraan waktu 1 jam 30 menit", html)  # 90 menit
         self.assertIn("3 langkah", html)
 
     def test_list_is_public_for_guest(self):
@@ -136,7 +136,7 @@ class EtutorialTests(unittest.TestCase):
     # ---- UC-ET-02: stepper ----
     def test_step_one_has_stepper_indicator_and_next_only(self):
         html = self.get("/etutorial/tutorial/flask-pertama")
-        self.assertIn("Step 1 dari 3", html)
+        self.assertIn("Langkah 1 dari 3", html)
         self.assertIn('aria-valuenow="1"', html)
         self.assertIn('aria-valuemax="3"', html)
         self.assertIn("Berikutnya", html)
@@ -146,14 +146,14 @@ class EtutorialTests(unittest.TestCase):
 
     def test_middle_step_has_prev_and_next(self):
         html = self.get("/etutorial/tutorial/flask-pertama/langkah/2")
-        self.assertIn("Step 2 dari 3", html)
+        self.assertIn("Langkah 2 dari 3", html)
         self.assertIn("Pasang Flask", html)
         self.assertIn("/etutorial/tutorial/flask-pertama/langkah/3", html)
         self.assertRegex(html, r'href="/etutorial/tutorial/flask-pertama"[^>]*data-et-prev')
 
     def test_last_step_shows_finish_not_next(self):
         html = self.get("/etutorial/tutorial/flask-pertama/langkah/3")
-        self.assertIn("Step 3 dari 3", html)
+        self.assertIn("Langkah 3 dari 3", html)
         self.assertIn("Selesai", html)
         self.assertNotIn("data-et-next", html)
         self.assertIn("Tutorial selesai", html)
@@ -367,7 +367,7 @@ class EtutorialTests(unittest.TestCase):
         self.login()
         r = self.client.post("/etutorial/pengaturan", data={"csrf_token": self.csrf(), "font_size": "xxl"})
         self.assertEqual(r.status_code, 400)
-        self.assertIn("Pilih salah satu ukuran font", r.get_data(as_text=True))
+        self.assertIn("Pilih salah satu ukuran huruf", r.get_data(as_text=True))
         self.assertEqual(self.sql("SELECT COUNT(*) FROM module_settings")[0][0], 0)
 
     def test_font_post_requires_csrf(self):

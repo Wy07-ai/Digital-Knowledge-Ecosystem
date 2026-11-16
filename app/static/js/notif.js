@@ -62,7 +62,7 @@
         notify('Semua notifikasi ditandai sudah dibaca.', 'success');
       }).catch(function (err) {
         notify(err && err.status === 401
-          ? 'Sesi Anda berakhir. Silakan masuk lagi.'
+          ? 'Sesi Anda berakhir. Masuk lagi untuk melanjutkan.'
           : 'Notifikasi belum bisa diperbarui. Periksa koneksi lalu coba lagi.', 'error');
       });
       return;

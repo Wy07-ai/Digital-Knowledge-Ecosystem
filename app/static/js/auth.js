@@ -17,11 +17,11 @@
   var MSG = {
     email: 'Email belum valid. Contoh: nama@email.com',
     passwordMin: 'Kata sandi minimal 8 karakter.',
-    passwordMax: 'Kata sandi maksimal 128 karakter.',
-    passwordRequired: 'Kata sandi wajib diisi.',
+    passwordMax: 'Kata sandi terlalu panjang. Maksimal 128 karakter.',
+    passwordRequired: 'Kata sandi belum diisi. Ketik kata sandi Anda.',
     confirm: 'Konfirmasi kata sandi belum sama. Ketik ulang kata sandi yang sama.',
-    nameRequired: 'Nama lengkap wajib diisi.',
-    nameMax: 'Nama lengkap maksimal 100 karakter.'
+    nameRequired: 'Nama lengkap belum diisi. Tulis nama Anda.',
+    nameMax: 'Nama lengkap terlalu panjang. Maksimal 100 karakter.'
   };
 
   function val(form, name) {

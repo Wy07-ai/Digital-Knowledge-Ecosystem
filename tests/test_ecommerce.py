@@ -250,7 +250,7 @@ class EcommerceTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 400)
         html = response.get_data(as_text=True)
-        self.assertIn("Alamat wajib diisi", html)
+        self.assertIn("Alamat penerima belum diisi", html)
         self.assertIn("Pilih metode pembayaran simulasi", html)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 0)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 1)
@@ -274,7 +274,7 @@ class EcommerceTests(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Pembayaran simulasi gagal diproses", response.get_data(as_text=True))
+        self.assertIn("Pembayaran simulasi belum berhasil", response.get_data(as_text=True))
         self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 0)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM order_items")[0][0], 0)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM enrollments")[0][0], 0)

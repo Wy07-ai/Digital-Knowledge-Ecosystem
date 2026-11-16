@@ -5,7 +5,7 @@
 {% block title %}Admin{% endblock %}
 {% block panel %}
   <h1 class="text-3xl font-bold tracking-tight">Admin</h1>
-  <p class="mt-1 text-muted">Moderasi konten Forum dan pengelolaan akun. Setiap tindakan dicatat di Log Aktivitas Anda.</p>
+  <p class="mt-1 text-muted">Kelola konten Forum dan akun pengguna. Setiap tindakan tercatat di Log Aktivitas Anda.</p>
 
   <nav class="mt-5 flex flex-wrap gap-2" aria-label="Bagian admin">
     {% for key, label in admin_tabs %}
@@ -28,7 +28,7 @@
                 <th scope="col" class="px-4 py-3 font-semibold"><span class="sr-only">Aksi</span></th></tr>
           {% elif admin_tab == 'balasan' %}
             <tr><th scope="col" class="px-4 py-3 font-semibold">Isi</th><th scope="col" class="px-4 py-3 font-semibold">Penulis</th>
-                <th scope="col" class="px-4 py-3 font-semibold">Thread</th><th scope="col" class="px-4 py-3 font-semibold">Dibuat</th>
+                <th scope="col" class="px-4 py-3 font-semibold">Topik</th><th scope="col" class="px-4 py-3 font-semibold">Dibuat</th>
                 <th scope="col" class="px-4 py-3 font-semibold"><span class="sr-only">Aksi</span></th></tr>
           {% else %}
             <tr><th scope="col" class="px-4 py-3 font-semibold">Nama</th><th scope="col" class="px-4 py-3 font-semibold">Email</th>
@@ -45,7 +45,7 @@
                 <td class="px-4 py-3">{{ r.author_name }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ r.reply_count }}</td>
                 <td class="whitespace-nowrap px-4 py-3 text-muted">{{ r.created_at|waktu }}</td>
-                <td class="px-4 py-3 text-right"><a href="{{ url_for('infosys.admin_delete_thread', thread_id=r.id) }}" class="btn btn-secondary" data-admin-delete>{{ icon('trash', 'h-4 w-4') }}<span>Hapus<span class="sr-only"> thread {{ r.title }}</span></span></a></td>
+                <td class="px-4 py-3 text-right"><a href="{{ url_for('infosys.admin_delete_thread', thread_id=r.id) }}" class="btn btn-secondary" data-admin-delete>{{ icon('trash', 'h-4 w-4') }}<span>Hapus<span class="sr-only"> topik {{ r.title }}</span></span></a></td>
               </tr>
             {% elif admin_tab == 'balasan' %}
               <tr>

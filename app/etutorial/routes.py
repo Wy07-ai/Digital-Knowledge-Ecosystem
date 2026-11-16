@@ -19,6 +19,7 @@ import sqlite3
 from flask import abort, current_app, flash, g, redirect, render_template, request, url_for
 
 from ..db import get_db
+from ..messages import MSG_CHANGE_FAILED
 from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
 from ..utils import MSG_CSRF, csrf_valid, is_safe_next, log_activity, login_required, now_iso
 from . import bp
@@ -26,7 +27,7 @@ from . import bp
 DIFFICULTIES = (("mudah", "Mudah"), ("menengah", "Menengah"), ("sulit", "Sulit"))
 DIFFICULTY_LABEL = dict(DIFFICULTIES)
 
-# Ukuran font bacaan: nilai tersimpan -> label. "md" = 16 px (teks dasar Blueprint 5.4).
+# Ukuran huruf bacaan: nilai tersimpan -> label. "md" = 16 px (teks dasar Blueprint 5.4).
 FONT_CHOICES = (("sm", "Kecil"), ("md", "Sedang"), ("lg", "Besar"))
 FONT_LABEL = dict(FONT_CHOICES)
 DEFAULT_FONT = "md"
@@ -118,7 +119,7 @@ def get_font_size():
 
 def save_font_size(user_id, font):
     set_setting(user_id, MODULE_KEY, SETTING_FONT, font, commit=False)
-    log_activity(MODULE_KEY, "etutorial_settings", f"Ukuran font bacaan: {FONT_LABEL[font].lower()}", commit=False)
+    log_activity(MODULE_KEY, "etutorial_settings", f"Ukuran huruf bacaan: {FONT_LABEL[font].lower()}", commit=False)
     get_db().commit()
 
 
@@ -208,7 +209,7 @@ def tutorial(slug, step_no):
     step["language"] = clean_language(step["code_language"])
     return render_template(
         "etutorial/tutorial.html",
-        page_title=f"{tut['title']} · Step {step_no}",
+        page_title=f"{tut['title']} · Langkah {step_no}",
         tutorial=tut,
         steps=steps,
         step=step,
@@ -260,12 +261,12 @@ def bookmark(slug):
             if changed:
                 log_activity(MODULE_KEY, "unbookmark", tut["title"], commit=False)
             db.commit()
-            flash("Tutorial dihapus dari Tersimpan." if changed else "Tutorial ini memang belum disimpan.",
+            flash("Tutorial dihapus dari Tersimpan." if changed else "Tutorial ini belum ada di Tersimpan.",
                   "success" if changed else "info")
     except sqlite3.Error:
         db.rollback()
-        current_app.logger.exception("Gagal mengubah bookmark user_id=%s tutorial=%s", user_id, tut["id"])
-        flash("Perubahan belum bisa disimpan. Coba lagi sebentar lagi.", "error")
+        current_app.logger.exception("Gagal mengubah tutorial tersimpan user_id=%s tutorial=%s", user_id, tut["id"])
+        flash(MSG_CHANGE_FAILED, "error")
     return redirect(target)
 
 
@@ -299,7 +300,7 @@ def settings():
             return render_template(
                 "etutorial/settings.html", page_title="Pengaturan E-Tutorial",
                 font=get_font_size(), choices=FONT_CHOICES,
-                error="Pilih salah satu ukuran font yang tersedia.",
+                error="Pilih salah satu ukuran huruf yang tersedia.",
             ), 400
         response = redirect(url_for("etutorial.settings"))
         if g.user is not None:
@@ -313,7 +314,7 @@ def settings():
         else:
             response.set_cookie(FONT_COOKIE, font, max_age=FONT_COOKIE_MAX_AGE, samesite="Lax", httponly=True,
                                 secure=bool(current_app.config.get("SESSION_COOKIE_SECURE")))
-        flash(msg_saved("E-Tutorial", f"Ukuran font bacaan: {FONT_LABEL[font].lower()}."), "success")
+        flash(msg_saved("E-Tutorial", f"Ukuran huruf bacaan: {FONT_LABEL[font].lower()}."), "success")
         return response
 
     return render_template(

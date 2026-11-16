@@ -44,7 +44,7 @@
         {% else %}
           <div class="rounded-xl border border-dashed border-line bg-surface p-6 text-center" role="status">
             <p class="font-semibold">Video belum bisa ditampilkan.</p>
-            <p class="mt-1 text-sm text-muted">Tautan video materi ini tidak didukung atau belum diisi. Anda tetap bisa melanjutkan ke materi berikutnya.</p>
+            <p class="mt-1 text-sm text-muted">Video materi ini belum tersedia. Anda tetap bisa lanjut ke materi berikutnya.</p>
           </div>
         {% endif %}
       {% endif %}
@@ -74,7 +74,7 @@
         <button type="button" data-complete-btn aria-pressed="{{ 'true' if is_done else 'false' }}"
                 class="btn btn--primary{{ ' is-done' if is_done }}">
           {{ icon('check', 'h-5 w-5') }}
-          <span data-complete-label>{{ 'Selesai · Batalkan' if is_done else 'Tandai Selesai' }}</span>
+          <span data-complete-label>{{ 'Selesai · Batalkan' if is_done else 'Tandai selesai' }}</span>
         </button>
 
         {% if next_lesson %}

@@ -4,7 +4,7 @@
 {% block title %}Statistik Semua Aplikasi{% endblock %}
 {% block panel %}
   <h1 class="text-3xl font-bold tracking-tight">Statistik Semua Aplikasi</h1>
-  <p class="mt-1 text-muted">Angka dari keenam aplikasi DKE. Semuanya mencakup akun Anda, kecuali jumlah artikel Portal yang bersifat umum.</p>
+  <p class="mt-1 text-muted">Angka dari keenam aplikasi DKE untuk akun Anda. Jumlah artikel Portal bersifat umum.</p>
 
   {% if stats.is_empty %}
     {{ empty_state('Belum ada statistik', 'Angka akan muncul setelah Anda berbelanja, mengikuti kelas, menyimpan tutorial, atau berdiskusi di forum.', 'Jelajahi aplikasi', url_for('main.index'), 'chart') }}
@@ -13,13 +13,13 @@
       {{ stat_card('Jumlah pesanan', stats.orders, ('Total belanja Rp ' ~ '{:,}'.format(stats.spent).replace(',', '.')) if stats.orders else 'Belum ada pesanan.', 'ecommerce', url_for('ecommerce.index')) }}
       {{ stat_card('Kelas diikuti', stats.courses, 'Kelas yang sudah Anda ikuti.' if stats.courses else 'Belum mengikuti kelas.', 'elearning', url_for('elearning.index')) }}
       {{ stat_card('Rata-rata progres', (stats.avg_progress ~ '%') if stats.avg_progress is not none else '-', 'Dari semua kelas yang diikuti.' if stats.avg_progress is not none else 'Muncul setelah Anda mengikuti kelas.', 'chart', None, stats.avg_progress) }}
-      {{ stat_card('Tutorial tersimpan', stats.bookmarks, 'Tutorial yang Anda bookmark.' if stats.bookmarks else 'Belum ada tutorial tersimpan.', 'etutorial', url_for('etutorial.index')) }}
-      {{ stat_card('Thread dibuat', stats.threads, 'Topik yang Anda mulai di forum.' if stats.threads else 'Belum membuat thread.', 'forum', url_for('forum.index')) }}
-      {{ stat_card('Balasan', stats.posts, 'Balasan yang Anda tulis di forum.' if stats.posts else 'Belum membalas thread.', 'forum', url_for('forum.index')) }}
+      {{ stat_card('Tutorial tersimpan', stats.bookmarks, 'Tutorial yang Anda simpan.' if stats.bookmarks else 'Belum ada tutorial tersimpan.', 'etutorial', url_for('etutorial.index')) }}
+      {{ stat_card('Topik dibuat', stats.threads, 'Topik yang Anda mulai di forum.' if stats.threads else 'Belum membuat topik.', 'forum', url_for('forum.index')) }}
+      {{ stat_card('Balasan', stats.posts, 'Balasan yang Anda tulis di forum.' if stats.posts else 'Belum membalas topik.', 'forum', url_for('forum.index')) }}
       {{ stat_card('Kuis lulus', stats.quizzes_passed, 'Kuis kelas yang sudah Anda lulusi.' if stats.quizzes_passed else 'Belum lulus kuis.', 'elearning', url_for('elearning.my_courses')) }}
       {{ stat_card('Artikel Portal', stats.articles, 'Artikel tersedia untuk dibaca.' if stats.articles else 'Belum ada artikel.', 'portal', url_for('portal.index')) }}
       {{ stat_card('Kategori favorit', stats.fav_categories, 'Kategori Portal yang Anda dahulukan.' if stats.fav_categories else 'Belum memilih kategori favorit.', 'portal', url_for('portal.settings')) }}
-      {{ stat_card('Aktivitas tercatat', stats.activities, (stats.logins ~ ' kali login.') if stats.logins else 'Belum ada login tercatat.', 'infosys', url_for('infosys.activity')) }}
+      {{ stat_card('Aktivitas tercatat', stats.activities, (stats.logins ~ ' kali masuk.') if stats.logins else 'Belum ada riwayat masuk.', 'infosys', url_for('infosys.activity')) }}
     </div>
 
     <section class="mt-6" aria-labelledby="h-modul">

@@ -1,8 +1,8 @@
 {% extends "ecommerce/layout_ecommerce.html" %}
-{% block title %}Checkout{% endblock %}
+{% block title %}Pembayaran{% endblock %}
 {% block module_content %}
   <div class="mb-6">
-    <h1 class="text-3xl font-bold tracking-tight">Checkout</h1>
+    <h1 class="text-3xl font-bold tracking-tight">Pembayaran</h1>
     <p class="mt-1 text-muted">Pembayaran ini simulasi; tidak ada pembayaran nyata.</p>
   </div>
 
@@ -11,7 +11,7 @@
     <section class="space-y-6">
       <div class="rounded-xl border border-line bg-surface p-5 shadow-sm">
         <h2 class="text-lg font-bold">Alamat</h2>
-        <p class="mt-1 text-sm text-muted">Alamat terisi dari Pengaturan E-Commerce. Alamat wajib diisi.</p>
+        <p class="mt-1 text-sm text-muted">Alamat terisi dari Pengaturan E-Commerce. Isi alamat penerima sebelum membayar.</p>
         <label for="checkout-address" class="mt-4 block text-sm font-semibold">Alamat penerima</label>
         <textarea id="checkout-address" name="address" rows="4" maxlength="1000" required
                   aria-invalid="{{ 'true' if errors.get('address') else 'false' }}"
@@ -40,7 +40,7 @@
             </label>
           {% endfor %}
         </div>
-        <p class="mt-3 text-sm text-muted">Metode favorit dapat diatur di <a href="{{ url_for('ecommerce.settings') }}" class="font-semibold underline">Pengaturan</a>.</p>
+        <p class="mt-3 text-sm text-muted">Metode favorit bisa diatur di <a href="{{ url_for('ecommerce.settings') }}" class="font-semibold underline">Pengaturan</a>.</p>
       </fieldset>
     </section>
 
@@ -64,7 +64,7 @@
         </div>
       </dl>
       <button type="submit" class="btn btn--primary mt-5 w-full">Bayar</button>
-      <p class="mt-3 text-center text-xs text-muted">Dengan menekan Bayar, pesanan simulasi akan tercatat di akunmu.</p>
+      <p class="mt-3 text-center text-xs text-muted">Dengan menekan Bayar, pesanan simulasi akan tercatat di akun Anda.</p>
     </aside>
   </form>
 {% endblock %}

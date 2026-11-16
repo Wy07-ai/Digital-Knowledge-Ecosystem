@@ -16,22 +16,22 @@ from werkzeug.exceptions import HTTPException
 # kode -> (judul, pesan). Teks ramah, tanpa istilah teknis.
 ERROR_TEXT = {
     403: ("Akses ditolak",
-          "Anda tidak punya izin untuk membuka halaman ini."),
+          "Akun Anda tidak punya izin membuka halaman ini. Kembali ke Beranda untuk melanjutkan."),
     404: ("Halaman tidak ditemukan",
-          "Alamat yang Anda tuju tidak tersedia. Mungkin salah ketik atau halamannya sudah dipindahkan."),
-    405: ("Cara akses tidak diizinkan",
-          "Halaman ini tidak bisa dibuka dengan cara tersebut. Silakan kembali dan gunakan tombol atau tautan yang tersedia."),
-    500: ("Terjadi kesalahan di server",
-          "Maaf, ada gangguan di sisi kami. Silakan coba lagi sebentar lagi."),
+          "Alamat ini tidak tersedia atau halamannya sudah dipindahkan. Kembali ke Beranda untuk mencari lagi."),
+    405: ("Halaman tidak bisa dibuka dengan cara ini",
+          "Kembali ke halaman sebelumnya, lalu gunakan tombol atau tautan yang tersedia."),
+    500: ("Ada gangguan di sisi kami",
+          "Ini bukan salah Anda. Coba lagi sebentar lagi."),
 }
 API_TEXT = {
-    403: "Anda tidak punya izin untuk mengakses sumber ini.",
-    404: "Sumber yang diminta tidak ditemukan.",
-    405: "Metode permintaan tidak diizinkan untuk alamat ini.",
-    500: "Terjadi kesalahan di server. Coba lagi sebentar lagi.",
+    403: "Akun Anda tidak punya izin untuk tindakan ini.",
+    404: "Data yang diminta tidak ditemukan.",
+    405: "Tindakan ini tidak tersedia untuk alamat tersebut.",
+    500: "Ada gangguan di sisi kami. Coba lagi sebentar lagi.",
 }
-GENERIC_TITLE = "Permintaan tidak dapat diproses"
-GENERIC_MESSAGE = "Permintaan tidak dapat diproses."
+GENERIC_TITLE = "Permintaan belum bisa diproses"
+GENERIC_MESSAGE = "Muat ulang halaman lalu coba lagi."
 
 # Cadangan bila template gagal dirender (mis. database rusak sehingga Top-Bar ikut galat).
 # Berdiri sendiri: tanpa template, database, maupun skrip.

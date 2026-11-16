@@ -19,7 +19,7 @@ Aturan bersama:
 from .db import get_db
 
 # Kalimat bersama untuk semua tab Pengaturan (Blueprint 5.5: spesifik, ramah, ada jalan keluar).
-MSG_SAVE_FAILED = "Pengaturan belum bisa disimpan. Coba lagi sebentar lagi."
+from .messages import MSG_SAVE_FAILED  # noqa: E402,F401  (kalimat ada di app/messages.py)
 
 
 def msg_saved(module_name, detail=None):

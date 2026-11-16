@@ -21,7 +21,7 @@ def index():
     ):
         session[LANDED_KEY] = True
         flash(
-            "Melanjutkan: " + " › ".join(resume["labels"]) + ". Pilih DKE di Top-Bar untuk kembali ke Beranda.",
+            "Melanjutkan: " + " › ".join(resume["labels"]) + ". Pilih DKE di bilah atas untuk kembali ke Beranda.",
             "info",
         )
         return redirect(resume["url"])
@@ -57,10 +57,10 @@ def ui_test():
 def ui_test_flash():
     """Memicu flash() Flask dari sisi server, lalu kembali ke halaman uji (pola PRG)."""
     _require_test_page()
-    flash("Produk ditambahkan ke keranjang.", "success")
-    flash("Email atau kata sandi salah. Periksa kembali dan coba lagi.", "error")
-    flash("Progres belajar tersimpan otomatis.", "info")
-    flash("Koneksi lambat. Perubahan akan disimpan saat tersambung kembali.", "warning")
+    flash(MSG_ADDED_TO_CART, "success")
+    flash(MSG_LOGIN_FAILED, "error")
+    flash(MSG_PROGRESS_AUTOSAVED, "info")
+    flash(MSG_SLOW_CONNECTION, "warning")
     flash("Pesan tanpa kategori (bawaan Flask) tampil sebagai toast info.")
     return redirect(url_for("main.ui_test"))
 

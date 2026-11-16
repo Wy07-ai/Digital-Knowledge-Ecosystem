@@ -24,7 +24,7 @@
     buttons.forEach(function (b) {
       b.setAttribute('aria-pressed', String(b.dataset.landingOption === value));
     });
-    if (state) state.textContent = value === 'last_module' ? 'aktif' : 'nonaktif';
+    if (state) state.textContent = value === 'last_module' ? 'aplikasi terakhir' : 'Beranda';
   }
 
   function notify(message, type) {
@@ -48,12 +48,12 @@
     }).then(function (res) {
       if (!res.ok) { var err = new Error('HTTP ' + res.status); err.status = res.status; throw err; }
       notify(next === 'last_module'
-        ? 'Berikutnya DKE akan membuka aplikasi terakhir Anda.'
-        : 'Smart Landing dimatikan. Berikutnya DKE akan membuka Beranda.', 'success');
+        ? 'Pengaturan disimpan. Berikutnya DKE membuka aplikasi terakhir Anda.'
+        : 'Pengaturan disimpan. Berikutnya DKE membuka Beranda.', 'success');
     }).catch(function (err) {
       show(previous);
       notify(err && err.status === 401
-        ? 'Sesi Anda berakhir. Silakan masuk lagi untuk menyimpan pengaturan.'
+        ? 'Sesi Anda berakhir. Masuk lagi untuk menyimpan pengaturan.'
         : 'Pengaturan belum tersimpan. Periksa koneksi lalu coba lagi.', 'error');
     }).then(function () { busy = false; });
   });

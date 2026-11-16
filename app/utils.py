@@ -84,7 +84,7 @@ def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if g.get("user") is None:
-            flash("Silakan masuk terlebih dahulu untuk mengakses halaman ini.", "warning")
+            flash(MSG_LOGIN_REQUIRED, "warning")
             return redirect(_login_url(_origin_path()))
         return view(*args, **kwargs)
 
@@ -109,7 +109,7 @@ def admin_required(view):
 # CSRF (token per sesi, tanpa ekstensi tambahan)
 # --------------------------------------------------------------------------
 CSRF_SESSION_KEY = "_csrf_token"
-MSG_CSRF = "Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi."  # satu kalimat untuk semua modul
+from .messages import MSG_CSRF, MSG_LOGIN_REQUIRED  # noqa: E402,F401  (kalimat ada di app/messages.py)
 
 
 def csrf_token():
