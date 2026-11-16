@@ -23,8 +23,9 @@
   <meta name="color-scheme" content="light dark">
   <title>{% block title %}Beranda{% endblock %} · DKE</title>
 
-  {# 1. Skrip tema anti-kedip: HARUS sinkron dan berada sebelum stylesheet/body. #}
-  <script>
+  {# 1. Skrip tema anti-kedip: HARUS sinkron dan berada sebelum stylesheet/body.
+        Skrip inline wajib ber-nonce (CSP: tanpa 'unsafe-inline' untuk skrip). #}
+  <script nonce="{{ csp_nonce() }}">
     (function () {
       var d = document.documentElement;
       function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -48,7 +49,7 @@
 
   {# 3. Tailwind v3 Play CDN + design token Blueprint 5.4 (nilai ada di custom.css) #}
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script>
+  <script nonce="{{ csp_nonce() }}">
     tailwind.config = {
       darkMode: 'class',
       theme: {

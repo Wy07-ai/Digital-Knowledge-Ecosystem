@@ -311,7 +311,8 @@ def settings():
                 flash(MSG_SAVE_FAILED, "error")
                 return response
         else:
-            response.set_cookie(FONT_COOKIE, font, max_age=FONT_COOKIE_MAX_AGE, samesite="Lax", httponly=True)
+            response.set_cookie(FONT_COOKIE, font, max_age=FONT_COOKIE_MAX_AGE, samesite="Lax", httponly=True,
+                                secure=bool(current_app.config.get("SESSION_COOKIE_SECURE")))
         flash(msg_saved("E-Tutorial", f"Ukuran font bacaan: {FONT_LABEL[font].lower()}."), "success")
         return response
 

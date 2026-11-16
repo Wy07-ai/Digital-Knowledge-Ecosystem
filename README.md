@@ -48,6 +48,28 @@ Dengan debug menyala, `DKE_SECRET_KEY` boleh kosong (dipakai kunci khusus pengem
 | `DKE_SECRET_KEY` | (tidak ada) | Kunci sesi. Wajib saat debug mati; hasilkan dengan `secrets.token_hex(32)` |
 | `FLASK_DEBUG` | `0` | `1` menyalakan mode debug (hanya untuk komputer sendiri) |
 | `HOST`, `PORT` | `127.0.0.1`, `5000` | Alamat dan port server pengembangan |
+| `DKE_HTTPS` | `0` | `1` menambahkan atribut `Secure` pada cookie sesi (dan cookie ukuran font E-Tutorial). Nyalakan hanya bila situs benar-benar dilayani lewat `https://`; di `http://127.0.0.1` cookie `Secure` tidak akan terkirim sehingga login gagal |
+| `DKE_BEHIND_PROXY` | `0` | `1` memasang `ProxyFix`: `X-Forwarded-For` dan `X-Forwarded-Proto` dipercaya, sehingga IP login dan pembatas login memakai IP klien, bukan IP reverse proxy. Jangan dinyalakan bila aplikasi bisa diakses langsung tanpa proxy (klien dapat memalsukan header) |
+| `DKE_PROXY_HOPS` | `1` | Jumlah proxy tepercaya di depan aplikasi (dipakai bersama `DKE_BEHIND_PROXY=1`) |
+
+Nilai aktif untuk variabel bertanda `1`: `1`, `true`, `yes`, atau `on`. Nilai lain (atau kosong) = mati.
+
+### Cookie sesi dan header keamanan (`app/security.py`)
+
+- Cookie sesi selalu `HttpOnly` dan `SameSite=Lax`. Atribut `Secure` mengikuti `DKE_HTTPS` (tidak dipaksa).
+- **Di belakang reverse proxy** (Nginx, Caddy, dsb.): isi `DKE_BEHIND_PROXY=1` (dan `DKE_PROXY_HOPS` bila proxy lebih dari satu).
+  Tanpa ini `request.remote_addr` berisi IP proxy, sehingga peringatan "lebih dari satu IP" di tab Keamanan dan
+  pembatas login per IP tidak akurat. Proxy harus menimpa/menambahkan `X-Forwarded-For` dan `X-Forwarded-Proto`.
+- Setiap respons (halaman HTML, API JSON, berkas statis, redirect, galat) membawa `X-Content-Type-Options: nosniff`,
+  `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, dan `Content-Security-Policy`.
+- CSP mengizinkan hanya sumber yang dipakai: skrip dari berkas sendiri + Tailwind CDN + skrip inline ber-`nonce`,
+  stylesheet Google Fonts, berkas font `fonts.gstatic.com`, iframe YouTube (`youtube-nocookie.com`) dan Vimeo,
+  gambar `https:`/`data:`, `connect-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`.
+- **Skrip inline wajib memakai nonce**: tulis `<script nonce="{{ csp_nonce() }}">`. Nonce dibuat baru tiap permintaan.
+  Atribut event (`onclick=...`) dan URL `javascript:` akan diblokir; pasang handler lewat berkas JS.
+- `style-src` masih memuat `'unsafe-inline'` karena Tailwind Play CDN menyisipkan `<style>` saat runtime dan beberapa
+  templat memakai `style="width: N%"`. Bila Tailwind dibuat statis, hapus Play CDN dari `script-src` dan perketat `style-src`.
+- Tes: `python -m unittest tests.test_security`.
 
 Tes otomatis tidak terpengaruh: setiap tes memberi `SECRET_KEY` sendiri lewat `create_app(test_config)`.
 
@@ -174,6 +196,7 @@ dke/
 └── app/
     ├── __init__.py         # create_app (+ cek SECRET_KEY), MODULES, registrasi blueprint, hook, context processor
     ├── db.py               # get_db, close_db, init_app
+    ├── security.py         # cookie sesi, ProxyFix opsional, header keamanan + CSP (nonce)
     ├── utils.py            # login_required, log_activity, notify, slugify
     ├── main/               # Beranda, API pengaturan global (api.py), halaman uji
     ├── infosys/ ecommerce/ elearning/ etutorial/ portal/ forum/
@@ -261,8 +284,8 @@ karena Blueprint hanya mendefinisikan kolom `message`.
     akun terdaftar terisi `user_id`-nya sehingga tampil di Log Aktivitas pemiliknya ("Gagal login"); baris email tak
     dikenal berisi `user_id` NULL.
   - Alamat IP diambil dari `request.remote_addr`; header `X-Forwarded-For` sengaja **tidak** dipercaya karena bisa
-    dipalsukan klien. Di belakang reverse proxy, atur proxy lebih dulu (mis. `werkzeug.middleware.proxy_fix.ProxyFix`
-    dengan jumlah proxy yang benar) agar IP yang terlihat adalah IP klien.
+    dipalsukan klien. Di belakang reverse proxy, isi `DKE_BEHIND_PROXY=1` (dan `DKE_PROXY_HOPS`) agar `ProxyFix`
+    aktif dan IP yang terlihat adalah IP klien (lihat bagian "Cookie sesi dan header keamanan").
   - Pembatas yang sama dipakai oleh form **Ganti kata sandi** (kunci akun = `user_id`, hitungan dari baris
     `password_change_failed`), menggantikan penghitung berbasis sesi yang lama.
   - Nilai dapat diubah lewat `app.config`: `LOGIN_MAX_FAILS` (5), `LOGIN_MAX_FAILS_PER_IP` (20),
