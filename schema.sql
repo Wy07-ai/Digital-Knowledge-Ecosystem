@@ -233,6 +233,7 @@ CREATE TABLE IF NOT EXISTS posts (
 
 -- ===== INDEKS TAMBAHAN (bukan tabel) =====
 CREATE INDEX IF NOT EXISTS idx_activity_logs_user      ON activity_logs(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_action    ON activity_logs(action, created_at);  -- pembatas login (throttle.py)
 CREATE INDEX IF NOT EXISTS idx_notifications_user      ON notifications(user_id, is_read);
 CREATE INDEX IF NOT EXISTS idx_products_category       ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_course         ON products(course_id);

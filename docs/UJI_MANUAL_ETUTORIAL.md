@@ -1,6 +1,6 @@
 # Uji manual E-Tutorial
 
-Persiapan: `python seed.py --reset` lalu `python run.py`, buka http://127.0.0.1:5000/etutorial/.
+Persiapan: `python seed.py --reset` lalu `python run.py` (kunci sesi: lihat README, bagian Menjalankan), buka http://127.0.0.1:5000/etutorial/.
 Akun demo: `demo@dke.test` / `Demo12345`. Tes otomatis: `python -m unittest tests.test_etutorial`.
 
 | # | Langkah | Hasil yang diharapkan |

@@ -1,6 +1,6 @@
 # Uji manual Forum
 
-Persiapan: `python seed.py --reset` lalu `python run.py`, buka http://127.0.0.1:5000/forum/.
+Persiapan: `python seed.py --reset` lalu `python run.py` (kunci sesi: lihat README, bagian Menjalankan), buka http://127.0.0.1:5000/forum/.
 Akun demo: `demo@dke.test` / `Demo12345` (penulis thread 3, punya 2 notifikasi balasan belum dibaca).
 Akun admin dan akun komunitas (budi/citra/dewi/eko) dibuat seed; hanya admin dan demo yang bisa login (lihat README).
 Tes otomatis: `python -m unittest tests.test_forum`.

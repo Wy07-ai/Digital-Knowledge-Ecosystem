@@ -1,6 +1,6 @@
 # Uji manual: integrasi lintas modul
 
-Persiapan: `python seed.py --reset`, `python run.py`, masuk sebagai `demo@dke.test` / `Demo12345`.
+Persiapan: `python seed.py --reset`, `python run.py` (kunci sesi: lihat README, bagian Menjalankan), masuk sebagai `demo@dke.test` / `Demo12345`.
 
 ## 1. Notifikasi Top-Bar
 1. Di Beranda, lonceng menampilkan lencana **2** (dua balasan Forum belum dibaca).

@@ -1,7 +1,7 @@
 """Rute modul Information System.
 
 UC-IS-01 Registrasi  : GET/POST /infosys/register
-UC-IS-02 Login       : GET/POST /infosys/login   (mendukung ?next=<halaman asal>)
+UC-IS-02 Login       : GET/POST /infosys/login   (mendukung ?next=<halaman asal>; dibatasi, lihat throttle.py)
 UC-IS-03 Logout      : POST     /infosys/logout  (GET hanya mengarahkan ke Beranda)
 
 Control Panel (sidebar tab, aksen indigo; semua data HANYA milik g.user, lihat panel.py):
@@ -13,7 +13,6 @@ UC-IS-07 Statistik   : GET      /infosys/statistik
 UC-IS-08 Keamanan    : GET      /infosys/keamanan?halaman=   (riwayat login)
 """
 import sqlite3
-import time
 
 from flask import flash, g, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -21,12 +20,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .. import DEFAULT_SETTINGS, MODULE_BY_KEY
 from ..db import get_db
 from ..utils import MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso, safe_next
-from . import bp, panel
+from . import bp, panel, throttle
 from .validation import (
     MSG_ACCOUNT_INACTIVE,
     MSG_CURRENT_WRONG,
     MSG_EMAIL_TAKEN,
     MSG_LOGIN_FAILED,
+    MSG_LOGIN_THROTTLED,
     MSG_PASSWORD_LOCKED,
     normalize_avatar_url,
     normalize_bio,
@@ -68,8 +68,6 @@ def _find_user_by_email(email):
 # Control Panel: kerangka tab (sidebar) dan pembantu
 # --------------------------------------------------------------------------
 MSG_FORM_INVALID = "Periksa kembali isian yang ditandai."
-PW_MAX_FAILS = 5          # percobaan salah kata sandi saat ini sebelum dikunci sementara
-PW_LOCK_SECONDS = 300
 
 PANEL_TABS = (
     # (kunci, endpoint, label, ikon)
@@ -191,10 +189,6 @@ def profile():
     return redirect(url_for("infosys.profile"))
 
 
-def _password_locked():
-    return session.get("pw_lock_until", 0) > time.time()
-
-
 @bp.route("/profil/sandi", methods=["POST"])
 @login_required
 def change_password():
@@ -207,21 +201,19 @@ def change_password():
     confirm = request.form.get("confirm_password", "")
     errors = validate_password_change(current, new, confirm)
 
-    if not errors and _password_locked():
+    # Pembatas yang sama dengan login (throttle.py): hitungan dari activity_logs per akun dan per IP,
+    # jadi tidak bisa dilewati dengan membuang cookie.
+    if not errors and throttle.password_change_blocked(_uid()):
         errors["current_password"] = MSG_PASSWORD_LOCKED
-    if not errors and not check_password_hash(g.user["password_hash"], current):
+    elif not errors and not check_password_hash(g.user["password_hash"], current):
         errors["current_password"] = MSG_CURRENT_WRONG
-        fails = session.get("pw_fails", 0) + 1
-        session["pw_fails"] = fails
-        if fails >= PW_MAX_FAILS:
-            session["pw_lock_until"] = time.time() + PW_LOCK_SECONDS
-            session["pw_fails"] = 0
         log_activity(MODULE, "password_change_failed", "Kata sandi saat ini salah")
 
     if errors:
-        flash(MSG_PASSWORD_LOCKED if _password_locked() else MSG_FORM_INVALID, "error")
+        locked = throttle.password_change_blocked(_uid())   # termasuk kegagalan yang baru dicatat
+        flash(MSG_PASSWORD_LOCKED if locked else MSG_FORM_INVALID, "error")
         # Kata sandi tidak pernah dikirim balik ke HTML.
-        return _render_profile(pw_errors=errors, status=429 if _password_locked() else 400,
+        return _render_profile(pw_errors=errors, status=429 if locked else 400,
                                focus=_first_error_field(
                                    errors, ("current_password", "new_password", "confirm_password")))
 
@@ -239,8 +231,6 @@ def change_password():
         flash("Kata sandi belum bisa diubah. Coba lagi sebentar lagi.", "error")
         return _render_profile(status=503)
 
-    session.pop("pw_fails", None)
-    session.pop("pw_lock_until", None)
     flash("Kata sandi berhasil diubah.", "success")
     return redirect(url_for("infosys.profile"))
 
@@ -390,6 +380,15 @@ def login():
     email = normalize_email(request.form.get("email"))
     password = request.form.get("password", "")
 
+    # 2b) Pembatas percobaan (throttle.py): terlalu banyak kegagalan untuk email ini atau dari IP ini
+    # dalam jendela waktu -> 429, bahkan bila kata sandinya benar. Berlaku sama untuk email terdaftar
+    # dan tidak, jadi tidak membocorkan akun. Percobaan yang ditolak tidak dicatat (jendela tidak
+    # diperpanjang oleh percobaan baru).
+    if throttle.login_blocked(email):
+        flash(MSG_LOGIN_THROTTLED, "error")
+        return render_template("infosys/login.html", page_title="Masuk", next_url=next_url,
+                               values={"email": email}, errors={}, focus="email"), 429
+
     # 3) Validasi format. 3a) Format salah: pesan di bawah kolom.
     errors = validate_login(email, password)
     if errors:
@@ -403,7 +402,9 @@ def login():
 
     if user is None or not password_ok:
         # 4a) Toast error + fokus kembali ke kolom kata sandi. Pesan sama untuk email
-        # tak dikenal dan kata sandi salah (tidak membocorkan akun mana yang ada).
+        # tak dikenal dan kata sandi salah (tidak membocorkan akun mana yang ada). Kegagalan dicatat
+        # untuk kedua kasus (login_failed) agar hitungan pembatas dan waktu respons tetap seragam.
+        throttle.record_login_failure(email, user["id"] if user else None)
         flash(MSG_LOGIN_FAILED, "error")
         return render_template("infosys/login.html", page_title="Masuk", next_url=next_url,
                                values={"email": email}, errors={}, focus="password"), 401

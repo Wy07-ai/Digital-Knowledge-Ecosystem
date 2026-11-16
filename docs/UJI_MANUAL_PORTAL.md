@@ -1,6 +1,6 @@
 # Uji manual Portal
 
-Persiapan: `python seed.py --reset` lalu `python run.py`, buka http://127.0.0.1:5000/portal/.
+Persiapan: `python seed.py --reset` lalu `python run.py` (kunci sesi: lihat README, bagian Menjalankan), buka http://127.0.0.1:5000/portal/.
 Akun demo: `demo@dke.test` / `Demo12345` (sudah punya preferensi `teknologi,pendidikan`). Tes otomatis: `python -m unittest tests.test_portal`.
 
 | # | Langkah | Hasil yang diharapkan |
