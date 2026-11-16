@@ -1,41 +1,51 @@
-{# Kartu modul untuk Beranda 6 kotak dan tempat lain.
+{# Kartu aplikasi untuk Beranda 6 kotak dan tempat lain.
 
-   module_card(module, summary=None, progress=None, href=None, detail=None, empty=False)
+   module_card(module, value=None, label=None, progress=None, href=None, empty=False, cta=False)
      module   : salah satu elemen MODULES (key, name, accent, desc)
-     summary  : cuplikan widget utama, mis. "2 item di keranjang" (opsional)
-     detail   : baris pendukung di bawah summary (opsional)
+     value    : angka yang ditonjolkan, mis. 2 (opsional)
+     label    : sisa metrik, mis. "di keranjang"; maks. ~40 karakter, satu baris
      progress : 0-100 untuk progress bar (opsional, mis. E-Learning)
-     empty    : True bila datanya kosong; summary tampil redup (bukan angka 0 yang membingungkan)
-   Aksen warna hanya garis atas dan ikon; nama modul selalu tertulis (warna bukan satu-satunya pembeda).
+     empty    : True bila datanya kosong; teks tampil redup (bukan angka 0 yang membingungkan)
+     cta      : True untuk ajakan Guest ("Lihat kelas"); tampil sebagai aksi, bukan data
+   Struktur: ikon + nama aplikasi + SATU baris metrik. Deskripsi panjang tidak tampil di kartu; ia ada di
+   title (tooltip) dan aria-describedby. Zona metrik menempel di dasar kartu (mt-auto) dengan tinggi
+   tetap, sehingga garis dan teks sejajar antarkartu di desktop, tablet, dan mobile.
+   Aksen warna hanya garis atas dan ikon; nama aplikasi selalu tertulis (warna bukan satu-satunya pembeda).
+   Seluruh kartu adalah satu tautan (target sentuh jauh di atas 44 px).
    Hover lift 4 px + glow aksen 200 ms ada di custom.css (.launcher-card), nonaktif di layar sentuh
    dan saat prefers-reduced-motion. Beri grid pembungkus kelas "launcher-grid". #}
 {% from '_components/_icons.html' import icon %}
-{% macro module_card(module, summary=None, progress=None, href=None, detail=None, empty=False) -%}
+{% macro module_card(module, value=None, label=None, progress=None, href=None, empty=False, cta=False) -%}
 <a href="{{ href or url_for(module.key ~ '.index') }}"
    class="launcher-card group flex h-full flex-col rounded-xl border border-line bg-surface p-5 shadow-sm"
    style="--card-accent: {{ module.accent }}; border-top: 4px solid {{ module.accent }}"
-   data-module="{{ module.key }}">
+   data-module="{{ module.key }}"
+   {% if module.desc %}title="{{ module.desc }}" aria-describedby="card-desc-{{ module.key }}"{% endif %}>
   <div class="flex items-center gap-3">
-    <span class="flex h-11 w-11 flex-none items-center justify-center rounded-lg text-white" style="background: {{ module.accent }}">
+    <span class="flex h-11 w-11 flex-none items-center justify-center rounded-lg text-white" style="background: {{ module.accent }}" aria-hidden="true">
       {{ icon(module.key, 'h-6 w-6') }}
     </span>
     <h3 class="text-lg font-semibold leading-snug text-ink">{{ module.name }}</h3>
   </div>
-  {% if module.desc %}<p class="mt-3 text-sm text-muted">{{ module.desc }}</p>{% endif %}
-  {% if summary or detail or progress is not none %}
+  {% if module.desc %}<span id="card-desc-{{ module.key }}" class="sr-only">{{ module.desc }}</span>{% endif %}
+  {% if label or value is not none or progress is not none %}
     <div class="mt-auto pt-4">
-    <div class="border-t border-line pt-3" data-widget{% if empty %} data-widget-empty{% endif %}>
-      {% if summary %}<p class="line-clamp-2 text-sm font-semibold {{ 'text-muted' if empty else 'text-ink' }}">{{ summary }}</p>{% endif %}
-      {% if progress is not none %}
-        <div class="mt-2 flex items-center gap-2">
-          <div class="h-2 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progres {{ summary or module.name }}">
-            <div class="h-full rounded-full transition-[width] duration-300" style="width: {{ progress }}%; background: {{ module.accent }}"></div>
-          </div>
-          <span class="text-xs font-semibold text-ink">{{ progress }}%</span>
+      <div class="h-16 border-t border-line pt-3" data-widget{% if empty %} data-widget-empty{% endif %}>
+        <p class="flex h-7 items-baseline gap-1.5 overflow-hidden whitespace-nowrap" title="{{ value if value is not none }}{{ ' ' if value is not none and label }}{{ label }}">
+          {% if value is not none %}<span class="flex-none text-xl font-bold leading-7 text-ink">{{ value }}</span>{% endif %}
+          {% if label %}
+            <span class="min-w-0 truncate text-sm {{ 'font-semibold text-primary' if cta else ('text-muted' if empty or value is not none else 'font-semibold text-ink') }}">{{ label }}{% if cta %}<span aria-hidden="true"> &rsaquo;</span>{% endif %}</span>
+          {% endif %}
+        </p>
+        <div class="mt-1 flex h-3 items-center gap-2">
+          {% if progress is not none %}
+            <div class="h-2 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progres {{ label or module.name }}">
+              <div class="h-full rounded-full transition-[width] duration-300" style="width: {{ progress }}%; background: {{ module.accent }}"></div>
+            </div>
+            <span class="text-xs font-semibold text-ink">{{ progress }}%</span>
+          {% endif %}
         </div>
-      {% endif %}
-      {% if detail %}<p class="mt-1 line-clamp-1 text-xs text-muted">{{ detail }}</p>{% endif %}
-    </div>
+      </div>
     </div>
   {% endif %}
 </a>

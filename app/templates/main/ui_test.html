@@ -68,7 +68,7 @@
     <p class="mt-1 text-sm text-muted">Klik kartu untuk membuka aplikasi; di sana App Switcher (ikon 9 titik) menandai aplikasi aktif.</p>
     <div class="launcher-grid mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {% for m in modules %}
-        {{ module_card(m, summary=('Python Dasar' if m.key == 'elearning' else None), progress=(45 if m.key == 'elearning' else None)) }}
+        {{ module_card(m, label=('Python Dasar' if m.key == 'elearning' else 'Lihat ' ~ m.name), progress=(45 if m.key == 'elearning' else None), cta=(m.key != 'elearning')) }}
       {% endfor %}
     </div>
   </section>

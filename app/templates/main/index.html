@@ -10,7 +10,7 @@
       <h1 class="text-3xl font-bold tracking-tight">{% if first_name %}Halo, {{ first_name }}{% else %}Beranda{% endif %}</h1>
       <p class="mt-1 text-muted">
         {% if current_user %}Pilih aplikasi untuk mulai, atau lanjutkan yang terakhir.
-        {% else %}Enam aplikasi dalam satu akun. <a href="{{ login_url() }}" class="font-semibold text-primary underline">Masuk</a> untuk melihat ringkasan pribadi Anda.{% endif %}
+        {% else %}Satu akun, enam aplikasi. <a href="{{ login_url() }}" class="font-semibold text-primary underline">Masuk</a> untuk ringkasan pribadi.{% endif %}
       </p>
     </div>
 
@@ -33,7 +33,7 @@
   <div class="launcher-grid mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" data-launcher-grid>
     {% for m in MODULES %}
       {% set wd = widgets[m.key] %}
-      {{ module_card(m, summary=wd.summary, detail=wd.detail, progress=wd.progress, empty=wd.empty) }}
+      {{ module_card(m, value=wd.value, label=wd.label, progress=wd.progress, empty=wd.empty, cta=wd.cta) }}
     {% endfor %}
   </div>
 
