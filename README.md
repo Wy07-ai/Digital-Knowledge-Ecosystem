@@ -312,6 +312,10 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 - **Tema** Light/Dark/Sistem dan **tampilan** Desktop/Mobile: Guest -> `localStorage`
   (`dke-theme`, `dke-view`); Member -> `POST /api/settings/global` (tabel `user_settings`),
   dan nilai dari database dipakai saat halaman dimuat. Skrip anti-kedip di `<head>` `base.html`.
+  Klik manual pada pilihan tema memakai efek *circular reveal* (View Transitions API): warna baru tumbuh
+  dari ikon tema ke seluruh layar. Tanpa dukungan API itu atau saat `prefers-reduced-motion` aktif, tema
+  berganti langsung. Mode Sistem yang berubah otomatis tidak beranimasi. Tes: `python -m unittest tests.test_theme_transition`;
+  uji manual: `docs/UJI_MANUAL_TEMA.md`.
 - **Toast** menggantikan `alert()`: `toast(pesan, 'success|error|info|warning', ms)`.
   Pesan `flash()` Flask otomatis tampil sebagai toast (kategori `danger` -> error, tanpa kategori -> info).
 - **Mobile View paksa**: beri kelas `launcher-grid` / `product-grid` / `card-grid` pada grid,
