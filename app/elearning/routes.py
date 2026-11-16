@@ -20,6 +20,10 @@ from flask import (abort, current_app, flash, g, jsonify, make_response, redirec
 
 from ..db import get_db
 from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
+from ..messages import (
+    MSG_ALREADY_ENROLLED, MSG_API_LOGIN_REQUIRED, MSG_DATA_INVALID, MSG_JSON_REQUIRED,
+    MSG_NOT_ENROLLED, MSG_REQUEST_REJECTED,
+)
 from ..utils import CSRF_SESSION_KEY, MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso
 from . import bp, quiz as quizlib
 
@@ -362,15 +366,15 @@ def enroll(course_id):
     user_id = g.user["id"]
     lessons = get_lessons(course_id)
     if get_enrollment(user_id, course_id) is not None:
-        flash("Anda sudah terdaftar di kelas ini. Lanjutkan belajar!", "info")
+        flash(MSG_ALREADY_ENROLLED, "info")
         target = resume_lesson(lessons, completed_lesson_ids(user_id, course_id))
         return redirect(_lesson_url(course_id, target) if target else detail)
 
     if not course["is_free"]:
-        flash("Kelas ini berbayar. Beli kelas lewat E-Commerce, lalu kelas otomatis muncul di Kelas Saya.", "warning")
+        flash("Kelas ini berbayar. Beli lewat E-Commerce, lalu kelas muncul otomatis di Kelas Saya.", "warning")
         return redirect(detail)
     if not lessons:
-        flash("Kelas ini belum memiliki materi, jadi belum bisa diikuti.", "warning")
+        flash("Kelas ini belum punya materi, jadi belum bisa diikuti. Coba lagi nanti.", "warning")
         return redirect(detail)
 
     db = get_db()
@@ -386,7 +390,7 @@ def enroll(course_id):
         db.commit()
     except sqlite3.IntegrityError:
         db.rollback()  # permintaan ganda bersamaan: pendaftaran pertama sudah tersimpan
-        flash("Anda sudah terdaftar di kelas ini. Lanjutkan belajar!", "info")
+        flash(MSG_ALREADY_ENROLLED, "info")
         return redirect(detail)
     except sqlite3.Error:
         db.rollback()
@@ -460,7 +464,7 @@ def lesson(course_id, order_no):
 
     # Tolak akses bila belum terdaftar: kembali ke detail kelas dengan penjelasan.
     if get_enrollment(user_id, course_id) is None:
-        flash("Anda belum terdaftar di kelas ini. Ikuti kelas lebih dulu untuk membuka ruang belajar.", "error")
+        flash(MSG_NOT_ENROLLED, "error")
         return redirect(url_for("elearning.course_detail", course_id=course_id))
 
     lessons = get_lessons(course_id)
@@ -505,11 +509,11 @@ def api_lesson_complete(lesson_id):
     Respons memuat hitungan terbaru sehingga halaman memperbarui progress bar tanpa reload.
     """
     if g.get("user") is None:
-        return _json_error("Silakan masuk terlebih dahulu.", 401)
+        return _json_error(MSG_API_LOGIN_REQUIRED, 401)
     if request.headers.get("Sec-Fetch-Site") == "cross-site":
-        return _json_error("Permintaan ditolak.", 403)
+        return _json_error(MSG_REQUEST_REJECTED, 403)
     if not request.is_json:
-        return _json_error("Gunakan Content-Type application/json.", 415)
+        return _json_error(MSG_JSON_REQUIRED, 415)
     expected = session.get(CSRF_SESSION_KEY)
     sent = request.headers.get("X-CSRF-Token", "")
     if not expected or sent != expected:
@@ -518,7 +522,7 @@ def api_lesson_complete(lesson_id):
     data = request.get_json(silent=True)
     completed = data.get("completed", True) if isinstance(data, dict) else None
     if not isinstance(completed, bool):
-        return _json_error("Data tidak valid.", 400)
+        return _json_error(MSG_DATA_INVALID, 400)
 
     db = get_db()
     user_id = g.user["id"]
@@ -530,7 +534,7 @@ def api_lesson_complete(lesson_id):
     if row is None:
         return _json_error("Materi tidak ditemukan.", 404)
     if get_enrollment(user_id, row["course_id"]) is None:
-        return _json_error("Anda belum terdaftar di kelas ini.", 403)
+        return _json_error(MSG_NOT_ENROLLED, 403)
 
     try:
         if completed:
@@ -583,7 +587,7 @@ def _quiz_context(course_id):
         abort(404)
     detail = redirect(url_for("elearning.course_detail", course_id=course_id))
     if get_enrollment(g.user["id"], course_id) is None:
-        flash("Anda belum terdaftar di kelas ini. Ikuti kelas lebih dulu untuk mengerjakan kuis.", "error")
+        flash(MSG_NOT_ENROLLED, "error")
         return None, None, detail
     quiz = quizlib.get_quiz(get_db(), course_id)
     if quiz is None or not quizlib.get_public_questions(get_db(), quiz["id"]):
@@ -658,7 +662,7 @@ def quiz_submit(course_id):
     except sqlite3.Error:
         db.rollback()
         current_app.logger.exception("Gagal menyimpan kuis user_id=%s course_id=%s", user_id, course_id)
-        flash("Jawaban belum bisa disimpan. Coba kumpulkan lagi; jawaban Anda masih tersimpan di browser.", "error")
+        flash("Jawaban belum bisa dikumpulkan. Coba lagi; jawaban Anda masih tersimpan di peramban ini.", "error")
         return redirect(quiz_url)
     return redirect(url_for("elearning.quiz_result", course_id=course_id, attempt_id=attempt_id))
 
@@ -723,11 +727,11 @@ def settings():
             errors["playback_speed"] = "Pilih salah satu kecepatan yang tersedia."
         goal = None
         if not goal_raw.isdigit():
-            errors["daily_goal_min"] = f"Isi target dengan angka bulat, {GOAL_MIN}–{GOAL_MAX} menit."
+            errors["daily_goal_min"] = f"Isi target dengan angka bulat antara {GOAL_MIN} dan {GOAL_MAX} menit."
         else:
             goal = int(goal_raw)
             if not GOAL_MIN <= goal <= GOAL_MAX:
-                errors["daily_goal_min"] = f"Target belajar harus antara {GOAL_MIN} dan {GOAL_MAX} menit per hari."
+                errors["daily_goal_min"] = f"Target belajar antara {GOAL_MIN} dan {GOAL_MAX} menit per hari."
         if errors:
             return render_template(
                 "elearning/settings.html", page_title="Pengaturan E-Learning",

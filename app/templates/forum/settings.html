@@ -5,7 +5,7 @@
 {% block module_content %}
   <header class="mb-6">
     <h1 class="text-3xl font-bold tracking-tight">Pengaturan Forum</h1>
-    <p class="mt-1 text-muted">Atur siapa yang bisa melihat profil Forum Anda dan apakah Anda diberi tahu saat ada yang membalas thread Anda.</p>
+    <p class="mt-1 text-muted">Atur siapa yang bisa melihat profil Forum Anda dan notifikasi balasan.</p>
   </header>
 
   <form method="post" action="{{ url_for('forum.settings') }}" novalidate class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
@@ -13,7 +13,7 @@
 
     <fieldset aria-describedby="help-privacy">
       <legend class="text-sm font-semibold">Privasi profil</legend>
-      <p id="help-privacy" class="mt-1 text-sm text-muted">Nama Anda tetap tampil pada thread dan balasan Anda. Pengaturan ini mengatur halaman profil Forum: bio, tanggal bergabung, dan ringkasan aktivitas.</p>
+      <p id="help-privacy" class="mt-1 text-sm text-muted">Nama Anda tetap tampil pada topik dan balasan. Pengaturan ini hanya untuk halaman profil: bio, tanggal bergabung, dan ringkasan aktivitas.</p>
       <div class="fm-choices mt-3">
         {% for key, label, note in privacy_choices %}
           <label class="fm-choice">
@@ -30,7 +30,7 @@
 
     <fieldset class="mt-7" aria-describedby="help-notify">
       <legend class="text-sm font-semibold">Notifikasi balasan</legend>
-      <p id="help-notify" class="mt-1 text-sm text-muted">Bila aktif, Anda mendapat notifikasi di lonceng Top-Bar setiap ada anggota lain yang membalas thread Anda. Balasan Anda sendiri tidak dihitung.</p>
+      <p id="help-notify" class="mt-1 text-sm text-muted">Bila aktif, lonceng di bilah atas memberi tahu Anda saat anggota lain membalas topik Anda. Balasan Anda sendiri tidak dihitung.</p>
       <div class="fm-choices mt-3">
         <label class="fm-choice">
           <input type="radio" name="notify_reply" value="1" {% if notify_on %}checked{% endif %}>

@@ -44,7 +44,7 @@
       <aside class="w-full flex-none lg:w-80" aria-label="Ikuti kelas">
         <div class="rounded-xl border border-line bg-page p-5 lg:sticky lg:top-24">
           <dl class="grid grid-cols-2 gap-3 text-sm">
-            <div><dt class="text-muted">Level</dt><dd class="font-semibold">{{ course.level_label }}</dd></div>
+            <div><dt class="text-muted">Tingkat</dt><dd class="font-semibold">{{ course.level_label }}</dd></div>
             <div><dt class="text-muted">Materi</dt><dd class="font-semibold">{{ course.lesson_count }}</dd></div>
             <div><dt class="text-muted">Durasi</dt><dd class="font-semibold">{{ format_minutes(course.total_minutes) if course.total_minutes else '–' }}</dd></div>
             <div><dt class="text-muted">Harga</dt><dd class="font-semibold">{{ 'Gratis' if course.is_free else format_rupiah(course.price) }}</dd></div>
@@ -87,7 +87,7 @@
           {% else %}
             {% if course.product_slug %}
               <a href="{{ url_for('ecommerce.product', slug=course.product_slug) }}" class="btn btn--primary mt-5 w-full">Beli di E-Commerce</a>
-              <p class="mt-3 text-center text-xs text-muted">Setelah checkout, kelas langsung muncul di Kelas Saya.</p>
+              <p class="mt-3 text-center text-xs text-muted">Setelah membayar, kelas langsung muncul di Kelas Saya.</p>
             {% else %}
               <button type="button" class="btn btn--primary mt-5 w-full" disabled>Belum dijual</button>
             {% endif %}

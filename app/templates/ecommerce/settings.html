@@ -4,7 +4,7 @@
 {% block module_content %}
   <header class="mb-6">
     <h1 class="text-3xl font-bold tracking-tight">Pengaturan E-Commerce</h1>
-    <p class="mt-1 text-muted">Simpan alamat dan metode pembayaran favorit untuk checkout berikutnya.</p>
+    <p class="mt-1 text-muted">Simpan alamat dan metode pembayaran favorit untuk pembayaran berikutnya.</p>
   </header>
 
   <form method="post" action="{{ url_for('ecommerce.settings') }}" class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">
@@ -17,7 +17,7 @@
     {% if errors.get('address') %}
       <p id="settings-address-error" class="mt-1 text-sm font-medium text-red-700 dark:text-red-300">{{ errors.address }}</p>
     {% else %}
-      <p id="settings-address-help" class="mt-1 text-sm text-muted">Alamat ini akan terisi otomatis di checkout. Maksimal 1.000 karakter.</p>
+      <p id="settings-address-help" class="mt-1 text-sm text-muted">Alamat ini akan terisi otomatis di halaman pembayaran. Maksimal 1.000 karakter.</p>
     {% endif %}
 
     <label for="settings-payment" class="mt-5 block text-sm font-semibold">Metode pembayaran favorit</label>
@@ -33,7 +33,7 @@
     {% if errors.get('payment_method') %}
       <p id="settings-payment-error" class="mt-1 text-sm font-medium text-red-700 dark:text-red-300">{{ errors.payment_method }}</p>
     {% else %}
-      <p id="settings-payment-help" class="mt-1 text-sm text-muted">Metode ini akan terpilih otomatis di checkout dan tetap bisa diganti.</p>
+      <p id="settings-payment-help" class="mt-1 text-sm text-muted">Metode ini akan terpilih otomatis di halaman pembayaran dan tetap bisa diganti.</p>
     {% endif %}
 
     <button type="submit" class="btn btn--primary mt-6">Simpan pengaturan</button>

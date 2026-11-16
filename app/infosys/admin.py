@@ -22,13 +22,13 @@ import sqlite3
 from flask import abort, current_app, flash, g, redirect, render_template, request, url_for
 
 from ..db import get_db
+from ..messages import MSG_CHANGE_FAILED
 from ..utils import MSG_CSRF, admin_required, csrf_valid, log_activity
 from . import bp, panel
 from .routes import MODULE, _pagination_ctx
 
 ADMIN_PER_PAGE = 10
-TABS = (("thread", "Thread"), ("balasan", "Balasan"), ("akun", "Akun"))
-MSG_ADMIN_DB = "Perubahan belum bisa disimpan. Coba lagi sebentar lagi."
+TABS = (("thread", "Topik"), ("balasan", "Balasan"), ("akun", "Akun"))
 
 
 def _short(text, limit=80):
@@ -93,7 +93,7 @@ def admin():
     return render_template(
         "infosys/admin.html", tab="admin", page_title="Admin", admin_tab=tab, admin_tabs=TABS, rows=rows,
         pager=_pagination_ctx("infosys.admin", info, tab=tab if tab != "thread" else None),
-        noun={"thread": "thread", "balasan": "balasan", "akun": "akun"}[tab])
+        noun={"thread": "topik", "balasan": "balasan", "akun": "akun"}[tab])
 
 
 # --------------------------------------------------------------------------
@@ -121,23 +121,23 @@ def admin_delete_thread(thread_id):
         try:
             db.execute("DELETE FROM threads WHERE id = ?", (thread_id,))  # posts ikut terhapus (CASCADE)
             log_activity(MODULE, "admin_delete_thread",
-                         f"Thread #{thread_id} \"{_short(thread['title'], 100)}\" oleh {thread['author_name']} "
+                         f"Topik #{thread_id} \"{_short(thread['title'], 100)}\" oleh {thread['author_name']} "
                          f"({thread['reply_count']} balasan ikut terhapus)", commit=False)
             db.commit()
         except sqlite3.Error:
             db.rollback()
             current_app.logger.exception("Admin gagal menghapus thread id=%s", thread_id)
-            flash(MSG_ADMIN_DB, "error")
+            flash(MSG_CHANGE_FAILED, "error")
             return redirect(back)
-        flash("Thread dihapus.", "success")
+        flash("Topik dihapus.", "success")
         return redirect(back)
-    notes = ["Thread yang dihapus tidak bisa dikembalikan."]
+    notes = ["Topik yang dihapus tidak bisa dikembalikan."]
     if thread["reply_count"]:
-        notes.append(f"{thread['reply_count']} balasan di thread ini ikut terhapus.")
+        notes.append(f"{thread['reply_count']} balasan di topik ini ikut terhapus.")
     return _confirm(
-        title="Hapus thread ini?", lead="Thread oleh " + thread["author_name"] + ":", subject=thread["title"],
+        title="Hapus topik ini?", lead="Topik oleh " + thread["author_name"] + ":", subject=thread["title"],
         notes=notes, action_url=url_for("infosys.admin_delete_thread", thread_id=thread_id),
-        confirm_label="Ya, hapus thread", cancel_url=back)
+        confirm_label="Ya, hapus topik", cancel_url=back)
 
 
 # --------------------------------------------------------------------------
@@ -169,13 +169,13 @@ def admin_delete_post(post_id):
                 db.execute("UPDATE threads SET is_solved = 0, accepted_post_id = NULL WHERE id = ?", (post["thread_id"],))
             db.execute("DELETE FROM posts WHERE id = ?", (post_id,))
             log_activity(MODULE, "admin_delete_reply",
-                         f"Balasan #{post_id} oleh {post['author_name']} di thread #{post['thread_id']} "
+                         f"Balasan #{post_id} oleh {post['author_name']} di topik #{post['thread_id']} "
                          f"\"{_short(post['thread_title'], 100)}\"", commit=False)
             db.commit()
         except sqlite3.Error:
             db.rollback()
             current_app.logger.exception("Admin gagal menghapus balasan id=%s", post_id)
-            flash(MSG_ADMIN_DB, "error")
+            flash(MSG_CHANGE_FAILED, "error")
             return redirect(back)
         flash("Balasan dihapus.", "success")
         return redirect(back)
@@ -184,9 +184,9 @@ def admin_delete_post(post_id):
     if child_count:
         notes.append(f"{child_count} balasan lain yang menanggapinya tetap ada dan naik satu tingkat.")
     if post["accepted_post_id"] == post_id:
-        notes.append("Balasan ini ditandai sebagai solusi, jadi thread kembali berstatus belum terjawab.")
+        notes.append("Balasan ini ditandai sebagai solusi, jadi topik kembali berstatus belum terjawab.")
     return _confirm(
-        title="Hapus balasan ini?", lead=f"Balasan oleh {post['author_name']} di thread \"{_short(post['thread_title'], 80)}\":",
+        title="Hapus balasan ini?", lead=f"Balasan oleh {post['author_name']} di topik \"{_short(post['thread_title'], 80)}\":",
         subject=_short(post["body"], 200), notes=notes,
         action_url=url_for("infosys.admin_delete_post", post_id=post_id),
         confirm_label="Ya, hapus balasan", cancel_url=back)
@@ -226,16 +226,16 @@ def _set_user_status(user_id, make_active):
         except sqlite3.Error:
             db.rollback()
             current_app.logger.exception("Admin gagal mengubah status akun id=%s", user_id)
-            flash(MSG_ADMIN_DB, "error")
+            flash(MSG_CHANGE_FAILED, "error")
             return redirect(back)
         flash(f"Akun {user['full_name']} di{verb}.", "success")
         return redirect(back)
 
     if make_active:
-        notes = ["Pengguna dapat login kembali dengan kata sandinya."]
+        notes = ["Pengguna bisa masuk lagi dengan kata sandinya."]
     else:
-        notes = ["Pengguna tidak bisa login, dan sesi yang sedang berjalan langsung tidak berlaku.",
-                 "Thread dan balasannya tetap ada. Akun bisa diaktifkan kembali kapan saja."]
+        notes = ["Pengguna tidak bisa masuk, dan sesi yang sedang berjalan langsung berakhir.",
+                 "Topik dan balasannya tetap ada. Akun bisa diaktifkan kembali kapan saja."]
     return _confirm(
         title=f"{verb.capitalize()} akun ini?", lead="Akun:", subject=f"{user['full_name']} ({user['email']})",
         notes=notes, action_url=url_for(endpoint, user_id=user_id),

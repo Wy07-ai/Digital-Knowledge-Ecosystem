@@ -1,0 +1,1356 @@
+berkas,baris,jenis,teks
+app/templates/base.html,24,html-teks,Beranda · DKE
+app/templates/base.html,64,html-teks,Lewati ke konten utama
+app/templates/_components/app_switcher.html,8,html-atribut,Pindah aplikasi
+app/templates/_components/app_switcher.html,16,html-teks,Pindah aplikasi
+app/templates/_components/app_switcher.html,30,html-teks,Aktif
+app/templates/_components/app_switcher.html,39,html-teks,Semua aplikasi (Beranda)
+app/templates/_components/breadcrumb.html,20,html-atribut,Jejak halaman
+app/templates/_components/breadcrumb.html,24,html-atribut,Tampilkan jenjang sebelumnya
+app/templates/_components/breadcrumb.html,52,html-atribut,Kembali
+app/templates/_components/breadcrumb.html,53,html-teks,Kembali
+app/templates/_components/breadcrumb.html,53,html-teks,ke
+app/templates/_components/module_card.html,41,html-atribut,Progres
+app/templates/_components/topbar.html,5,jinja,Beranda
+app/templates/_components/topbar.html,11,html-atribut,Beranda DKE
+app/templates/_components/topbar.html,26,html-atribut,"Keranjang belanja, item"
+app/templates/_components/topbar.html,40,html-atribut,Pilih tema
+app/templates/_components/topbar.html,49,html-atribut,Tema tampilan
+app/templates/_components/topbar.html,64,html-atribut,Tampilan Mobile
+app/templates/_components/topbar.html,64,html-atribut,Tampilan Mobile (aktif/nonaktif)
+app/templates/_components/topbar.html,73,html-atribut,"Notifikasi , belum dibaca"
+app/templates/_components/topbar.html,118,html-atribut,Menu profil
+app/templates/_components/topbar.html,15,html-teks,DKE
+app/templates/_components/topbar.html,31,html-teks,Keranjang
+app/templates/_components/topbar.html,52,html-teks,Terang
+app/templates/_components/topbar.html,55,html-teks,Gelap
+app/templates/_components/topbar.html,58,html-teks,Sistem
+app/templates/_components/topbar.html,66,html-teks,Mobile
+app/templates/_components/topbar.html,86,html-teks,Notifikasi
+app/templates/_components/topbar.html,88,html-teks,Tandai semua dibaca
+app/templates/_components/topbar.html,111,html-teks,Belum ada notifikasi.
+app/templates/_components/topbar.html,131,html-teks,Profil Pengaturan
+app/templates/_components/topbar.html,135,html-teks,Keluar
+app/templates/_components/topbar.html,140,html-teks,Masuk
+app/templates/_components/topbar.html,141,html-teks,Daftar
+app/templates/ecommerce/cart.html,13,jinja,Keranjang masih kosong
+app/templates/ecommerce/cart.html,13,jinja,Produk yang Anda tambahkan akan muncul di sini.
+app/templates/ecommerce/cart.html,13,jinja,Jelajahi katalog
+app/templates/ecommerce/cart.html,21,html-atribut,Produk di keranjang
+app/templates/ecommerce/cart.html,25,html-atribut,Lihat
+app/templates/ecommerce/cart.html,62,html-atribut,Ringkasan belanja
+app/templates/ecommerce/cart.html,1,html-teks,Keranjang
+app/templates/ecommerce/cart.html,7,html-teks,Keranjang Belanja
+app/templates/ecommerce/cart.html,8,html-teks,item di keranjang
+app/templates/ecommerce/cart.html,15,html-teks,Bayar
+app/templates/ecommerce/cart.html,16,html-teks,"Tambahkan produk dulu, lalu bayar."
+app/templates/ecommerce/cart.html,37,html-teks,Jumlah:
+app/templates/ecommerce/cart.html,41,html-teks,Subtotal item
+app/templates/ecommerce/cart.html,46,html-teks,Jumlah
+app/templates/ecommerce/cart.html,50,html-teks,Ubah
+app/templates/ecommerce/cart.html,55,html-teks,Hapus
+app/templates/ecommerce/cart.html,63,html-teks,Ringkasan belanja
+app/templates/ecommerce/cart.html,66,html-teks,Subtotal
+app/templates/ecommerce/cart.html,70,html-teks,Total
+app/templates/ecommerce/cart.html,75,html-teks,Lanjut bayar
+app/templates/ecommerce/checkout.html,1,html-teks,Pembayaran
+app/templates/ecommerce/checkout.html,5,html-teks,Pembayaran
+app/templates/ecommerce/checkout.html,6,html-teks,Pembayaran ini simulasi; tidak ada pembayaran nyata.
+app/templates/ecommerce/checkout.html,13,html-teks,Alamat
+app/templates/ecommerce/checkout.html,14,html-teks,Alamat terisi dari Pengaturan E-Commerce. Isi alamat penerima sebelum membayar.
+app/templates/ecommerce/checkout.html,15,html-teks,Alamat penerima
+app/templates/ecommerce/checkout.html,23,html-teks,Kelola alamat yang akan terisi otomatis di halaman
+app/templates/ecommerce/checkout.html,23,html-teks,Pengaturan
+app/templates/ecommerce/checkout.html,28,html-teks,Metode pembayaran simulasi
+app/templates/ecommerce/checkout.html,43,html-teks,Metode favorit bisa diatur di
+app/templates/ecommerce/checkout.html,43,html-teks,Pengaturan
+app/templates/ecommerce/checkout.html,48,html-teks,Ringkasan pesanan
+app/templates/ecommerce/checkout.html,62,html-teks,Total
+app/templates/ecommerce/checkout.html,66,html-teks,Bayar
+app/templates/ecommerce/checkout.html,67,html-teks,"Dengan menekan Bayar, pesanan simulasi akan tercatat di akun Anda."
+app/templates/ecommerce/index.html,89,jinja,Produk digital
+app/templates/ecommerce/index.html,90,jinja,Produk digital
+app/templates/ecommerce/index.html,95,jinja,Produk digital pilihan untuk mendukung proses belajar Anda.
+app/templates/ecommerce/index.html,110,jinja,Produk tidak ditemukan
+app/templates/ecommerce/index.html,110,jinja,Coba ubah kata kunci atau rentang harga.
+app/templates/ecommerce/index.html,110,jinja,Tampilkan semua produk
+app/templates/ecommerce/index.html,19,html-atribut,Filter katalog
+app/templates/ecommerce/index.html,24,html-atribut,Nama atau deskripsi
+app/templates/ecommerce/index.html,24,html-atribut,Cari nama atau deskripsi produk
+app/templates/ecommerce/index.html,57,html-atribut,Rp
+app/templates/ecommerce/index.html,62,html-atribut,Rp
+app/templates/ecommerce/index.html,78,html-atribut,Lihat
+app/templates/ecommerce/index.html,1,html-teks,Katalog Produk
+app/templates/ecommerce/index.html,8,html-teks,Belajar dan berkarya
+app/templates/ecommerce/index.html,11,html-teks,Katalog Produk
+app/templates/ecommerce/index.html,12,html-teks,"Temukan kursus, e-book, dan aset digital untuk kebutuhan Anda."
+app/templates/ecommerce/index.html,15,html-teks,Lihat keranjang ( )
+app/templates/ecommerce/index.html,23,html-teks,Cari produk
+app/templates/ecommerce/index.html,29,html-teks,Kategori
+app/templates/ecommerce/index.html,31,html-teks,Semua kategori
+app/templates/ecommerce/index.html,38,html-teks,Jenis produk
+app/templates/ecommerce/index.html,40,html-teks,Semua jenis
+app/templates/ecommerce/index.html,47,html-teks,Urutkan
+app/templates/ecommerce/index.html,56,html-teks,Harga minimum
+app/templates/ecommerce/index.html,61,html-teks,Harga maksimum
+app/templates/ecommerce/index.html,68,html-teks,Terapkan filter
+app/templates/ecommerce/index.html,69,html-teks,Hapus filter
+app/templates/ecommerce/index.html,70,html-teks,produk ditemukan
+app/templates/ecommerce/index.html,101,html-teks,Tambah ke keranjang
+app/templates/ecommerce/layout_ecommerce.html,4,html-atribut,Navigasi E-Commerce
+app/templates/ecommerce/layout_ecommerce.html,6,html-teks,Katalog
+app/templates/ecommerce/layout_ecommerce.html,9,html-teks,Pesanan Saya
+app/templates/ecommerce/layout_ecommerce.html,11,html-teks,Pengaturan
+app/templates/ecommerce/order_detail.html,1,html-teks,Konfirmasi Pesanan
+app/templates/ecommerce/order_detail.html,10,html-teks,Pesanan berhasil dibuat
+app/templates/ecommerce/order_detail.html,11,html-teks,Pembayaran simulasi berhasil dicatat.
+app/templates/ecommerce/order_detail.html,16,html-teks,Kode pesanan
+app/templates/ecommerce/order_detail.html,20,html-teks,Metode pembayaran
+app/templates/ecommerce/order_detail.html,24,html-teks,Alamat penerima
+app/templates/ecommerce/order_detail.html,29,html-teks,Ringkasan item
+app/templates/ecommerce/order_detail.html,42,html-teks,Total
+app/templates/ecommerce/order_detail.html,46,html-teks,Mulai belajar di Kelas Saya
+app/templates/ecommerce/order_detail.html,47,html-teks,Pesanan Saya
+app/templates/ecommerce/order_detail.html,48,html-teks,Kembali ke katalog
+app/templates/ecommerce/orders.html,21,jinja,Lunas (simulasi)
+app/templates/ecommerce/orders.html,30,jinja,Belum ada pesanan
+app/templates/ecommerce/orders.html,30,jinja,Pesanan simulasi yang berhasil dibayar akan tercatat di sini.
+app/templates/ecommerce/orders.html,30,jinja,Jelajahi katalog
+app/templates/ecommerce/orders.html,1,html-teks,Pesanan Saya
+app/templates/ecommerce/orders.html,6,html-teks,Pesanan Saya
+app/templates/ecommerce/orders.html,7,html-teks,Riwayat pesanan dan konfirmasi pembayaran simulasi.
+app/templates/ecommerce/orders.html,22,html-teks,Detail
+app/templates/ecommerce/product.html,20,jinja,Kursus digital
+app/templates/ecommerce/product.html,20,jinja,Template & aset
+app/templates/ecommerce/product.html,20,jinja,Produk digital
+app/templates/ecommerce/product.html,26,jinja,Produk digital pilihan untuk mendukung proses belajar Anda.
+app/templates/ecommerce/product.html,5,html-atribut,Jejak halaman
+app/templates/ecommerce/product.html,6,html-teks,Katalog
+app/templates/ecommerce/product.html,25,html-teks,Tentang produk
+app/templates/ecommerce/product.html,32,html-teks,Tambah ke keranjang
+app/templates/ecommerce/settings.html,1,html-teks,Pengaturan E-Commerce max-w-3xl
+app/templates/ecommerce/settings.html,6,html-teks,Pengaturan E-Commerce
+app/templates/ecommerce/settings.html,7,html-teks,Simpan alamat dan metode pembayaran favorit untuk pembayaran berikutnya.
+app/templates/ecommerce/settings.html,12,html-teks,Alamat penerima
+app/templates/ecommerce/settings.html,20,html-teks,Alamat ini akan terisi otomatis di halaman pembayaran. Maksimal 1.000 karakter.
+app/templates/ecommerce/settings.html,23,html-teks,Metode pembayaran favorit
+app/templates/ecommerce/settings.html,28,html-teks,Pilih metode pembayaran
+app/templates/ecommerce/settings.html,36,html-teks,Metode ini akan terpilih otomatis di halaman pembayaran dan tetap bisa diganti.
+app/templates/ecommerce/settings.html,39,html-teks,Simpan pengaturan
+app/templates/elearning/_course_card.html,10,jinja,Kelas
+app/templates/elearning/_course_card.html,32,html-atribut,Progres
+app/templates/elearning/_course_card.html,16,html-teks,Gratis
+app/templates/elearning/_course_card.html,23,html-teks,materi ·
+app/templates/elearning/_course_card.html,30,html-teks,dari materi
+app/templates/elearning/_course_card.html,41,html-teks,Tinjau ulang Lanjutkan belajar Mulai belajar
+app/templates/elearning/_course_card.html,45,html-teks,Buka kelas
+app/templates/elearning/_course_card.html,47,html-teks,Detail kelas
+app/templates/elearning/course_detail.html,18,jinja,Deskripsi kelas belum tersedia.
+app/templates/elearning/course_detail.html,34,jinja,Video
+app/templates/elearning/course_detail.html,34,jinja,Bacaan
+app/templates/elearning/course_detail.html,50,jinja,Gratis
+app/templates/elearning/course_detail.html,71,jinja,· sudah lulus
+app/templates/elearning/course_detail.html,44,html-atribut,Ikuti kelas
+app/templates/elearning/course_detail.html,56,html-atribut,Progres belajar
+app/templates/elearning/course_detail.html,11,html-teks,Pengajar:
+app/templates/elearning/course_detail.html,17,html-teks,Tentang kelas
+app/templates/elearning/course_detail.html,20,html-teks,Daftar materi ( )
+app/templates/elearning/course_detail.html,26,html-teks,Selesai
+app/templates/elearning/course_detail.html,34,html-teks,· mnt
+app/templates/elearning/course_detail.html,40,html-teks,Materi belum tersedia.
+app/templates/elearning/course_detail.html,47,html-teks,Tingkat
+app/templates/elearning/course_detail.html,48,html-teks,Materi
+app/templates/elearning/course_detail.html,49,html-teks,Durasi
+app/templates/elearning/course_detail.html,50,html-teks,Harga
+app/templates/elearning/course_detail.html,55,html-teks,dari materi
+app/templates/elearning/course_detail.html,61,html-teks,Tinjau ulang Lanjutkan belajar Mulai belajar
+app/templates/elearning/course_detail.html,66,html-teks,Coba kuis lagi Kerjakan kuis
+app/templates/elearning/course_detail.html,69,html-teks,soal · lulus bila nilai ≥
+app/templates/elearning/course_detail.html,71,html-teks,Nilai terbaik
+app/templates/elearning/course_detail.html,74,html-teks,Anda sudah terdaftar di kelas ini.
+app/templates/elearning/course_detail.html,76,html-teks,Belum ada materi
+app/templates/elearning/course_detail.html,81,html-teks,Ikuti kelas gratis
+app/templates/elearning/course_detail.html,84,html-teks,Masuk untuk mengikuti kelas
+app/templates/elearning/course_detail.html,85,html-teks,"Kelas ini gratis. Setelah masuk, Anda kembali ke halaman ini."
+app/templates/elearning/course_detail.html,89,html-teks,Beli di E-Commerce
+app/templates/elearning/course_detail.html,90,html-teks,"Setelah membayar, kelas langsung muncul di Kelas Saya."
+app/templates/elearning/course_detail.html,92,html-teks,Belum dijual
+app/templates/elearning/index.html,35,jinja,Belum ada kelas tingkat
+app/templates/elearning/index.html,35,jinja,Coba tingkat lain atau tampilkan semua kelas.
+app/templates/elearning/index.html,35,jinja,Tampilkan semua kelas
+app/templates/elearning/index.html,37,jinja,Belum ada kelas
+app/templates/elearning/index.html,37,jinja,Kelas akan muncul di sini setelah ditambahkan.
+app/templates/elearning/index.html,37,jinja,Kembali ke Beranda
+app/templates/elearning/index.html,12,html-atribut,Filter tingkat kelas
+app/templates/elearning/index.html,1,html-teks,Daftar Kelas
+app/templates/elearning/index.html,7,html-teks,E-Learning
+app/templates/elearning/index.html,8,html-teks,Daftar Kelas
+app/templates/elearning/index.html,14,html-teks,Semua tingkat
+app/templates/elearning/index.html,22,html-teks,"Filter tingkat tidak dikenal, jadi semua kelas ditampilkan."
+app/templates/elearning/index.html,28,html-teks,Menampilkan kelas tingkat .
+app/templates/elearning/layout_elearning.html,7,html-atribut,Navigasi E-Learning
+app/templates/elearning/layout_elearning.html,10,html-teks,Daftar Kelas
+app/templates/elearning/layout_elearning.html,14,html-teks,Kelas Saya
+app/templates/elearning/layout_elearning.html,17,html-teks,Pengaturan
+app/templates/elearning/lesson.html,16,jinja,Video
+app/templates/elearning/lesson.html,16,jinja,Bacaan
+app/templates/elearning/lesson.html,77,jinja,Selesai · Batalkan
+app/templates/elearning/lesson.html,77,jinja,Tandai selesai
+app/templates/elearning/lesson.html,122,jinja,Video
+app/templates/elearning/lesson.html,122,jinja,Bacaan
+app/templates/elearning/lesson.html,20,html-atribut,Progres kelas
+app/templates/elearning/lesson.html,25,html-atribut,Progres kelas
+app/templates/elearning/lesson.html,95,html-atribut,Daftar bab
+app/templates/elearning/lesson.html,99,html-atribut,Progres kelas
+app/templates/elearning/lesson.html,113,html-atribut,Bab kelas
+app/templates/elearning/lesson.html,1,html-teks,· max-w-7xl
+app/templates/elearning/lesson.html,16,html-teks,Materi dari · · mnt
+app/templates/elearning/lesson.html,22,html-teks,Progres kelas
+app/templates/elearning/lesson.html,23,html-teks,dari materi · %
+app/templates/elearning/lesson.html,42,html-teks,Kecepatan putar: .
+app/templates/elearning/lesson.html,43,html-teks,Ubah di Pengaturan
+app/templates/elearning/lesson.html,46,html-teks,Video belum bisa ditampilkan.
+app/templates/elearning/lesson.html,47,html-teks,Video materi ini belum tersedia. Anda tetap bisa lanjut ke materi berikutnya.
+app/templates/elearning/lesson.html,54,html-teks,Catatan materi
+app/templates/elearning/lesson.html,61,html-teks,Isi materi belum tersedia.
+app/templates/elearning/lesson.html,68,html-teks,Sebelumnya
+app/templates/elearning/lesson.html,71,html-teks,Sebelumnya
+app/templates/elearning/lesson.html,83,html-teks,Berikutnya
+app/templates/elearning/lesson.html,86,html-teks,Ini materi terakhir
+app/templates/elearning/lesson.html,89,html-teks,Semua materi kelas ini sudah selesai. Kerja bagus!
+app/templates/elearning/lesson.html,98,html-teks,dari materi · %
+app/templates/elearning/lesson.html,104,html-teks,Kuis lulus · coba lagi Coba kuis lagi Kerjakan kuis
+app/templates/elearning/lesson.html,110,html-teks,Daftar bab ( )
+app/templates/elearning/lesson.html,122,html-teks,· mnt
+app/templates/elearning/my_courses.html,33,jinja,Belum mengikuti kelas
+app/templates/elearning/my_courses.html,33,jinja,"Pilih kelas gratis di Daftar Kelas, atau beli kursus lewat E-Commerce."
+app/templates/elearning/my_courses.html,33,jinja,Lihat daftar kelas
+app/templates/elearning/my_courses.html,12,html-atribut,Target belajar hari ini
+app/templates/elearning/my_courses.html,21,html-atribut,Target belajar harian
+app/templates/elearning/my_courses.html,1,html-teks,Kelas Saya
+app/templates/elearning/my_courses.html,7,html-teks,E-Learning
+app/templates/elearning/my_courses.html,8,html-teks,Kelas Saya
+app/templates/elearning/my_courses.html,9,html-teks,Kelas gratis yang Anda ikuti dan kursus hasil pembelian muncul di sini.
+app/templates/elearning/my_courses.html,14,html-teks,Target belajar hari ini
+app/templates/elearning/my_courses.html,15,html-teks,Ubah target
+app/templates/elearning/my_courses.html,17,html-teks,Target tercapai. Kerja bagus!
+app/templates/elearning/my_courses.html,17,html-teks,dari menit. Tandai materi selesai untuk menambah menit belajar.
+app/templates/elearning/quiz.html,26,html-atribut,Nomor soal
+app/templates/elearning/quiz.html,29,html-atribut,Soal
+app/templates/elearning/quiz.html,1,html-teks,· max-w-3xl
+app/templates/elearning/quiz.html,19,html-teks,"soal · nilai minimal lulus · percobaan sebelumnya: , nilai terbaik"
+app/templates/elearning/quiz.html,39,html-teks,Soal dari
+app/templates/elearning/quiz.html,47,html-teks,Pilihan :
+app/templates/elearning/quiz.html,57,html-teks,Sebelumnya
+app/templates/elearning/quiz.html,59,html-teks,Selanjutnya
+app/templates/elearning/quiz.html,60,html-teks,Kumpulkan
+app/templates/elearning/quiz.html,64,html-teks,Kumpulkan jawaban
+app/templates/elearning/quiz.html,69,html-teks,Masih ada soal yang kosong
+app/templates/elearning/quiz.html,71,html-teks,"Soal yang tidak dijawab dihitung salah, dan kuis yang sudah dikumpulkan tidak bisa diubah."
+app/templates/elearning/quiz.html,73,html-teks,Periksa lagi
+app/templates/elearning/quiz.html,74,html-teks,Kumpulkan sekarang
+app/templates/elearning/quiz_result.html,13,jinja,Lulus
+app/templates/elearning/quiz_result.html,13,jinja,Belum lulus
+app/templates/elearning/quiz_result.html,15,html-atribut,Nilai dari 100
+app/templates/elearning/quiz_result.html,1,html-teks,Hasil · max-w-3xl
+app/templates/elearning/quiz_result.html,16,html-teks,Benar dari soal · nilai minimal lulus
+app/templates/elearning/quiz_result.html,20,html-teks,Selamat! Kelas ini ditandai selesai dan progres belajar Anda menjadi 100%.
+app/templates/elearning/quiz_result.html,22,html-teks,"Nilai Anda belum mencapai batas lulus. Pelajari pembahasan di bawah, lalu coba lagi."
+app/templates/elearning/quiz_result.html,25,html-teks,Coba Lagi
+app/templates/elearning/quiz_result.html,26,html-teks,Kembali ke kelas
+app/templates/elearning/quiz_result.html,30,html-teks,Pembahasan
+app/templates/elearning/quiz_result.html,35,html-teks,Soal
+app/templates/elearning/quiz_result.html,36,html-teks,Benar
+app/templates/elearning/quiz_result.html,37,html-teks,Salah
+app/templates/elearning/quiz_result.html,38,html-teks,Tidak dijawab
+app/templates/elearning/quiz_result.html,48,html-teks,Jawaban benar
+app/templates/elearning/quiz_result.html,49,html-teks,Jawaban Anda
+app/templates/elearning/quiz_result.html,55,html-teks,Pembahasan:
+app/templates/elearning/quiz_result.html,62,html-teks,Coba Lagi
+app/templates/elearning/quiz_result.html,63,html-teks,Kelas Saya
+app/templates/elearning/settings.html,1,html-teks,Pengaturan E-Learning max-w-3xl
+app/templates/elearning/settings.html,6,html-teks,E-Learning
+app/templates/elearning/settings.html,7,html-teks,Pengaturan E-Learning
+app/templates/elearning/settings.html,8,html-teks,Atur kecepatan video dan target belajar harian. Berlaku mulai materi berikutnya.
+app/templates/elearning/settings.html,16,html-teks,Kecepatan video
+app/templates/elearning/settings.html,28,html-teks,Dipakai di pemutar video Ruang Belajar. Pemutar yang tidak mendukung pengaturan ini tetap memakai kecepatan normal.
+app/templates/elearning/settings.html,32,html-teks,Target belajar (menit per hari)
+app/templates/elearning/settings.html,41,html-teks,– menit. Menit belajar dihitung dari durasi materi yang Anda tandai selesai hari ini.
+app/templates/elearning/settings.html,44,html-teks,Simpan pengaturan
+app/templates/etutorial/_tutorial_card.html,29,html-atribut,Hapus dari Tersimpan
+app/templates/etutorial/_tutorial_card.html,9,html-teks,Tersimpan
+app/templates/etutorial/_tutorial_card.html,18,html-teks,Perkiraan waktu
+app/templates/etutorial/_tutorial_card.html,20,html-teks,langkah
+app/templates/etutorial/_tutorial_card.html,23,html-teks,Mulai tutorial
+app/templates/etutorial/_tutorial_card.html,29,html-teks,Hapus
+app/templates/etutorial/index.html,55,jinja,Tidak ada tutorial yang cocok
+app/templates/etutorial/index.html,55,jinja,"Coba kategori atau tingkat lain, atau atur ulang filter."
+app/templates/etutorial/index.html,55,jinja,Atur ulang filter
+app/templates/etutorial/index.html,57,jinja,Belum ada tutorial
+app/templates/etutorial/index.html,57,jinja,Tutorial akan muncul di sini setelah ditambahkan.
+app/templates/etutorial/index.html,57,jinja,Kembali ke Beranda
+app/templates/etutorial/index.html,14,html-atribut,Filter kategori
+app/templates/etutorial/index.html,25,html-atribut,Filter tingkat kesulitan
+app/templates/etutorial/index.html,1,html-teks,Daftar Tutorial
+app/templates/etutorial/index.html,7,html-teks,E-Tutorial
+app/templates/etutorial/index.html,8,html-teks,Daftar Tutorial
+app/templates/etutorial/index.html,15,html-teks,Kategori
+app/templates/etutorial/index.html,18,html-teks,Semua kategori
+app/templates/etutorial/index.html,26,html-teks,Tingkat kesulitan
+app/templates/etutorial/index.html,29,html-teks,Semua tingkat
+app/templates/etutorial/index.html,37,html-teks,Atur ulang filter
+app/templates/etutorial/index.html,42,html-teks,"Sebagian filter tidak dikenal, jadi diabaikan."
+app/templates/etutorial/index.html,48,html-teks,Menampilkan dari tutorial.
+app/templates/etutorial/layout_etutorial.html,6,html-atribut,Navigasi E-Tutorial
+app/templates/etutorial/layout_etutorial.html,9,html-teks,Daftar Tutorial
+app/templates/etutorial/layout_etutorial.html,12,html-teks,Tersimpan
+app/templates/etutorial/layout_etutorial.html,15,html-teks,Pengaturan
+app/templates/etutorial/saved.html,20,jinja,Belum ada tutorial tersimpan
+app/templates/etutorial/saved.html,20,jinja,Buka sebuah tutorial lalu pilih Simpan tutorial agar mudah ditemukan lagi.
+app/templates/etutorial/saved.html,20,jinja,Telusuri tutorial
+app/templates/etutorial/saved.html,1,html-teks,Tersimpan
+app/templates/etutorial/saved.html,7,html-teks,E-Tutorial
+app/templates/etutorial/saved.html,8,html-teks,Tersimpan
+app/templates/etutorial/saved.html,9,html-teks,"Tutorial yang Anda simpan, dari yang terbaru."
+app/templates/etutorial/saved.html,13,html-teks,tutorial tersimpan.
+app/templates/etutorial/settings.html,53,html-atribut,Contoh kode pratinjau
+app/templates/etutorial/settings.html,1,html-teks,Pengaturan E-Tutorial max-w-3xl
+app/templates/etutorial/settings.html,8,html-teks,E-Tutorial
+app/templates/etutorial/settings.html,9,html-teks,Pengaturan E-Tutorial
+app/templates/etutorial/settings.html,10,html-teks,Pilih ukuran huruf untuk membaca tutorial. Pratinjau berubah langsung.
+app/templates/etutorial/settings.html,14,html-teks,"Anda belum masuk, jadi pilihan ini hanya disimpan di peramban ini."
+app/templates/etutorial/settings.html,16,html-teks,Masuk
+app/templates/etutorial/settings.html,16,html-teks,agar tersimpan di akun dan ikut ke perangkat lain.
+app/templates/etutorial/settings.html,24,html-teks,Ukuran huruf bacaan
+app/templates/etutorial/settings.html,30,html-teks,Aa
+app/templates/etutorial/settings.html,40,html-teks,Berlaku untuk teks langkah dan blok kode di halaman tutorial. Ukuran Besar tetap rapi di layar ponsel.
+app/templates/etutorial/settings.html,44,html-teks,Pratinjau
+app/templates/etutorial/settings.html,46,html-teks,Langkah 2
+app/templates/etutorial/settings.html,47,html-teks,Pasang Flask
+app/templates/etutorial/settings.html,49,html-teks,"Pasang Flask dengan pip, lalu pastikan terpasang dengan menampilkan informasi paketnya."
+app/templates/etutorial/settings.html,52,html-teks,bash
+app/templates/etutorial/settings.html,53,html-teks,pip install Flask pip show flask
+app/templates/etutorial/settings.html,58,html-teks,Simpan pengaturan
+app/templates/etutorial/tutorial.html,34,jinja,Hapus dari Tersimpan
+app/templates/etutorial/tutorial.html,34,jinja,Simpan tutorial
+app/templates/etutorial/tutorial.html,41,jinja,Kecil
+app/templates/etutorial/tutorial.html,41,jinja,Sedang
+app/templates/etutorial/tutorial.html,41,jinja,Besar
+app/templates/etutorial/tutorial.html,126,jinja,Tutorial ini belum punya langkah
+app/templates/etutorial/tutorial.html,126,jinja,"Langkah tutorial ini sedang disiapkan, coba tutorial lain dulu."
+app/templates/etutorial/tutorial.html,126,jinja,Kembali ke daftar
+app/templates/etutorial/tutorial.html,48,html-atribut,Langkah tutorial
+app/templates/etutorial/tutorial.html,53,html-atribut,Posisi langkah
+app/templates/etutorial/tutorial.html,53,html-atribut,Langkah dari
+app/templates/etutorial/tutorial.html,62,html-atribut,Langkah :
+app/templates/etutorial/tutorial.html,86,html-atribut,Salin kode Langkah
+app/templates/etutorial/tutorial.html,91,html-atribut,Kode Langkah
+app/templates/etutorial/tutorial.html,1,html-teks,· Langkah max-w-3xl
+app/templates/etutorial/tutorial.html,21,html-teks,Perkiraan waktu
+app/templates/etutorial/tutorial.html,38,html-teks,Masuk untuk menyimpan
+app/templates/etutorial/tutorial.html,40,html-teks,Ukuran huruf: · Ubah
+app/templates/etutorial/tutorial.html,50,html-teks,Langkah dari
+app/templates/etutorial/tutorial.html,75,html-teks,Langkah
+app/templates/etutorial/tutorial.html,88,html-teks,Salin
+app/templates/etutorial/tutorial.html,99,html-teks,Sebelumnya
+app/templates/etutorial/tutorial.html,103,html-teks,Sebelumnya
+app/templates/etutorial/tutorial.html,106,html-teks,Berikutnya
+app/templates/etutorial/tutorial.html,110,html-teks,Selesai
+app/templates/etutorial/tutorial.html,116,html-teks,Tutorial selesai
+app/templates/etutorial/tutorial.html,117,html-teks,Ini langkah terakhir. Coba ulangi tanpa menyalin kode untuk menguji pemahaman Anda.
+app/templates/etutorial/tutorial.html,119,html-teks,Ulangi dari Langkah 1
+app/templates/etutorial/tutorial.html,120,html-teks,Tutorial lainnya
+app/templates/etutorial/tutorial.html,121,html-teks,Buka Tersimpan
+app/templates/forum/_components.html,54,html-atribut,Halaman
+app/templates/forum/_components.html,61,html-atribut,Halaman
+app/templates/forum/_components.html,10,html-teks,Terjawab
+app/templates/forum/_components.html,32,html-teks,dilihat
+app/templates/forum/_components.html,37,html-teks,balasan
+app/templates/forum/_components.html,52,html-teks,Menampilkan dari
+app/templates/forum/_components.html,56,html-teks,Sebelumnya
+app/templates/forum/_components.html,57,html-teks,Sebelumnya
+app/templates/forum/_components.html,66,html-teks,Berikutnya
+app/templates/forum/_components.html,67,html-teks,Berikutnya
+app/templates/forum/delete_post.html,1,html-teks,Hapus Balasan max-w-2xl
+app/templates/forum/delete_post.html,7,html-teks,Hapus balasan ini?
+app/templates/forum/delete_post.html,8,html-teks,Di topik:
+app/templates/forum/delete_post.html,11,html-teks,Balasan yang dihapus tidak bisa dikembalikan.
+app/templates/forum/delete_post.html,12,html-teks,balasan lain yang menanggapinya tetap ada dan naik satu tingkat.
+app/templates/forum/delete_post.html,13,html-teks,"Balasan ini ditandai sebagai solusi, jadi topik kembali berstatus belum terjawab."
+app/templates/forum/delete_post.html,17,html-teks,"Ya, hapus balasan"
+app/templates/forum/delete_post.html,18,html-teks,Batal
+app/templates/forum/edit_post.html,15,html-atribut,Balasan
+app/templates/forum/edit_post.html,1,html-teks,Ubah Balasan max-w-3xl
+app/templates/forum/edit_post.html,7,html-teks,Ubah balasan
+app/templates/forum/edit_post.html,8,html-teks,Di topik:
+app/templates/forum/edit_post.html,14,html-teks,Isi balasan
+app/templates/forum/edit_post.html,23,html-teks,Simpan perubahan
+app/templates/forum/edit_post.html,24,html-teks,Batal
+app/templates/forum/index.html,56,jinja,Semua topik
+app/templates/forum/index.html,56,jinja,Semua pertanyaan di sini sudah punya solusi.
+app/templates/forum/index.html,56,jinja,Lihat semua topik
+app/templates/forum/index.html,60,jinja,Belum ada topik di kategori
+app/templates/forum/index.html,60,jinja,Jadilah yang pertama memulai diskusi di kategori ini.
+app/templates/forum/index.html,60,jinja,Buat topik
+app/templates/forum/index.html,64,jinja,Belum ada topik
+app/templates/forum/index.html,64,jinja,Mulai diskusi pertama: ajukan pertanyaan atau bagikan pengalaman belajar Anda.
+app/templates/forum/index.html,64,jinja,Buat topik pertama
+app/templates/forum/index.html,17,html-atribut,Filter kategori
+app/templates/forum/index.html,28,html-atribut,Urutan topik
+app/templates/forum/index.html,49,html-atribut,Daftar topik
+app/templates/forum/index.html,1,html-teks,Forum
+app/templates/forum/index.html,9,html-teks,Forum diskusi
+app/templates/forum/index.html,12,html-teks,Buat topik
+app/templates/forum/index.html,20,html-teks,Semua
+app/templates/forum/index.html,31,html-teks,Terbaru
+app/templates/forum/index.html,33,html-teks,Belum terjawab
+app/templates/forum/index.html,39,html-teks,"Kategori itu tidak dikenal, jadi semua topik ditampilkan."
+app/templates/forum/index.html,42,html-teks,"Urutan itu tidak dikenal, jadi topik diurutkan dari yang terbaru."
+app/templates/forum/index.html,45,html-teks,"Menampilkan topik yang belum punya solusi, dari yang paling sedikit balasannya."
+app/templates/forum/layout_forum.html,8,html-atribut,Navigasi Forum
+app/templates/forum/layout_forum.html,10,html-teks,Diskusi
+app/templates/forum/layout_forum.html,12,html-teks,Topik Saya
+app/templates/forum/layout_forum.html,14,html-teks,Pengaturan
+app/templates/forum/my_threads.html,25,jinja,Anda belum membuat topik
+app/templates/forum/my_threads.html,25,jinja,Mulai diskusi pertama Anda dengan pertanyaan atau cerita belajar.
+app/templates/forum/my_threads.html,25,jinja,Buat topik pertama
+app/templates/forum/my_threads.html,18,html-atribut,Daftar topik saya
+app/templates/forum/my_threads.html,1,html-teks,Topik Saya
+app/templates/forum/my_threads.html,9,html-teks,Topik saya
+app/templates/forum/my_threads.html,10,html-teks,"topik yang Anda mulai, di antaranya sudah terjawab. Topik yang Anda mulai akan muncul di sini."
+app/templates/forum/my_threads.html,14,html-teks,Buat topik
+app/templates/forum/new_thread.html,17,html-atribut,Kategori
+app/templates/forum/new_thread.html,17,html-atribut,Pilih salah satu kategori.
+app/templates/forum/new_thread.html,31,html-atribut,Judul
+app/templates/forum/new_thread.html,46,html-atribut,Isi topik
+app/templates/forum/new_thread.html,46,html-atribut,"Jelaskan apa yang sudah Anda coba, pesan galat yang muncul, atau hal yang ingin Anda diskusikan."
+app/templates/forum/new_thread.html,59,html-atribut,Membuat topik&hellip;
+app/templates/forum/new_thread.html,1,html-teks,Buat Topik max-w-3xl
+app/templates/forum/new_thread.html,7,html-teks,Buat topik baru
+app/templates/forum/new_thread.html,8,html-teks,"Tulis judul yang jelas dan jelaskan konteksnya, supaya anggota lain mudah membantu."
+app/templates/forum/new_thread.html,16,html-teks,Kategori
+app/templates/forum/new_thread.html,21,html-teks,Pilih kategori
+app/templates/forum/new_thread.html,30,html-teks,Judul
+app/templates/forum/new_thread.html,38,html-teks,karakter.
+app/templates/forum/new_thread.html,45,html-teks,Isi topik
+app/templates/forum/new_thread.html,52,html-teks,"Minimal karakter. Teks ditampilkan apa adanya, tanpa format HTML."
+app/templates/forum/new_thread.html,59,html-teks,Buat topik
+app/templates/forum/new_thread.html,60,html-teks,Batal
+app/templates/forum/profile.html,1,html-teks,max-w-3xl
+app/templates/forum/profile.html,11,html-teks,"Profil Forum , bergabung"
+app/templates/forum/profile.html,17,html-teks,Profil Anda diatur
+app/templates/forum/profile.html,19,html-teks,Ubah pengaturan privasi
+app/templates/forum/profile.html,24,html-teks,Topik
+app/templates/forum/profile.html,25,html-teks,Balasan
+app/templates/forum/profile.html,26,html-teks,Topik Terjawab
+app/templates/forum/profile.html,29,html-teks,Topik terbaru
+app/templates/forum/profile.html,33,html-teks,belum membuat topik.
+app/templates/forum/profile.html,40,html-teks,Masuk untuk melihat profil ini
+app/templates/forum/profile.html,41,html-teks,Pemilik profil hanya membagikannya kepada anggota yang sudah masuk.
+app/templates/forum/profile.html,42,html-teks,Masuk
+app/templates/forum/profile.html,44,html-teks,Profil ini privat
+app/templates/forum/profile.html,45,html-teks,Pemilik profil memilih untuk tidak membagikan detailnya. Anda tetap bisa membaca topik dan balasannya di Forum.
+app/templates/forum/profile.html,46,html-teks,Kembali ke diskusi
+app/templates/forum/settings.html,1,html-teks,Pengaturan Forum max-w-3xl
+app/templates/forum/settings.html,7,html-teks,Pengaturan Forum
+app/templates/forum/settings.html,8,html-teks,Atur siapa yang bisa melihat profil Forum Anda dan notifikasi balasan.
+app/templates/forum/settings.html,15,html-teks,Privasi profil
+app/templates/forum/settings.html,16,html-teks,"Nama Anda tetap tampil pada topik dan balasan. Pengaturan ini hanya untuk halaman profil: bio, tanggal bergabung, dan ringkasan aktivitas."
+app/templates/forum/settings.html,32,html-teks,Notifikasi balasan
+app/templates/forum/settings.html,33,html-teks,"Bila aktif, lonceng di bilah atas memberi tahu Anda saat anggota lain membalas topik Anda. Balasan Anda sendiri tidak dihitung."
+app/templates/forum/settings.html,39,html-teks,Aktif
+app/templates/forum/settings.html,40,html-teks,Beri tahu saya saat ada balasan baru.
+app/templates/forum/settings.html,47,html-teks,Nonaktif
+app/templates/forum/settings.html,48,html-teks,Jangan kirim notifikasi balasan.
+app/templates/forum/settings.html,55,html-teks,Simpan pengaturan
+app/templates/forum/settings.html,56,html-teks,Kembali ke diskusi
+app/templates/forum/thread.html,48,html-atribut,Balasan dari
+app/templates/forum/thread.html,119,html-atribut,Balasan
+app/templates/forum/thread.html,119,html-atribut,Tulis balasan yang membantu. Teks ditampilkan apa adanya.
+app/templates/forum/thread.html,1,html-teks,max-w-4xl
+app/templates/forum/thread.html,23,html-teks,dilihat
+app/templates/forum/thread.html,31,html-teks,Lihat balasan yang menjadi solusi
+app/templates/forum/thread.html,33,html-teks,"Bila ada balasan yang menjawab pertanyaan Anda, pilih"
+app/templates/forum/thread.html,33,html-teks,Tandai sebagai solusi
+app/templates/forum/thread.html,33,html-teks,pada balasan itu.
+app/templates/forum/thread.html,40,html-teks,balasan
+app/templates/forum/thread.html,41,html-teks,Tulis balasan
+app/templates/forum/thread.html,52,html-teks,Penulis topik
+app/templates/forum/thread.html,53,html-teks,Solusi
+app/templates/forum/thread.html,58,html-teks,Balasan tingkat .
+app/templates/forum/thread.html,58,html-teks,Membalas
+app/templates/forum/thread.html,69,html-teks,Balas
+app/templates/forum/thread.html,76,html-teks,Batalkan tanda solusi
+app/templates/forum/thread.html,80,html-teks,Tandai sebagai solusi
+app/templates/forum/thread.html,85,html-teks,Ubah
+app/templates/forum/thread.html,85,html-teks,balasan Anda
+app/templates/forum/thread.html,86,html-teks,Hapus
+app/templates/forum/thread.html,86,html-teks,balasan Anda
+app/templates/forum/thread.html,94,html-teks,Balasan yang bersarang lebih dari tingkat ditampilkan sejajar dengan tingkat dan diberi keterangan Membalas .
+app/templates/forum/thread.html,97,html-teks,Belum ada balasan. Jadilah yang pertama membantu.
+app/templates/forum/thread.html,105,html-teks,Tulis balasan
+app/templates/forum/thread.html,111,html-teks,Membalas topik ini.
+app/templates/forum/thread.html,112,html-teks,Membalas
+app/templates/forum/thread.html,114,html-teks,Batal membalas
+app/templates/forum/thread.html,118,html-teks,Isi balasan
+app/templates/forum/thread.html,128,html-teks,Kirim balasan
+app/templates/forum/thread.html,134,html-teks,Ingin ikut membahas?
+app/templates/forum/thread.html,135,html-teks,"Masuk dulu untuk membalas topik ini. Setelah masuk, Anda kembali ke halaman ini."
+app/templates/forum/thread.html,136,html-teks,Masuk untuk membalas
+app/templates/infosys/_auth.html,22,html-teks,Tampilkan
+app/templates/infosys/_panel.html,10,html-atribut,Menu Akun Saya
+app/templates/infosys/_panel.html,18,html-atribut,Tab Akun Saya
+app/templates/infosys/_panel.html,26,html-teks,Admin
+app/templates/infosys/_panel_macros.html,82,html-atribut,Halaman
+app/templates/infosys/_panel_macros.html,21,html-teks,(opsional)
+app/templates/infosys/_panel_macros.html,39,html-teks,Tampilkan
+app/templates/infosys/_panel_macros.html,80,html-teks,Menampilkan dari Tidak ada
+app/templates/infosys/_panel_macros.html,84,html-teks,Sebelumnya
+app/templates/infosys/_panel_macros.html,85,html-teks,Sebelumnya
+app/templates/infosys/_panel_macros.html,93,html-teks,Berikutnya
+app/templates/infosys/_panel_macros.html,94,html-teks,Berikutnya
+app/templates/infosys/activity.html,11,jinja,Belum ada aktivitas
+app/templates/infosys/activity.html,11,jinja,Aktivitas Anda di semua aplikasi akan tercatat di sini.
+app/templates/infosys/activity.html,11,jinja,Jelajahi aplikasi
+app/templates/infosys/activity.html,50,jinja,Belum ada aktivitas di aplikasi ini
+app/templates/infosys/activity.html,50,jinja,Coba pilih aplikasi lain atau tampilkan semua aktivitas.
+app/templates/infosys/activity.html,50,jinja,Tampilkan semua
+app/templates/infosys/activity.html,1,html-teks,Log Aktivitas
+app/templates/infosys/activity.html,7,html-teks,Log Aktivitas
+app/templates/infosys/activity.html,8,html-teks,"Riwayat tindakan akun Anda, dari yang terbaru. Hanya Anda yang bisa melihatnya."
+app/templates/infosys/activity.html,15,html-teks,Filter aplikasi
+app/templates/infosys/activity.html,17,html-teks,Semua aplikasi ( )
+app/templates/infosys/activity.html,21,html-teks,Terapkan
+app/templates/infosys/activity.html,22,html-teks,Hapus filter
+app/templates/infosys/activity.html,24,html-teks,"Filter aplikasi tidak dikenal, jadi semua aplikasi ditampilkan."
+app/templates/infosys/activity.html,29,html-teks,"Log aktivitas aplikasi , halaman dari"
+app/templates/infosys/activity.html,31,html-teks,Waktu
+app/templates/infosys/activity.html,31,html-teks,Aplikasi
+app/templates/infosys/activity.html,32,html-teks,Aktivitas
+app/templates/infosys/activity.html,32,html-teks,Detail
+app/templates/infosys/activity.html,33,html-teks,IP
+app/templates/infosys/admin.html,19,jinja,Belum ada data
+app/templates/infosys/admin.html,19,jinja,Tidak ada
+app/templates/infosys/admin.html,19,jinja,Kembali ke Ringkasan
+app/templates/infosys/admin.html,62,jinja,Admin
+app/templates/infosys/admin.html,62,jinja,Member
+app/templates/infosys/admin.html,10,html-atribut,Bagian admin
+app/templates/infosys/admin.html,1,html-teks,Admin
+app/templates/infosys/admin.html,7,html-teks,Admin
+app/templates/infosys/admin.html,8,html-teks,Kelola konten Forum dan akun pengguna. Setiap tindakan tercatat di Log Aktivitas Anda.
+app/templates/infosys/admin.html,23,html-teks,"Daftar , halaman dari"
+app/templates/infosys/admin.html,26,html-teks,Judul
+app/templates/infosys/admin.html,26,html-teks,Penulis
+app/templates/infosys/admin.html,27,html-teks,Balasan
+app/templates/infosys/admin.html,27,html-teks,Dibuat
+app/templates/infosys/admin.html,28,html-teks,Aksi
+app/templates/infosys/admin.html,30,html-teks,Isi
+app/templates/infosys/admin.html,30,html-teks,Penulis
+app/templates/infosys/admin.html,31,html-teks,Topik
+app/templates/infosys/admin.html,31,html-teks,Dibuat
+app/templates/infosys/admin.html,32,html-teks,Aksi
+app/templates/infosys/admin.html,34,html-teks,Nama
+app/templates/infosys/admin.html,34,html-teks,Email
+app/templates/infosys/admin.html,35,html-teks,Peran
+app/templates/infosys/admin.html,35,html-teks,Status
+app/templates/infosys/admin.html,36,html-teks,Aksi
+app/templates/infosys/admin.html,48,html-teks,Hapus
+app/templates/infosys/admin.html,48,html-teks,topik
+app/templates/infosys/admin.html,56,html-teks,Hapus
+app/templates/infosys/admin.html,56,html-teks,balasan #
+app/templates/infosys/admin.html,63,html-teks,Aktif
+app/templates/infosys/admin.html,63,html-teks,Nonaktif
+app/templates/infosys/admin.html,66,html-teks,Aktifkan
+app/templates/infosys/admin.html,66,html-teks,akun
+app/templates/infosys/admin.html,68,html-teks,Nonaktifkan
+app/templates/infosys/admin.html,68,html-teks,akun
+app/templates/infosys/admin_confirm.html,15,html-teks,Batal
+app/templates/infosys/index.html,9,jinja,Masuk untuk melihat akun Anda
+app/templates/infosys/index.html,9,jinja,"Profil, log aktivitas, dan keamanan akun tersedia setelah Anda masuk."
+app/templates/infosys/index.html,9,jinja,Masuk
+app/templates/infosys/index.html,45,jinja,Pesanan
+app/templates/infosys/index.html,46,jinja,Kelas diikuti
+app/templates/infosys/index.html,47,jinja,Rata-rata progres
+app/templates/infosys/index.html,48,jinja,Tutorial tersimpan
+app/templates/infosys/index.html,17,html-atribut,Akun
+app/templates/infosys/index.html,1,html-teks,Information System
+app/templates/infosys/index.html,7,html-teks,Information System
+app/templates/infosys/index.html,10,html-teks,Belum punya akun?
+app/templates/infosys/index.html,10,html-teks,Daftar gratis
+app/templates/infosys/index.html,14,html-teks,Ringkasan
+app/templates/infosys/index.html,15,html-teks,Ringkasan akun dan aktivitas Anda.
+app/templates/infosys/index.html,23,html-teks,Bio belum diisi.
+app/templates/infosys/index.html,23,html-teks,Lengkapi profil
+app/templates/infosys/index.html,24,html-teks,Anggota sejak Terakhir masuk Ini pertama kalinya Anda masuk
+app/templates/infosys/index.html,29,html-teks,Ubah profil
+app/templates/infosys/index.html,34,html-teks,Statistik singkat
+app/templates/infosys/index.html,35,html-teks,Lihat semua
+app/templates/infosys/index.html,38,html-teks,Belum ada data. Mulai dengan
+app/templates/infosys/index.html,39,html-teks,ikut kelas
+app/templates/infosys/index.html,40,html-teks,simpan tutorial
+app/templates/infosys/index.html,40,html-teks,", atau"
+app/templates/infosys/index.html,41,html-teks,bertanya di forum
+app/templates/infosys/index.html,55,html-teks,Aktivitas terbaru
+app/templates/infosys/index.html,56,html-teks,Lihat semua ( )
+app/templates/infosys/index.html,70,html-teks,Belum ada aktivitas. Aktivitas Anda akan muncul di sini.
+app/templates/infosys/login.html,15,jinja,Email
+app/templates/infosys/login.html,16,jinja,Kata sandi
+app/templates/infosys/login.html,1,html-teks,Masuk max-w-md
+app/templates/infosys/login.html,7,html-teks,Masuk
+app/templates/infosys/login.html,8,html-teks,"Masuk untuk memakai keranjang, kelas, tutorial tersimpan, dan forum."
+app/templates/infosys/login.html,18,html-teks,Masuk
+app/templates/infosys/login.html,21,html-teks,Belum punya akun?
+app/templates/infosys/login.html,24,html-teks,Daftar
+app/templates/infosys/profile.html,16,jinja,Nama lengkap
+app/templates/infosys/profile.html,17,jinja,Bio
+app/templates/infosys/profile.html,17,jinja,Ceritakan singkat tentang diri Anda.
+app/templates/infosys/profile.html,18,jinja,Tautan foto profil
+app/templates/infosys/profile.html,18,jinja,Alamat gambar berawalan https://. Maksimal 500 karakter.
+app/templates/infosys/profile.html,31,jinja,Kata sandi saat ini
+app/templates/infosys/profile.html,32,jinja,Kata sandi baru
+app/templates/infosys/profile.html,32,jinja,Minimal 8 karakter.
+app/templates/infosys/profile.html,33,jinja,Konfirmasi kata sandi baru
+app/templates/infosys/profile.html,1,html-teks,Profil Pengaturan
+app/templates/infosys/profile.html,5,html-teks,Profil
+app/templates/infosys/profile.html,6,html-teks,"Ubah nama, bio, dan foto profil. Email"
+app/templates/infosys/profile.html,6,html-teks,tidak bisa diubah.
+app/templates/infosys/profile.html,9,html-teks,Data profil
+app/templates/infosys/profile.html,14,html-teks,"Pratinjau foto. Tempel tautan gambar di bawah. Bila kosong, inisial nama yang tampil."
+app/templates/infosys/profile.html,20,html-teks,Simpan profil
+app/templates/infosys/profile.html,21,html-teks,Batalkan perubahan
+app/templates/infosys/profile.html,27,html-teks,Ganti kata sandi
+app/templates/infosys/profile.html,28,html-teks,Minimal 8 karakter. Anda tetap masuk di perangkat ini setelah diganti.
+app/templates/infosys/profile.html,34,html-teks,Ganti kata sandi
+app/templates/infosys/register.html,18,jinja,Nama lengkap
+app/templates/infosys/register.html,19,jinja,Email
+app/templates/infosys/register.html,20,jinja,Kata sandi
+app/templates/infosys/register.html,20,jinja,Minimal 8 karakter.
+app/templates/infosys/register.html,21,jinja,Konfirmasi kata sandi
+app/templates/infosys/register.html,1,html-teks,Daftar max-w-md
+app/templates/infosys/register.html,7,html-teks,Buat akun
+app/templates/infosys/register.html,8,html-teks,Satu akun untuk semua aplikasi DKE. Gratis.
+app/templates/infosys/register.html,23,html-teks,Daftar
+app/templates/infosys/register.html,26,html-teks,Sudah punya akun?
+app/templates/infosys/register.html,29,html-teks,Masuk
+app/templates/infosys/security.html,10,jinja,Terakhir masuk
+app/templates/infosys/security.html,10,jinja,Belum ada
+app/templates/infosys/security.html,11,jinja,Total riwayat masuk
+app/templates/infosys/security.html,42,jinja,Berhasil masuk
+app/templates/infosys/security.html,50,jinja,Belum ada riwayat masuk
+app/templates/infosys/security.html,50,jinja,"Setiap kali Anda masuk, waktu dan alamat IP-nya akan tercatat di sini."
+app/templates/infosys/security.html,50,jinja,Kembali ke Ringkasan
+app/templates/infosys/security.html,1,html-teks,Pengaturan Keamanan
+app/templates/infosys/security.html,6,html-teks,Pengaturan Keamanan
+app/templates/infosys/security.html,7,html-teks,Lihat riwayat masuk akun Anda dan jaga kata sandi tetap aman.
+app/templates/infosys/security.html,16,html-teks,Kata sandi
+app/templates/infosys/security.html,17,html-teks,"Ganti secara berkala, dan segera jika ada riwayat masuk yang tidak Anda kenali."
+app/templates/infosys/security.html,19,html-teks,Ganti kata sandi
+app/templates/infosys/security.html,23,html-teks,Riwayat masuk
+app/templates/infosys/security.html,26,html-teks,Perhatian:
+app/templates/infosys/security.html,27,html-teks,"Ada lebih dari satu alamat IP di halaman ini. Jika ada yang tidak Anda kenali, ganti kata sandi."
+app/templates/infosys/security.html,33,html-teks,"Riwayat masuk, halaman dari"
+app/templates/infosys/security.html,35,html-teks,Waktu
+app/templates/infosys/security.html,35,html-teks,Alamat IP
+app/templates/infosys/security.html,35,html-teks,Keterangan
+app/templates/infosys/security.html,40,html-teks,Terbaru
+app/templates/infosys/stats.html,10,jinja,Belum ada statistik
+app/templates/infosys/stats.html,10,jinja,"Angka akan muncul setelah Anda berbelanja, mengikuti kelas, menyimpan tutorial, atau berdiskusi di forum."
+app/templates/infosys/stats.html,10,jinja,Jelajahi aplikasi
+app/templates/infosys/stats.html,13,jinja,Jumlah pesanan
+app/templates/infosys/stats.html,13,jinja,Total belanja Rp
+app/templates/infosys/stats.html,13,jinja,Belum ada pesanan.
+app/templates/infosys/stats.html,14,jinja,Kelas diikuti
+app/templates/infosys/stats.html,14,jinja,Kelas yang sudah Anda ikuti.
+app/templates/infosys/stats.html,14,jinja,Belum mengikuti kelas.
+app/templates/infosys/stats.html,15,jinja,Rata-rata progres
+app/templates/infosys/stats.html,15,jinja,Dari semua kelas yang diikuti.
+app/templates/infosys/stats.html,15,jinja,Muncul setelah Anda mengikuti kelas.
+app/templates/infosys/stats.html,16,jinja,Tutorial tersimpan
+app/templates/infosys/stats.html,16,jinja,Tutorial yang Anda simpan.
+app/templates/infosys/stats.html,16,jinja,Belum ada tutorial tersimpan.
+app/templates/infosys/stats.html,17,jinja,Topik dibuat
+app/templates/infosys/stats.html,17,jinja,Topik yang Anda mulai di forum.
+app/templates/infosys/stats.html,17,jinja,Belum membuat topik.
+app/templates/infosys/stats.html,18,jinja,Balasan
+app/templates/infosys/stats.html,18,jinja,Balasan yang Anda tulis di forum.
+app/templates/infosys/stats.html,18,jinja,Belum membalas topik.
+app/templates/infosys/stats.html,19,jinja,Kuis lulus
+app/templates/infosys/stats.html,19,jinja,Kuis kelas yang sudah Anda lulusi.
+app/templates/infosys/stats.html,19,jinja,Belum lulus kuis.
+app/templates/infosys/stats.html,20,jinja,Artikel Portal
+app/templates/infosys/stats.html,20,jinja,Artikel tersedia untuk dibaca.
+app/templates/infosys/stats.html,20,jinja,Belum ada artikel.
+app/templates/infosys/stats.html,21,jinja,Kategori favorit
+app/templates/infosys/stats.html,21,jinja,Kategori Portal yang Anda dahulukan.
+app/templates/infosys/stats.html,21,jinja,Belum memilih kategori favorit.
+app/templates/infosys/stats.html,22,jinja,Aktivitas tercatat
+app/templates/infosys/stats.html,22,jinja,Belum ada riwayat masuk.
+app/templates/infosys/stats.html,48,html-atribut,Progres
+app/templates/infosys/stats.html,1,html-teks,Statistik Semua Aplikasi
+app/templates/infosys/stats.html,6,html-teks,Statistik Semua Aplikasi
+app/templates/infosys/stats.html,7,html-teks,Angka dari keenam aplikasi DKE untuk akun Anda. Jumlah artikel Portal bersifat umum.
+app/templates/infosys/stats.html,26,html-teks,Aktivitas per aplikasi
+app/templates/infosys/stats.html,31,html-teks,aktivitas
+app/templates/infosys/stats.html,32,html-teks,Belum ada aktivitas
+app/templates/infosys/stats.html,39,html-teks,Progres per kelas
+app/templates/infosys/stats.html,46,html-teks,dari materi % Belum ada materi
+app/templates/infosys/stats.html,55,html-teks,Belum ada kelas yang diikuti.
+app/templates/infosys/stats.html,56,html-teks,Lihat daftar kelas
+app/templates/main/error.html,1,html-teks,max-w-2xl
+app/templates/main/error.html,21,html-teks,Kembali ke Beranda
+app/templates/main/index.html,72,jinja,Beranda
+app/templates/main/index.html,1,html-teks,Beranda
+app/templates/main/index.html,10,html-teks,SELAMAT DATANG KEMBALI
+app/templates/main/index.html,11,html-teks,"Halo, ."
+app/templates/main/index.html,12,html-teks,"Pilih aplikasi, atau lanjutkan aktivitas terakhir."
+app/templates/main/index.html,14,html-teks,EKOSISTEM BELAJAR DIGITAL
+app/templates/main/index.html,15,html-teks,"Belajar lebih mudah, saat semuanya terhubung."
+app/templates/main/index.html,16,html-teks,Satu akun untuk enam aplikasi belajar dan berkarya.
+app/templates/main/index.html,24,html-teks,Lanjutkan:
+app/templates/main/index.html,33,html-teks,Jelajahi kelas
+app/templates/main/index.html,37,html-teks,Mulai belajar
+app/templates/main/index.html,45,html-teks,DKE
+app/templates/main/index.html,55,html-teks,"SATU PINTU, ENAM APLIKASI"
+app/templates/main/index.html,56,html-teks,Pilih aplikasi Anda
+app/templates/main/index.html,58,html-teks,Mulai dari yang Anda butuhkan hari ini.
+app/templates/main/index.html,71,html-teks,Saat membuka DKE
+app/templates/main/index.html,75,html-teks,Selalu tampilkan Beranda
+app/templates/main/index.html,77,html-teks,Lanjutkan aplikasi terakhir
+app/templates/main/index.html,79,html-teks,Berlaku saat Anda masuk atau membuka DKE lagi. Tombol DKE di bilah atas selalu ke Beranda.
+app/templates/main/nav_demo.html,1,html-teks,Contoh Navigasi
+app/templates/main/nav_demo.html,6,html-teks,Contoh halaman jenjang 3: Materi Contoh halaman jenjang 2: Kelas
+app/templates/main/nav_demo.html,9,html-teks,Perhatikan baris di atas judul: tombol
+app/templates/main/nav_demo.html,10,html-teks,Kembali
+app/templates/main/nav_demo.html,10,html-teks,dan
+app/templates/main/nav_demo.html,10,html-teks,jejak halaman
+app/templates/main/nav_demo.html,10,html-teks,"Tombol Kembali selalu menuju halaman kelas (induknya) daftar E-Learning (induknya) , bukan halaman yang kebetulan Anda buka sebelumnya."
+app/templates/main/nav_demo.html,17,html-teks,Coba sendiri
+app/templates/main/nav_demo.html,19,html-teks,"Buka halaman ini dari tautan mana pun, lalu klik"
+app/templates/main/nav_demo.html,19,html-teks,Kembali
+app/templates/main/nav_demo.html,19,html-teks,. Tujuannya tetap sama.
+app/templates/main/nav_demo.html,20,html-teks,Klik jenjang di jejak halaman untuk naik langsung ke kelas atau ke daftar E-Learning.
+app/templates/main/nav_demo.html,21,html-teks,"Tekan tombol Mobile di bilah atas: jejak halaman diringkas menjadi halaman aktif, dan tombol membuka jenjang yang disembunyikan."
+app/templates/main/nav_demo.html,22,html-teks,Buka Pindah aplikasi (ikon 9 titik) untuk pindah aplikasi tanpa lewat Beranda.
+app/templates/main/nav_demo.html,26,html-teks,Materi
+app/templates/main/nav_demo.html,27,html-teks,Materi
+app/templates/main/nav_demo.html,29,html-teks,Buka Materi 1 (jenjang 3)
+app/templates/main/nav_demo.html,31,html-teks,Halaman uji komponen
+app/templates/main/nav_demo.html,36,html-teks,Cara mendaftarkan halaman bersarang
+app/templates/main/nav_demo.html,37,html-teks,Dua baris di
+app/templates/main/nav_demo.html,37,html-teks,app/navigation.py
+app/templates/main/nav_demo.html,37,html-teks,sudah cukup; template tidak perlu diubah.
+app/templates/main/nav_demo.html,38,html-teks,"node(""main.nav_demo_course"", _course_title, parent=""elearning.index"") node(""main.nav_demo_lesson"", _lesson_title, parent=""main.nav_demo_course"")"
+app/templates/main/ui_test.html,55,jinja,Kelas 1
+app/templates/main/ui_test.html,56,jinja,Kelas 1
+app/templates/main/ui_test.html,56,jinja,Materi 1
+app/templates/main/ui_test.html,71,jinja,Python Dasar
+app/templates/main/ui_test.html,71,jinja,Lihat
+app/templates/main/ui_test.html,78,jinja,Keranjang masih kosong
+app/templates/main/ui_test.html,78,jinja,Jelajahi katalog untuk mulai.
+app/templates/main/ui_test.html,78,jinja,Lihat katalog
+app/templates/main/ui_test.html,1,html-teks,Uji Komponen
+app/templates/main/ui_test.html,9,html-teks,Uji Komponen Fondasi Tampilan
+app/templates/main/ui_test.html,10,html-teks,Halaman pengembangan. Matikan di produksi dengan
+app/templates/main/ui_test.html,10,html-teks,DKE_UI_TEST=0
+app/templates/main/ui_test.html,14,html-teks,1. Toast (JavaScript)
+app/templates/main/ui_test.html,15,html-teks,"Masuk dari kanan atas 200 ms, hilang otomatis 3,5 detik, berhenti saat disorot atau difokus."
+app/templates/main/ui_test.html,17,html-teks,Sukses
+app/templates/main/ui_test.html,18,html-teks,Error
+app/templates/main/ui_test.html,19,html-teks,Informasi
+app/templates/main/ui_test.html,20,html-teks,Peringatan
+app/templates/main/ui_test.html,23,html-teks,Keempat jenis sekaligus
+app/templates/main/ui_test.html,24,html-teks,Pesan panjang
+app/templates/main/ui_test.html,25,html-teks,Tanpa auto-hide
+app/templates/main/ui_test.html,26,html-teks,Tutup semua
+app/templates/main/ui_test.html,32,html-teks,2. Pesan
+app/templates/main/ui_test.html,32,html-teks,flash()
+app/templates/main/ui_test.html,32,html-teks,Flask
+app/templates/main/ui_test.html,33,html-teks,"Memicu 5 pesan flash di server (success, error, info, warning, dan kategori bawaan), lalu halaman dimuat ulang. Semuanya harus tampil sebagai toast."
+app/templates/main/ui_test.html,34,html-teks,Kirim flash dari server
+app/templates/main/ui_test.html,39,html-teks,3. Tema dan tampilan
+app/templates/main/ui_test.html,40,html-teks,"Ubah lewat ikon tema dan tombol Mobile di bilah atas, lalu muat ulang halaman: pilihan harus bertahan tanpa kedip."
+app/templates/main/ui_test.html,42,html-teks,Tema pilihan
+app/templates/main/ui_test.html,43,html-teks,Mode gelap aktif
+app/templates/main/ui_test.html,44,html-teks,Tampilan
+app/templates/main/ui_test.html,45,html-teks,Disimpan di
+app/templates/main/ui_test.html,51,html-teks,"4. Navigasi 3 level: Kembali, jejak halaman, Pindah aplikasi"
+app/templates/main/ui_test.html,52,html-teks,"Di Mobile View, jenjang tengah diringkas menjadi Materi 1 dan tombol membuka jenjang yang disembunyikan."
+app/templates/main/ui_test.html,58,html-teks,Contoh langsung dengan data dari database (hierarki dibaca dari
+app/templates/main/ui_test.html,58,html-teks,app/navigation.py
+app/templates/main/ui_test.html,60,html-teks,Buka halaman bersarang (3 jenjang)
+app/templates/main/ui_test.html,61,html-teks,"Profil Pengaturan (2 jenjang, perlu masuk)"
+app/templates/main/ui_test.html,67,html-teks,5. Kartu aplikasi dan penanda aplikasi aktif
+app/templates/main/ui_test.html,68,html-teks,Klik kartu untuk membuka aplikasi; di sana Pindah aplikasi (ikon 9 titik) menandai aplikasi aktif.
+app/templates/main/ui_test.html,77,html-teks,6. Empty state
+app/templates/main/ui_test.html,82,html-teks,7. Komponen UI bersama
+app/templates/main/ui_test.html,83,html-teks,"Aksen mengikuti aplikasi aktif; varian tetap dibedakan oleh bentuk, teks, dan status."
+app/templates/main/ui_test.html,85,html-teks,Primary
+app/templates/main/ui_test.html,86,html-teks,Secondary
+app/templates/main/ui_test.html,87,html-teks,Ghost
+app/templates/main/ui_test.html,88,html-teks,Danger
+app/templates/main/ui_test.html,92,html-teks,Card dengan aksen atas
+app/templates/main/ui_test.html,93,html-teks,Komponen dasar untuk permukaan konten.
+app/templates/main/ui_test.html,96,html-teks,Card interaktif
+app/templates/main/ui_test.html,97,html-teks,Hover lift hanya aktif pada perangkat yang mendukung hover.
+app/templates/main/ui_test.html,101,html-teks,Accent
+app/templates/main/ui_test.html,102,html-teks,Solid
+app/templates/main/ui_test.html,103,html-teks,Outline
+app/templates/main/ui_test.html,104,html-teks,Muted
+app/templates/main/ui_test.html,105,html-teks,Sukses
+app/templates/main/ui_test.html,106,html-teks,Peringatan
+app/templates/main/ui_test.html,109,html-teks,Filter
+app/templates/main/ui_test.html,110,html-teks,Filter aktif
+app/templates/main/ui_test.html,111,html-teks,Field
+app/templates/portal/_components.html,29,jinja,Pilihan
+app/templates/portal/_components.html,29,jinja,Terbaru
+app/templates/portal/_components.html,64,html-atribut,Halaman artikel
+app/templates/portal/_components.html,71,html-atribut,Halaman
+app/templates/portal/_components.html,17,html-teks,menit baca
+app/templates/portal/_components.html,18,html-teks,kali dibaca
+app/templates/portal/_components.html,38,html-teks,Baca artikel
+app/templates/portal/_components.html,62,html-teks,Menampilkan dari artikel lainnya
+app/templates/portal/_components.html,66,html-teks,Sebelumnya
+app/templates/portal/_components.html,67,html-teks,Sebelumnya
+app/templates/portal/_components.html,76,html-teks,Berikutnya
+app/templates/portal/_components.html,77,html-teks,Berikutnya
+app/templates/portal/article.html,11,html-teks,Pilihan
+app/templates/portal/article.html,27,html-teks,Artikel terkait di
+app/templates/portal/article.html,33,html-teks,Belum ada artikel lain di kategori ini.
+app/templates/portal/article.html,34,html-teks,Lihat semua artikel
+app/templates/portal/index.html,55,jinja,Belum ada artikel di kategori
+app/templates/portal/index.html,55,jinja,Artikel di kategori ini akan muncul di sini setelah ditambahkan.
+app/templates/portal/index.html,55,jinja,Lihat semua artikel
+app/templates/portal/index.html,59,jinja,Belum ada artikel
+app/templates/portal/index.html,59,jinja,Artikel akan muncul di sini setelah ditambahkan.
+app/templates/portal/index.html,59,jinja,Kembali ke Beranda
+app/templates/portal/index.html,13,html-atribut,Filter kategori
+app/templates/portal/index.html,40,html-atribut,Artikel utama
+app/templates/portal/index.html,1,html-teks,Portal
+app/templates/portal/index.html,7,html-teks,Portal
+app/templates/portal/index.html,8,html-teks,Artikel Berita Pilihan
+app/templates/portal/index.html,16,html-teks,Semua
+app/templates/portal/index.html,21,html-teks,(favorit)
+app/templates/portal/index.html,28,html-teks,"Kategori itu tidak dikenal, jadi semua artikel ditampilkan."
+app/templates/portal/index.html,33,html-teks,Urutan disesuaikan dengan kategori favorit Anda:
+app/templates/portal/index.html,35,html-teks,Ubah preferensi
+app/templates/portal/index.html,45,html-teks,Artikel lainnya di Artikel lainnya
+app/templates/portal/layout_portal.html,7,html-atribut,Navigasi Portal
+app/templates/portal/layout_portal.html,10,html-teks,Artikel
+app/templates/portal/layout_portal.html,13,html-teks,Pengaturan
+app/templates/portal/settings.html,43,jinja,Belum ada kategori
+app/templates/portal/settings.html,43,jinja,Kategori Portal akan muncul di sini setelah ditambahkan.
+app/templates/portal/settings.html,43,jinja,Kembali ke Portal
+app/templates/portal/settings.html,1,html-teks,Pengaturan Portal max-w-3xl
+app/templates/portal/settings.html,8,html-teks,Portal
+app/templates/portal/settings.html,9,html-teks,Pengaturan Portal
+app/templates/portal/settings.html,10,html-teks,Artikel dari kategori favorit tampil lebih dulu di Portal. Tidak ada yang disembunyikan.
+app/templates/portal/settings.html,18,html-teks,Kategori favorit
+app/templates/portal/settings.html,26,html-teks,artikel
+app/templates/portal/settings.html,31,html-teks,Saat ini diutamakan: .
+app/templates/portal/settings.html,31,html-teks,"Belum ada kategori favorit, jadi beranda diurutkan dari artikel terbaru."
+app/templates/portal/settings.html,37,html-teks,Simpan pengaturan
+app/templates/portal/settings.html,38,html-teks,Hapus preferensi
+app/templates/portal/settings.html,39,html-teks,Lihat beranda Portal
+app/__init__.py,38,py,Information System
+app/__init__.py,38,py,"Profil, log aktivitas, dan statistik dari semua aplikasi."
+app/__init__.py,39,py,"Katalog produk, keranjang, dan pembayaran."
+app/__init__.py,40,py,"Kelas, materi, kuis, dan progres belajar."
+app/__init__.py,41,py,Tutorial langkah demi langkah dengan contoh kode.
+app/__init__.py,42,py,Portal
+app/__init__.py,42,py,Artikel dan berita pilihan per kategori.
+app/__init__.py,43,py,Forum
+app/__init__.py,43,py,"Diskusi, tanya jawab, dan balasan komunitas."
+app/errors.py,33,py,Permintaan belum bisa diproses
+app/errors.py,34,py,Muat ulang halaman lalu coba lagi.
+app/errors.py,28,py,Akun Anda tidak punya izin untuk tindakan ini.
+app/errors.py,29,py,Data yang diminta tidak ditemukan.
+app/errors.py,30,py,Tindakan ini tidak tersedia untuk alamat tersebut.
+app/errors.py,31,py,Ada gangguan di sisi kami. Coba lagi sebentar lagi.
+app/errors.py,18,py,Akses ditolak
+app/errors.py,19,py,Akun Anda tidak punya izin membuka halaman ini. Kembali ke Beranda untuk melanjutkan.
+app/errors.py,20,py,Halaman tidak ditemukan
+app/errors.py,21,py,Alamat ini tidak tersedia atau halamannya sudah dipindahkan. Kembali ke Beranda untuk mencari lagi.
+app/errors.py,22,py,Halaman tidak bisa dibuka dengan cara ini
+app/errors.py,23,py,"Kembali ke halaman sebelumnya, lalu gunakan tombol atau tautan yang tersedia."
+app/errors.py,24,py,Ada gangguan di sisi kami
+app/errors.py,25,py,Ini bukan salah Anda. Coba lagi sebentar lagi.
+app/messages.py,17,py,Sesi formulir kedaluwarsa. Muat ulang halaman lalu coba lagi.
+app/messages.py,18,py,Masuk dulu untuk membuka halaman ini.
+app/messages.py,19,py,"Sesi Anda berakhir. Masuk lagi, lalu ulangi."
+app/messages.py,20,py,Permintaan tidak diterima. Muat ulang halaman lalu coba lagi.
+app/messages.py,21,py,Format permintaan belum sesuai. Muat ulang halaman lalu coba lagi.
+app/messages.py,22,py,Data belum sesuai. Muat ulang halaman lalu coba lagi.
+app/messages.py,23,py,Periksa kembali isian yang ditandai.
+app/messages.py,24,py,Perubahan belum bisa disimpan. Coba lagi sebentar lagi.
+app/messages.py,25,py,Pengaturan belum bisa disimpan. Coba lagi sebentar lagi.
+app/messages.py,28,py,Email belum valid. Contoh: nama@email.com
+app/messages.py,29,py,Kata sandi minimal 8 karakter.
+app/messages.py,30,py,Email atau kata sandi salah. Periksa kembali dan coba lagi.
+app/messages.py,31,py,Terlalu banyak percobaan. Coba lagi dalam beberapa menit.
+app/messages.py,32,py,Nama lengkap belum diisi. Tulis nama Anda.
+app/messages.py,33,py,Nama lengkap terlalu panjang. Maksimal 100 karakter.
+app/messages.py,34,py,Kata sandi terlalu panjang. Maksimal 128 karakter.
+app/messages.py,35,py,Konfirmasi kata sandi belum sama. Ketik ulang kata sandi yang sama.
+app/messages.py,36,py,Kata sandi belum diisi. Ketik kata sandi Anda.
+app/messages.py,37,py,"Email ini sudah terdaftar. Masuk, atau pakai email lain."
+app/messages.py,38,py,Akun ini dinonaktifkan. Hubungi admin untuk mengaktifkannya kembali.
+app/messages.py,41,py,Bio terlalu panjang. Maksimal 300 karakter.
+app/messages.py,42,py,Tautan foto belum valid. Gunakan alamat gambar yang diawali https://
+app/messages.py,43,py,Tautan foto terlalu panjang. Maksimal 500 karakter.
+app/messages.py,44,py,Ketik kata sandi Anda saat ini.
+app/messages.py,45,py,Kata sandi saat ini salah. Periksa kembali dan coba lagi.
+app/messages.py,46,py,Kata sandi baru sama dengan yang lama. Pilih kata sandi yang berbeda.
+app/messages.py,47,py,Konfirmasi kata sandi baru belum sama. Ketik ulang kata sandi yang sama.
+app/messages.py,48,py,"Terlalu banyak percobaan. Tunggu beberapa menit, lalu coba lagi."
+app/messages.py,51,py,Anda sudah terdaftar di kelas ini. Lanjutkan belajar!
+app/messages.py,52,py,Anda belum terdaftar di kelas ini. Ikuti kelas lebih dulu.
+app/messages.py,55,py,Produk ditambahkan ke keranjang.
+app/messages.py,56,py,"Keranjang masih kosong. Tambahkan produk dulu, lalu bayar."
+app/messages.py,57,py,Produk tidak ada di keranjang. Muat ulang halaman lalu coba lagi.
+app/messages.py,60,py,Progres belajar tersimpan otomatis.
+app/messages.py,61,py,Koneksi lambat. Perubahan akan disimpan saat tersambung kembali.
+app/module_settings.py,27,py,Pengaturan
+app/navigation.py,104,py,Profil & Pengaturan
+app/navigation.py,105,py,Log Aktivitas
+app/navigation.py,106,py,Statistik Semua Aplikasi
+app/navigation.py,107,py,Pengaturan Keamanan
+app/navigation.py,108,py,Admin
+app/navigation.py,109,py,Hapus Topik
+app/navigation.py,110,py,Hapus Balasan
+app/navigation.py,111,py,Nonaktifkan Akun
+app/navigation.py,112,py,Aktifkan Akun
+app/navigation.py,116,py,Keranjang
+app/navigation.py,117,py,Pembayaran
+app/navigation.py,118,py,Pesanan Saya
+app/navigation.py,120,py,Pengaturan
+app/navigation.py,126,py,Kuis
+app/navigation.py,127,py,Hasil Kuis
+app/navigation.py,128,py,Kelas Saya
+app/navigation.py,129,py,Pengaturan
+app/navigation.py,133,py,Tersimpan
+app/navigation.py,134,py,Pengaturan
+app/navigation.py,138,py,Pengaturan
+app/navigation.py,142,py,Buat Topik
+app/navigation.py,143,py,Ubah Balasan
+app/navigation.py,144,py,Hapus Balasan
+app/navigation.py,145,py,Topik Saya
+app/navigation.py,146,py,Pengaturan
+app/navigation.py,65,py,Materi
+app/navigation.py,71,py,Artikel
+app/navigation.py,76,py,Tutorial
+app/navigation.py,81,py,Produk
+app/navigation.py,86,py,Topik
+app/navigation.py,97,py,Anggota
+app/navigation.py,178,py,Halaman
+app/navigation.py,57,py,Kelas
+app/security.py,42,py,Lax
+app/security.py,71,py,default-src 'self'
+app/security.py,73,py,style-src 'self' 'unsafe-inline'
+app/security.py,74,py,font-src 'self'
+app/security.py,75,py,img-src 'self' data: https:
+app/security.py,76,py,media-src 'self' https:
+app/security.py,78,py,connect-src 'self'
+app/security.py,79,py,object-src 'none'
+app/security.py,80,py,base-uri 'self'
+app/security.py,81,py,form-action 'self'
+app/security.py,82,py,frame-ancestors 'none'
+app/security.py,72,py,script-src 'self' 'nonce-
+app/utils.py,208,py,AND id = ?
+app/ecommerce/routes.py,15,py,Kursus digital
+app/ecommerce/routes.py,17,py,Template & aset
+app/ecommerce/routes.py,20,py,Terbaru
+app/ecommerce/routes.py,21,py,Harga terendah
+app/ecommerce/routes.py,21,py,"p.price ASC, p.name COLLATE NOCASE ASC"
+app/ecommerce/routes.py,22,py,Harga tertinggi
+app/ecommerce/routes.py,22,py,"p.price DESC, p.name COLLATE NOCASE ASC"
+app/ecommerce/routes.py,23,py,Nama A-Z
+app/ecommerce/routes.py,23,py,p.name COLLATE NOCASE ASC
+app/ecommerce/routes.py,26,py,Transfer bank (simulasi)
+app/ecommerce/routes.py,27,py,E-Wallet (simulasi)
+app/ecommerce/routes.py,28,py,Kartu (simulasi)
+app/ecommerce/routes.py,93,py,Alamat dan metode bayar favorit diperbarui
+app/ecommerce/routes.py,304,py,Jumlah produk diperbarui.
+app/ecommerce/routes.py,332,py,Produk dihapus dari keranjang.
+app/ecommerce/routes.py,110,py,Batas pesanan hari ini sudah tercapai. Coba lagi besok.
+app/ecommerce/routes.py,165,py,p.price >= ?
+app/ecommerce/routes.py,185,py,Katalog
+app/ecommerce/routes.py,228,py,Keranjang
+app/ecommerce/routes.py,242,py,Masuk dulu untuk menambahkan produk ke keranjang.
+app/ecommerce/routes.py,365,py,Alamat penerima belum diisi. Isi alamat sebelum membayar.
+app/ecommerce/routes.py,369,py,Pilih metode pembayaran simulasi.
+app/ecommerce/routes.py,478,py,Pembayaran
+app/ecommerce/routes.py,503,py,Pilih metode pembayaran favorit.
+app/ecommerce/routes.py,527,py,Pengaturan E-Commerce
+app/ecommerce/routes.py,544,py,Pesanan Saya
+app/ecommerce/routes.py,573,py,Konfirmasi Pesanan
+app/ecommerce/routes.py,40,py,Rp
+app/ecommerce/routes.py,274,py,Jumlah produk belum valid. Masukkan angka bulat.
+app/ecommerce/routes.py,276,py,Jumlah harus antara 1 dan
+app/ecommerce/routes.py,384,py,BEGIN IMMEDIATE
+app/ecommerce/routes.py,448,py,Pesanan berhasil dibuat
+app/ecommerce/routes.py,473,py,Pesanan
+app/ecommerce/routes.py,501,py,Alamat maksimal
+app/ecommerce/routes.py,367,py,Alamat maksimal
+app/ecommerce/routes.py,398,py,"Hapus produk yang sudah tidak tersedia dari keranjang, lalu bayar lagi."
+app/ecommerce/routes.py,406,py,Ada kursus di keranjang yang belum terhubung ke kelas. Hubungi admin.
+app/ecommerce/routes.py,449,py,Pesanan
+app/ecommerce/routes.py,457,py,Pesanan
+app/ecommerce/routes.py,457,py,dibuat (
+app/ecommerce/routes.py,468,py,Pembayaran simulasi belum berhasil. Keranjang Anda aman. Coba lagi sebentar lagi.
+app/ecommerce/routes.py,373,py,Pembayaran
+app/ecommerce/routes.py,507,py,Pengaturan E-Commerce
+app/elearning/routes.py,42,py,+7 hours
+app/elearning/routes.py,30,py,Pemula
+app/elearning/routes.py,30,py,Menengah
+app/elearning/routes.py,30,py,Lanjut
+app/elearning/routes.py,194,py,Normal (1×)
+app/elearning/routes.py,189,py,Kecepatan video
+app/elearning/routes.py,309,py,Daftar Kelas
+app/elearning/routes.py,374,py,"Kelas ini berbayar. Beli lewat E-Commerce, lalu kelas muncul otomatis di Kelas Saya."
+app/elearning/routes.py,377,py,"Kelas ini belum punya materi, jadi belum bisa diikuti. Coba lagi nanti."
+app/elearning/routes.py,387,py,Pendaftaran kelas berhasil
+app/elearning/routes.py,401,py,Berhasil mengikuti kelas
+app/elearning/routes.py,442,py,Kelas Saya
+app/elearning/routes.py,535,py,Materi tidak ditemukan.
+app/elearning/routes.py,594,py,Kelas ini belum memiliki kuis.
+app/elearning/routes.py,727,py,Pilih salah satu kecepatan yang tersedia.
+app/elearning/routes.py,753,py,Pengaturan E-Learning
+app/elearning/routes.py,57,py,Rp
+app/elearning/routes.py,386,py,Mendaftar kelas gratis:
+app/elearning/routes.py,388,py,Anda terdaftar di
+app/elearning/routes.py,398,py,Pendaftaran belum bisa disimpan. Coba lagi sebentar lagi.
+app/elearning/routes.py,554,py,Progres belum bisa disimpan. Coba lagi sebentar lagi.
+app/elearning/routes.py,665,py,Jawaban belum bisa dikumpulkan. Coba lagi; jawaban Anda masih tersimpan di peramban ini.
+app/elearning/routes.py,730,py,Isi target dengan angka bulat antara
+app/elearning/routes.py,655,py,Kelas selesai
+app/elearning/routes.py,734,py,Target belajar antara
+app/elearning/routes.py,98,py,AND c.id = ?
+app/elearning/routes.py,547,py,Materi
+app/elearning/routes.py,656,py,Anda lulus kuis dan menyelesaikan kelas
+app/elearning/routes.py,699,py,Hasil
+app/elearning/routes.py,737,py,Pengaturan E-Learning
+app/elearning/routes.py,419,py,", e.source AS enroll_source, e.enrolled_at AS enrolled_at, e.completed_at AS completed_at"
+app/etutorial/routes.py,27,py,Mudah
+app/etutorial/routes.py,27,py,Menengah
+app/etutorial/routes.py,27,py,Sulit
+app/etutorial/routes.py,31,py,Kecil
+app/etutorial/routes.py,31,py,Sedang
+app/etutorial/routes.py,31,py,Besar
+app/etutorial/routes.py,122,py,Ukuran huruf bacaan:
+app/etutorial/routes.py,165,py,Daftar Tutorial
+app/etutorial/routes.py,284,py,Tersimpan
+app/etutorial/routes.py,321,py,Pengaturan E-Tutorial
+app/etutorial/routes.py,212,py,· Langkah
+app/etutorial/routes.py,255,py,Tutorial disimpan ke Tersimpan.
+app/etutorial/routes.py,255,py,Tutorial ini sudah ada di Tersimpan.
+app/etutorial/routes.py,264,py,Tutorial dihapus dari Tersimpan.
+app/etutorial/routes.py,264,py,Tutorial ini belum ada di Tersimpan.
+app/etutorial/routes.py,315,py,Lax
+app/etutorial/routes.py,317,py,Ukuran huruf bacaan:
+app/etutorial/routes.py,301,py,Pengaturan E-Tutorial
+app/etutorial/routes.py,303,py,Pilih salah satu ukuran huruf yang tersedia.
+app/forum/logic.py,36,py,Jan
+app/forum/logic.py,36,py,Feb
+app/forum/logic.py,36,py,Mar
+app/forum/logic.py,36,py,Apr
+app/forum/logic.py,36,py,Mei
+app/forum/logic.py,36,py,Jun
+app/forum/logic.py,36,py,Jul
+app/forum/logic.py,36,py,Agu
+app/forum/logic.py,36,py,Sep
+app/forum/logic.py,36,py,Okt
+app/forum/logic.py,36,py,Nov
+app/forum/logic.py,36,py,Des
+app/forum/logic.py,26,py,Publik
+app/forum/logic.py,26,py,"Siapa pun, termasuk pengunjung yang belum masuk, bisa melihat profil Forum Anda."
+app/forum/logic.py,27,py,Hanya anggota
+app/forum/logic.py,27,py,Hanya pengguna yang sudah masuk yang bisa melihat profil Forum Anda.
+app/forum/logic.py,28,py,Privat
+app/forum/logic.py,28,py,Hanya Anda yang bisa melihat halaman profil Forum Anda.
+app/forum/logic.py,65,py,Judul belum diisi. Tulis judul yang jelas.
+app/forum/logic.py,76,py,Pilih salah satu kategori.
+app/forum/logic.py,80,py,Isi topik belum diisi. Jelaskan pertanyaan atau cerita Anda.
+app/forum/logic.py,297,py,Belum ada balasan
+app/forum/logic.py,92,py,Balasan belum diisi. Tulis balasan Anda.
+app/forum/logic.py,67,py,Judul terlalu pendek. Tulis minimal
+app/forum/logic.py,82,py,Isi terlalu pendek. Jelaskan minimal
+app/forum/logic.py,94,py,Balasan terlalu pendek. Tulis minimal
+app/forum/logic.py,96,py,Balasan terlalu panjang. Maksimal
+app/forum/logic.py,96,py,karakter (sekarang
+app/forum/logic.py,69,py,Judul terlalu panjang. Maksimal
+app/forum/logic.py,69,py,karakter (sekarang
+app/forum/logic.py,84,py,Isi terlalu panjang. Maksimal
+app/forum/logic.py,84,py,karakter (sekarang
+app/forum/routes.py,269,py,Topik berhasil dibuat. Tunggu balasan dari anggota lain.
+app/forum/routes.py,325,py,", t.body AS body"
+app/forum/routes.py,337,py,", t.body AS body"
+app/forum/routes.py,376,py,Balasan terkirim.
+app/forum/routes.py,200,py,c.slug = ?
+app/forum/routes.py,213,py,Forum
+app/forum/routes.py,327,py,", t.body AS body"
+app/forum/routes.py,402,py,Tanda solusi dibatalkan. Topik kembali berstatus belum terjawab.
+app/forum/routes.py,413,py,Balasan ditandai sebagai solusi. Topik kini berlabel Terjawab.
+app/forum/routes.py,476,py,Balasan dihapus.
+app/forum/routes.py,479,py,Hapus Balasan
+app/forum/routes.py,498,py,Topik Saya
+app/forum/routes.py,534,py,Pengaturan Forum
+app/forum/routes.py,231,py,Buat Topik
+app/forum/routes.py,349,py,Balasan yang dituju tidak ditemukan. Muat ulang halaman lalu coba lagi.
+app/forum/routes.py,449,py,Balasan diperbarui.
+app/forum/routes.py,451,py,Ubah Balasan
+app/forum/routes.py,516,py,Pilihan tidak dikenali. Pilih salah satu opsi yang tersedia.
+app/forum/routes.py,530,py,Forum
+app/forum/routes.py,363,py,membalas topik Anda
+app/forum/routes.py,408,py,Balasan yang dipilih tidak ditemukan di topik ini.
+app/forum/routes.py,522,py,Privasi profil:
+app/forum/routes.py,208,py,LIMIT ? OFFSET ?
+app/infosys/admin.py,31,py,Topik
+app/infosys/admin.py,31,py,Balasan
+app/infosys/admin.py,31,py,Akun
+app/infosys/admin.py,134,py,Topik yang dihapus tidak bisa dikembalikan.
+app/infosys/admin.py,183,py,Balasan yang dihapus tidak bisa dikembalikan.
+app/infosys/admin.py,94,py,Admin
+app/infosys/admin.py,132,py,Topik dihapus.
+app/infosys/admin.py,138,py,Hapus topik ini?
+app/infosys/admin.py,140,py,"Ya, hapus topik"
+app/infosys/admin.py,180,py,Balasan dihapus.
+app/infosys/admin.py,187,py,"Balasan ini ditandai sebagai solusi, jadi topik kembali berstatus belum terjawab."
+app/infosys/admin.py,189,py,Hapus balasan ini?
+app/infosys/admin.py,192,py,"Ya, hapus balasan"
+app/infosys/admin.py,209,py,Anda tidak bisa menonaktifkan akun Anda sendiri.
+app/infosys/admin.py,212,py,Akun admin tidak bisa dinonaktifkan lewat halaman ini.
+app/infosys/admin.py,235,py,Pengguna bisa masuk lagi dengan kata sandinya.
+app/infosys/admin.py,237,py,"Pengguna tidak bisa masuk, dan sesi yang sedang berjalan langsung berakhir."
+app/infosys/admin.py,238,py,Topik dan balasannya tetap ada. Akun bisa diaktifkan kembali kapan saja.
+app/infosys/admin.py,189,py,Balasan oleh
+app/infosys/admin.py,189,py,"di topik """
+app/infosys/admin.py,215,py,Akun
+app/infosys/admin.py,231,py,Akun
+app/infosys/admin.py,240,py,akun ini?
+app/infosys/admin.py,124,py,Topik #
+app/infosys/admin.py,124,py,""" oleh"
+app/infosys/admin.py,125,py,balasan ikut terhapus)
+app/infosys/admin.py,138,py,Topik oleh
+app/infosys/admin.py,172,py,Balasan #
+app/infosys/admin.py,172,py,di topik #
+app/infosys/admin.py,224,py,Akun #
+app/infosys/panel.py,17,py,Daftar akun
+app/infosys/panel.py,18,py,Masuk
+app/infosys/panel.py,19,py,Gagal masuk
+app/infosys/panel.py,20,py,Keluar
+app/infosys/panel.py,21,py,Ubah profil
+app/infosys/panel.py,22,py,Ubah kata sandi
+app/infosys/panel.py,23,py,Gagal mengubah kata sandi
+app/infosys/panel.py,24,py,Ikut kelas
+app/infosys/panel.py,25,py,Bayar pesanan
+app/infosys/panel.py,26,py,Lulus kuis
+app/infosys/panel.py,27,py,Kuis belum lulus
+app/infosys/panel.py,28,py,Buat topik
+app/infosys/panel.py,29,py,Balas topik
+app/infosys/panel.py,30,py,Ubah balasan
+app/infosys/panel.py,31,py,Hapus balasan
+app/infosys/panel.py,32,py,Tandai solusi
+app/infosys/panel.py,33,py,Batalkan tanda solusi
+app/infosys/panel.py,34,py,Ubah pengaturan Forum
+app/infosys/panel.py,35,py,Admin: hapus topik
+app/infosys/panel.py,36,py,Admin: hapus balasan
+app/infosys/panel.py,37,py,Admin: nonaktifkan akun
+app/infosys/panel.py,38,py,Admin: aktifkan akun
+app/infosys/panel.py,39,py,Simpan tutorial
+app/infosys/panel.py,40,py,Hapus tutorial tersimpan
+app/infosys/panel.py,41,py,Ubah preferensi Portal
+app/infosys/panel.py,42,py,Ubah pengaturan E-Commerce
+app/infosys/panel.py,43,py,Ubah pengaturan E-Learning
+app/infosys/panel.py,44,py,Ubah pengaturan E-Tutorial
+app/infosys/panel.py,67,py,Jan
+app/infosys/panel.py,67,py,Feb
+app/infosys/panel.py,67,py,Mar
+app/infosys/panel.py,67,py,Apr
+app/infosys/panel.py,67,py,Mei
+app/infosys/panel.py,67,py,Jun
+app/infosys/panel.py,67,py,Jul
+app/infosys/panel.py,67,py,Agu
+app/infosys/panel.py,67,py,Sep
+app/infosys/panel.py,67,py,Okt
+app/infosys/panel.py,67,py,Nov
+app/infosys/panel.py,67,py,Des
+app/infosys/panel.py,102,py,AND module_key = ?
+app/infosys/panel.py,105,py,AND action = ?
+app/infosys/panel.py,115,py,AND module_key = ?
+app/infosys/panel.py,118,py,AND action = ?
+app/infosys/routes.py,74,py,Ringkasan
+app/infosys/routes.py,75,py,Profil
+app/infosys/routes.py,76,py,Log Aktivitas
+app/infosys/routes.py,77,py,Statistik Semua Aplikasi
+app/infosys/routes.py,78,py,Pengaturan Keamanan
+app/infosys/routes.py,131,py,Ringkasan
+app/infosys/routes.py,145,py,Profil & Pengaturan
+app/infosys/routes.py,188,py,Profil berhasil disimpan.
+app/infosys/routes.py,234,py,Kata sandi berhasil diubah.
+app/infosys/routes.py,249,py,Log Aktivitas
+app/infosys/routes.py,263,py,Statistik Semua Aplikasi
+app/infosys/routes.py,278,py,Pengaturan Keamanan
+app/infosys/routes.py,355,py,Akun berhasil dibuat. Masuk dengan email dan kata sandi Anda.
+app/infosys/routes.py,423,py,Berhasil masuk
+app/infosys/routes.py,173,py,Tidak ada perubahan untuk disimpan.
+app/infosys/routes.py,224,py,Kata sandi diubah
+app/infosys/routes.py,225,py,Kata sandi diubah
+app/infosys/routes.py,226,py,"Jika bukan Anda yang melakukannya, segera ubah kata sandi lagi."
+app/infosys/routes.py,338,py,Akun baru dibuat
+app/infosys/routes.py,426,py,"Selamat datang kembali,"
+app/infosys/routes.py,446,py,Keluar dari akun
+app/infosys/routes.py,448,py,Anda sudah keluar. Sampai jumpa lagi.
+app/infosys/routes.py,127,py,Information System
+app/infosys/routes.py,180,py,Profil diperbarui:
+app/infosys/routes.py,185,py,Profil belum bisa disimpan. Coba lagi sebentar lagi.
+app/infosys/routes.py,210,py,Kata sandi saat ini salah
+app/infosys/routes.py,231,py,Kata sandi belum bisa diubah. Coba lagi sebentar lagi.
+app/infosys/routes.py,293,py,Daftar
+app/infosys/routes.py,348,py,Akun belum bisa dibuat. Coba lagi sebentar lagi.
+app/infosys/routes.py,371,py,Masuk
+app/infosys/routes.py,315,py,Daftar
+app/infosys/routes.py,389,py,Masuk
+app/infosys/routes.py,396,py,Masuk
+app/infosys/routes.py,409,py,Masuk
+app/infosys/routes.py,414,py,Masuk
+app/infosys/routes.py,343,py,Daftar
+app/infosys/routes.py,349,py,Daftar
+app/infosys/throttle.py,75,py,Percobaan masuk gagal (ref
+app/main/api.py,59,py,Data notifikasi belum sesuai. Muat ulang halaman lalu coba lagi.
+app/main/api.py,65,py,Pilih notifikasi yang akan ditandai dibaca.
+app/main/api.py,69,py,Notifikasi belum bisa diperbarui. Coba lagi sebentar lagi.
+app/main/api.py,87,py,Pengaturan tidak dikenal:
+app/main/api.py,98,py,", updated_at) VALUES (?,"
+app/main/api.py,90,py,Nilai
+app/main/api.py,90,py,belum sesuai. Pilih salah satu:
+app/main/launcher.py,20,py,Jan
+app/main/launcher.py,20,py,Feb
+app/main/launcher.py,20,py,Mar
+app/main/launcher.py,20,py,Apr
+app/main/launcher.py,20,py,Mei
+app/main/launcher.py,20,py,Jun
+app/main/launcher.py,20,py,Jul
+app/main/launcher.py,20,py,Agu
+app/main/launcher.py,20,py,Sep
+app/main/launcher.py,20,py,Okt
+app/main/launcher.py,20,py,Nov
+app/main/launcher.py,20,py,Des
+app/main/launcher.py,111,py,Keranjang masih kosong
+app/main/launcher.py,150,py,Belum ada tutorial tersimpan
+app/main/launcher.py,162,py,Belum ada artikel baru
+app/main/launcher.py,176,py,Tidak ada balasan baru
+app/main/launcher.py,93,py,Masuk ke akun
+app/main/launcher.py,100,py,Belum ada aktivitas hari ini
+app/main/launcher.py,136,py,Belum mengikuti kelas
+app/main/launcher.py,156,py,Belum ada artikel
+app/main/launcher.py,158,py,Baca artikel
+app/main/launcher.py,231,py,Halaman terakhir
+app/main/launcher.py,107,py,Lihat produk
+app/main/launcher.py,107,py,Belum ada produk
+app/main/launcher.py,117,py,Lihat kelas
+app/main/launcher.py,117,py,Belum ada kelas
+app/main/launcher.py,146,py,Lihat tutorial
+app/main/launcher.py,146,py,Belum ada tutorial
+app/main/launcher.py,168,py,Lihat diskusi
+app/main/launcher.py,168,py,Belum ada diskusi
+app/main/launcher.py,198,py,Ringkasan belum tersedia
+app/main/routes.py,64,py,Pesan tanpa kategori (bawaan Flask) tampil sebagai toast info.
+app/main/routes.py,35,py,Beranda
+app/main/routes.py,53,py,Uji Komponen
+app/main/routes.py,75,py,Contoh Navigasi
+app/main/routes.py,81,py,Contoh Navigasi
+app/portal/routes.py,45,py,Redaksi DKE
+app/portal/routes.py,49,py,Jan
+app/portal/routes.py,49,py,Feb
+app/portal/routes.py,49,py,Mar
+app/portal/routes.py,49,py,Apr
+app/portal/routes.py,49,py,Mei
+app/portal/routes.py,49,py,Jun
+app/portal/routes.py,49,py,Jul
+app/portal/routes.py,49,py,Agu
+app/portal/routes.py,49,py,Sep
+app/portal/routes.py,49,py,Okt
+app/portal/routes.py,49,py,Nov
+app/portal/routes.py,49,py,Des
+app/portal/routes.py,148,py,Sampul artikel:
+app/portal/routes.py,184,py,Preferensi kategori dihapus
+app/portal/routes.py,196,py,CASE WHEN c.slug IN (
+app/portal/routes.py,196,py,") THEN 0 ELSE 1 END,"
+app/portal/routes.py,215,py,c.slug = ?
+app/portal/routes.py,307,py,Portal
+app/portal/routes.py,380,py,Pengaturan Portal
+app/portal/routes.py,184,py,Kategori favorit:
+app/portal/routes.py,375,py,Preferensi dihapus. Beranda Portal kembali diurutkan dari yang terbaru.
+app/portal/routes.py,373,py,Portal
+app/portal/routes.py,327,py,", a.body AS body"
+app/portal/routes.py,373,py,Beranda Portal kini mendahulukan:
+app/portal/routes.py,332,py,", a.body AS body"
+app/static/js/app.js,26,js,Produk ditambahkan ke keranjang.
+app/static/js/app.js,27,js,Email atau kata sandi salah. Periksa kembali dan coba lagi.
+app/static/js/app.js,28,js,Progres belajar tersimpan otomatis.
+app/static/js/app.js,29,js,Koneksi lambat. Perubahan akan disimpan saat tersambung kembali.
+app/static/js/auth.js,18,js,Email belum valid. Contoh: nama@email.com
+app/static/js/auth.js,19,js,Kata sandi minimal 8 karakter.
+app/static/js/auth.js,20,js,Kata sandi terlalu panjang. Maksimal 128 karakter.
+app/static/js/auth.js,21,js,Kata sandi belum diisi. Ketik kata sandi Anda.
+app/static/js/auth.js,22,js,Konfirmasi kata sandi belum sama. Ketik ulang kata sandi yang sama.
+app/static/js/auth.js,23,js,Nama lengkap belum diisi. Tulis nama Anda.
+app/static/js/auth.js,24,js,Nama lengkap terlalu panjang. Maksimal 100 karakter.
+app/static/js/auth.js,155,js,Sembunyikan
+app/static/js/auth.js,155,js,Tampilkan
+app/static/js/cart.js,11,js,Rp
+app/static/js/cart.js,26,js,"Keranjang belanja,"
+app/static/js/cart.js,66,js,Keranjang belum bisa diperbarui.
+app/static/js/cart.js,82,js,Jumlah produk diperbarui.
+app/static/js/cart.js,87,js,Produk dihapus dari keranjang.
+app/static/js/cart.js,90,js,Keranjang belum bisa diperbarui. Periksa koneksi lalu coba lagi.
+app/static/js/copy.js,12,js,Kode disalin
+app/static/js/copy.js,13,js,Gagal menyalin kode. Pilih kode lalu salin secara manual.
+app/static/js/copy.js,71,js,Tersalin
+app/static/js/elearning.js,29,js,Selesai · Batalkan
+app/static/js/elearning.js,29,js,Tandai selesai
+app/static/js/elearning.js,69,js,Accept
+app/static/js/elearning.js,77,js,Progres belum bisa disimpan. Coba lagi sebentar lagi.
+app/static/js/elearning.js,78,js,"Sesi Anda berakhir. Masuk lagi, lalu ulangi."
+app/static/js/elearning.js,86,js,Semua materi selesai. Kerja bagus!
+app/static/js/elearning.js,86,js,Materi ditandai selesai. Progres tersimpan.
+app/static/js/elearning.js,88,js,Tanda selesai dibatalkan.
+app/static/js/elearning.js,91,js,Koneksi terputus. Progres belum tersimpan. Coba lagi.
+app/static/js/forum.js,30,js,Isian
+app/static/js/forum.js,123,js,Periksa kembali isian yang ditandai.
+app/static/js/forum.js,225,js,Escape
+app/static/js/launcher.js,27,js,Beranda
+app/static/js/launcher.js,46,js,Accept
+app/static/js/launcher.js,51,js,Pengaturan disimpan. Berikutnya DKE membuka aplikasi terakhir Anda.
+app/static/js/launcher.js,52,js,Pengaturan disimpan. Berikutnya DKE membuka Beranda.
+app/static/js/launcher.js,56,js,Sesi Anda berakhir. Masuk lagi untuk menyimpan pengaturan.
+app/static/js/launcher.js,57,js,Pengaturan belum tersimpan. Periksa koneksi lalu coba lagi.
+app/static/js/notif.js,30,js,Accept
+app/static/js/notif.js,52,js,Notifikasi
+app/static/js/notif.js,62,js,Semua notifikasi ditandai sudah dibaca.
+app/static/js/notif.js,65,js,Sesi Anda berakhir. Masuk lagi untuk melanjutkan.
+app/static/js/notif.js,66,js,Notifikasi belum bisa diperbarui. Periksa koneksi lalu coba lagi.
+app/static/js/notif.js,79,js,Notifikasi belum bisa diperbarui. Periksa koneksi lalu coba lagi.
+app/static/js/panel.js,13,js,Nama lengkap belum diisi. Tulis nama Anda.
+app/static/js/panel.js,14,js,Nama lengkap terlalu panjang. Maksimal 100 karakter.
+app/static/js/panel.js,15,js,Bio terlalu panjang. Maksimal 300 karakter.
+app/static/js/panel.js,17,js,Tautan foto terlalu panjang. Maksimal 500 karakter.
+app/static/js/panel.js,18,js,Ketik kata sandi Anda saat ini.
+app/static/js/panel.js,19,js,Kata sandi minimal 8 karakter.
+app/static/js/panel.js,20,js,Kata sandi terlalu panjang. Maksimal 128 karakter.
+app/static/js/panel.js,21,js,Kata sandi baru sama dengan yang lama. Pilih kata sandi yang berbeda.
+app/static/js/panel.js,22,js,Konfirmasi kata sandi baru belum sama. Ketik ulang kata sandi yang sama.
+app/static/js/panel.js,23,js,Periksa kembali isian yang ditandai.
+app/static/js/panel.js,217,js,Sembunyikan
+app/static/js/panel.js,217,js,Tampilkan
+app/static/js/quiz.js,92,js,Soal
+app/static/js/quiz.js,95,js,Soal
+app/static/js/quiz.js,125,js,Soal nomor
+app/static/js/quiz.js,131,js,Soal kosong dihitung salah. Kumpulkan sekarang?
+app/static/js/switcher.js,80,js,Escape
+app/static/js/switcher.js,101,js,Home
+app/static/js/switcher.js,102,js,End
+app/static/js/theme.js,56,js,Accept
+app/static/js/theme.js,65,js,Sesi Anda berakhir. Masuk lagi untuk menyimpan pengaturan.
+app/static/js/theme.js,66,js,Pengaturan belum tersimpan ke akun Anda. Periksa koneksi lalu coba lagi.
+app/static/js/toast.js,95,js,Tutup notifikasi

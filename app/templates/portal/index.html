@@ -53,10 +53,10 @@
   {% elif not featured %}
     {% if category %}
       {{ empty_state('Belum ada artikel di kategori ' ~ category_name,
-                     'Artikel baru akan muncul di sini. Sementara itu, jelajahi kategori lain.',
+                     'Artikel di kategori ini akan muncul di sini setelah ditambahkan.',
                      'Lihat semua artikel', url_for('portal.index')) }}
     {% else %}
-      {{ empty_state('Belum ada artikel', 'Artikel baru akan muncul di sini. Sementara itu, jelajahi aplikasi lain.',
+      {{ empty_state('Belum ada artikel', 'Artikel akan muncul di sini setelah ditambahkan.',
                      'Kembali ke Beranda', url_for('main.index')) }}
     {% endif %}
   {% endif %}

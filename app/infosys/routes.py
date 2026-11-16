@@ -19,6 +19,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .. import DEFAULT_SETTINGS, MODULE_BY_KEY
 from ..db import get_db
+from ..messages import MSG_FORM_INVALID
 from ..utils import MSG_CSRF, csrf_valid, log_activity, login_required, notify, now_iso, safe_next
 from . import bp, panel, throttle
 from .validation import (
@@ -67,7 +68,6 @@ def _find_user_by_email(email):
 # --------------------------------------------------------------------------
 # Control Panel: kerangka tab (sidebar) dan pembantu
 # --------------------------------------------------------------------------
-MSG_FORM_INVALID = "Periksa kembali isian yang ditandai."
 
 PANEL_TABS = (
     # (kunci, endpoint, label, ikon)
@@ -352,7 +352,7 @@ def register():
 
     # Alur Blueprint: Registrasi, lalu login. Email diisikan otomatis di halaman login.
     session["login_prefill_email"] = email
-    flash("Akun berhasil dibuat. Silakan masuk dengan email dan kata sandi Anda.", "success")
+    flash("Akun berhasil dibuat. Masuk dengan email dan kata sandi Anda.", "success")
     return redirect(url_for("infosys.login", next=next_url) if next_url
                     else url_for("infosys.login"))
 
@@ -420,7 +420,7 @@ def login():
     session["user_id"] = user["id"]
     db = get_db()
     db.execute("UPDATE users SET last_login_at = ? WHERE id = ?", (now_iso(), user["id"]))
-    log_activity(MODULE, "login", "Login berhasil", user_id=user["id"], commit=False)
+    log_activity(MODULE, "login", "Berhasil masuk", user_id=user["id"], commit=False)
     db.commit()
 
     flash(f"Selamat datang kembali, {user['full_name'].split()[0]}.", "success")
@@ -443,7 +443,7 @@ def logout():
         return redirect(url_for("main.index"))
 
     if g.user is not None:
-        log_activity(MODULE, "logout", "Logout", commit=True)   # sebelum sesi dihapus
+        log_activity(MODULE, "logout", "Keluar dari akun", commit=True)   # sebelum sesi dihapus
         session.clear()
         flash("Anda sudah keluar. Sampai jumpa lagi.", "success")
     return redirect(url_for("main.index"))

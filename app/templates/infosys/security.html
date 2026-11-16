@@ -4,33 +4,33 @@
 {% block title %}Pengaturan Keamanan{% endblock %}
 {% block panel %}
   <h1 class="text-3xl font-bold tracking-tight">Pengaturan Keamanan</h1>
-  <p class="mt-1 text-muted">Pantau riwayat login akun Anda dan jaga kata sandi tetap aman.</p>
+  <p class="mt-1 text-muted">Lihat riwayat masuk akun Anda dan jaga kata sandi tetap aman.</p>
 
   <div class="card-grid mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-    {{ stat_card('Login terakhir', (current_user['last_login_at']|waktu) if current_user['last_login_at'] else 'Belum ada', None, 'user') }}
-    {{ stat_card('Total login tercatat', total, None, 'shield') }}
+    {{ stat_card('Terakhir masuk', (current_user['last_login_at']|waktu) if current_user['last_login_at'] else 'Belum ada', None, 'user') }}
+    {{ stat_card('Total riwayat masuk', total, None, 'shield') }}
   </div>
 
   <section class="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface p-5 shadow-sm stack-mobile">
     <div>
       <h2 class="text-lg font-semibold">Kata sandi</h2>
-      <p class="text-sm text-muted">Disarankan diganti berkala, dan segera bila ada login yang tidak Anda kenali.</p>
+      <p class="text-sm text-muted">Ganti secara berkala, dan segera jika ada riwayat masuk yang tidak Anda kenali.</p>
     </div>
     <a href="{{ url_for('infosys.profile') }}#sandi" class="btn btn-primary">Ganti kata sandi</a>
   </section>
 
   <section class="mt-6" aria-labelledby="h-login">
-    <h2 id="h-login" class="text-lg font-semibold">Riwayat login</h2>
+    <h2 id="h-login" class="text-lg font-semibold">Riwayat masuk</h2>
     {% if many_ips %}
       <p class="mt-2 flex items-start gap-2 rounded-xl border border-line bg-surface p-4 text-sm" data-note="ip">
         <span class="font-semibold text-amber-700 dark:text-amber-400">Perhatian:</span>
-        <span>Halaman ini memuat lebih dari satu alamat IP. Bila ada yang tidak Anda kenali, ganti kata sandi Anda.</span>
+        <span>Ada lebih dari satu alamat IP di halaman ini. Jika ada yang tidak Anda kenali, ganti kata sandi.</span>
       </p>
     {% endif %}
     {% if rows %}
       <div class="mt-3 overflow-x-auto rounded-xl border border-line bg-surface" data-login-table>
         <table class="w-full min-w-[28rem] text-left text-sm">
-          <caption class="sr-only">Riwayat login, halaman {{ pager.page }} dari {{ pager.pages }}</caption>
+          <caption class="sr-only">Riwayat masuk, halaman {{ pager.page }} dari {{ pager.pages }}</caption>
           <thead class="border-b border-line bg-page text-muted">
             <tr><th scope="col" class="px-4 py-3 font-semibold">Waktu</th><th scope="col" class="px-4 py-3 font-semibold">Alamat IP</th><th scope="col" class="px-4 py-3 font-semibold">Keterangan</th></tr>
           </thead>
@@ -39,15 +39,15 @@
               <tr>
                 <td class="whitespace-nowrap px-4 py-3">{{ r['created_at']|waktu }}{% if loop.first and pager.page == 1 %} <span class="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">Terbaru</span>{% endif %}</td>
                 <td class="whitespace-nowrap px-4 py-3 text-muted">{{ r['ip_address'] or '-' }}</td>
-                <td class="px-4 py-3">{{ r['detail'] or 'Login berhasil' }}</td>
+                <td class="px-4 py-3">{{ r['detail'] or 'Berhasil masuk' }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-      {{ pagination(pager, 'login') }}
+      {{ pagination(pager, 'riwayat masuk') }}
     {% else %}
-      {{ empty_state('Belum ada riwayat login', 'Setiap kali Anda masuk, waktu dan alamat IP-nya akan tercatat di sini.', 'Kembali ke Ringkasan', url_for('infosys.index'), 'shield') }}
+      {{ empty_state('Belum ada riwayat masuk', 'Setiap kali Anda masuk, waktu dan alamat IP-nya akan tercatat di sini.', 'Kembali ke Ringkasan', url_for('infosys.index'), 'shield') }}
     {% endif %}
   </section>
 {% endblock %}

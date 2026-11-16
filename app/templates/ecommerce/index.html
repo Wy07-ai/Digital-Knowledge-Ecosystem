@@ -9,7 +9,7 @@
     <div class="mt-1 flex flex-wrap items-end justify-between gap-3">
       <div>
         <h1 class="page-title font-bold tracking-tight">Katalog Produk</h1>
-        <p class="mt-1 text-muted">Temukan kursus, e-book, dan aset digital untuk kebutuhanmu.</p>
+        <p class="mt-1 text-muted">Temukan kursus, e-book, dan aset digital untuk kebutuhan Anda.</p>
       </div>
       <a href="{{ url_for('ecommerce.cart') if current_user else url_for('infosys.login', next=url_for('ecommerce.cart')) }}"
          class="btn btn-secondary">Lihat keranjang{% if current_user and cart_item_count %} ({{ cart_item_count }}){% endif %}</a>
@@ -92,7 +92,7 @@
             <a href="{{ url_for('ecommerce.product', slug=product.slug) }}" class="mt-3 text-lg font-bold leading-snug text-ink hover:underline">
               {{ product.name }}
             </a>
-            <p class="mt-2 line-clamp-3 text-sm text-muted">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajarmu.' }}</p>
+            <p class="mt-2 line-clamp-3 text-sm text-muted">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajar Anda.' }}</p>
             <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
               <p class="ecommerce-price text-lg font-bold">{{ product.price|rupiah }}</p>
               <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">

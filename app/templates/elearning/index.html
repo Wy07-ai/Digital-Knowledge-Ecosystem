@@ -9,9 +9,9 @@
     <p class="mt-1 text-muted">{{ current_module.desc }}</p>
   </header>
 
-  <nav class="mb-6 flex flex-wrap gap-2" aria-label="Filter level kelas">
+  <nav class="mb-6 flex flex-wrap gap-2" aria-label="Filter tingkat kelas">
     <a href="{{ url_for('elearning.index') }}" class="chip {{ 'is-active' if not level }}"
-       {% if not level %}aria-current="true"{% endif %}>Semua level <span class="el-count">({{ total_count }})</span></a>
+       {% if not level %}aria-current="true"{% endif %}>Semua tingkat <span class="el-count">({{ total_count }})</span></a>
     {% for key, label in levels %}
       <a href="{{ url_for('elearning.index', level=key) }}" class="chip {{ 'is-active' if level == key }}"
          {% if level == key %}aria-current="true"{% endif %}>{{ label }} <span class="el-count">({{ counts[key] }})</span></a>
@@ -20,20 +20,20 @@
 
   {% if unknown_level %}
     <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">
-      Filter level tidak dikenal, jadi semua kelas ditampilkan.
+      Filter tingkat tidak dikenal, jadi semua kelas ditampilkan.
     </p>
   {% endif %}
 
   {% if courses %}
-    <p class="mb-3 text-sm text-muted" aria-live="polite">Menampilkan {{ courses|length }} kelas{% if level %} level {{ levels|selectattr(0, 'equalto', level)|map(attribute=1)|first|lower }}{% endif %}.</p>
+    <p class="mb-3 text-sm text-muted" aria-live="polite">Menampilkan {{ courses|length }} kelas{% if level %} tingkat {{ levels|selectattr(0, 'equalto', level)|map(attribute=1)|first|lower }}{% endif %}.</p>
     <div class="card-grid grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {% for course in courses %}
         {{ course_card(course, enrolled=course.id in enrolled_ids, prog=progress.get(course.id) if course.id in enrolled_ids else None) }}
       {% endfor %}
     </div>
   {% elif level %}
-    {{ empty_state('Belum ada kelas level ' ~ (levels|selectattr(0, 'equalto', level)|map(attribute=1)|first|lower), 'Coba level lain atau tampilkan semua kelas.', 'Tampilkan semua kelas', url_for('elearning.index'), 'filter') }}
+    {{ empty_state('Belum ada kelas tingkat ' ~ (levels|selectattr(0, 'equalto', level)|map(attribute=1)|first|lower), 'Coba tingkat lain atau tampilkan semua kelas.', 'Tampilkan semua kelas', url_for('elearning.index'), 'filter') }}
   {% else %}
-    {{ empty_state('Belum ada kelas', 'Kelas baru akan muncul di sini. Sementara itu, jelajahi aplikasi lain.', 'Kembali ke Beranda', url_for('main.index')) }}
+    {{ empty_state('Belum ada kelas', 'Kelas akan muncul di sini setelah ditambahkan.', 'Kembali ke Beranda', url_for('main.index')) }}
   {% endif %}
 {% endblock %}

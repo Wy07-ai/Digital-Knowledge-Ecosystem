@@ -194,7 +194,7 @@ class LoginThrottleTests(ThrottleTestCase):
     def test_login_failed_tampil_di_log_aktivitas_dengan_label_ramah(self):
         self.fail_logins(1)
         self.assertEqual(self.login("demo@dke.test", "Demo12345").status_code, 302)
-        self.assertIn("Gagal login", self.client.get("/infosys/log").get_data(as_text=True))
+        self.assertIn("Gagal masuk", self.client.get("/infosys/log").get_data(as_text=True))
 
 
 class LoginThrottleByIpTests(ThrottleTestCase):

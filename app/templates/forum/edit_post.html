@@ -5,7 +5,7 @@
 {% block module_content %}
   <header class="mb-6">
     <h1 class="text-3xl font-bold tracking-tight">Ubah balasan</h1>
-    <p class="mt-1 text-muted">Di thread: <a href="{{ url_for('forum.thread', thread_id=post.thread_id) }}" class="font-semibold underline underline-offset-2">{{ post.thread_title }}</a></p>
+    <p class="mt-1 text-muted">Di topik: <a href="{{ url_for('forum.thread', thread_id=post.thread_id) }}" class="font-semibold underline underline-offset-2">{{ post.thread_title }}</a></p>
   </header>
   <form method="post" action="{{ url_for('forum.edit_post', post_id=post.id) }}" novalidate data-fm-form
         class="rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6">

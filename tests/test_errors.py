@@ -76,7 +76,7 @@ class HtmlErrorTest(ErrorPageCase):
         self.assertIn('href="/"', html)                    # tombol menuju Beranda
         self.assertIn('class="topbar', html)               # Top-Bar tetap ada
         self.assertIn('aria-label="Beranda DKE"', html)
-        self.assertNotIn('aria-label="Breadcrumb"', html)  # halaman galat bukan bagian hierarki navigasi
+        self.assertNotIn('aria-label="Jejak halaman"', html)  # halaman galat bukan bagian hierarki navigasi
 
     def test_url_tidak_dikenal_menampilkan_404_dengan_tombol_beranda(self):
         r = self.get("/halaman/yang/tidak/ada", 404)
@@ -95,12 +95,12 @@ class HtmlErrorTest(ErrorPageCase):
         r = self.client.post("/dev/ui-test")                # rute hanya GET
         self.assertEqual(r.status_code, 405)
         self.assertIn("GET", r.headers["Allow"])            # header Allow dipertahankan
-        self.assert_halaman_galat(r.get_data(as_text=True), "Cara akses tidak diizinkan")
+        self.assert_halaman_galat(r.get_data(as_text=True), "Halaman tidak bisa dibuka dengan cara ini")
 
     def test_500_tidak_menampilkan_detail_galat(self):
         r = self.get("/uji/meledak", 500)
         html = r.get_data(as_text=True)
-        self.assert_halaman_galat(html, "Terjadi kesalahan di server")
+        self.assert_halaman_galat(html, "Ada gangguan di sisi kami")
         for bocor in (SECRET_DETAIL, "RuntimeError", "Traceback", "uji_meledak"):
             self.assertNotIn(bocor, html)
 
@@ -108,7 +108,7 @@ class HtmlErrorTest(ErrorPageCase):
         with mock.patch("app.errors.render_template", side_effect=RuntimeError(SECRET_DETAIL)):
             r = self.get("/uji/meledak", 500)
         html = r.get_data(as_text=True)
-        self.assertIn("Terjadi kesalahan di server", html)
+        self.assertIn("Ada gangguan di sisi kami", html)
         self.assertIn("Kembali ke Beranda", html)
         self.assertNotIn(SECRET_DETAIL, html)
 
@@ -184,7 +184,7 @@ class ApiErrorTest(ErrorPageCase):
     def test_respons_json_endpoint_yang_ada_tidak_berubah(self):
         r = self.client.post("/api/settings/global", json={"theme": "dark"})   # Guest: 401 dari endpoint sendiri
         self.assertEqual(r.status_code, 401)
-        self.assertEqual(r.get_json()["error"], "Silakan masuk terlebih dahulu.")
+        self.assertEqual(r.get_json()["error"], "Sesi Anda berakhir. Masuk lagi, lalu ulangi.")
 
     def test_jalur_mirip_api_bukan_api(self):
         r = self.get("/apiary/tidak-ada", 404)             # bukan segmen "api"

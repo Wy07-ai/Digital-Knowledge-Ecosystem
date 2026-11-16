@@ -376,7 +376,7 @@ Indeks adalah struktur tambahan yang mempercepat pencarian pada kolom tertentu, 
 
 Indeks tidak gratis: ia memakan ruang penyimpanan dan membuat penulisan (INSERT, UPDATE, DELETE) sedikit lebih lambat karena indeks ikut diperbarui. Karena itu buat indeks seperlunya.
 
-Transaksi mengelompokkan beberapa perintah agar berhasil seluruhnya atau dibatalkan seluruhnya. Contohnya saat checkout, pesanan dan rinciannya harus tersimpan bersama.
+Transaksi mengelompokkan beberapa perintah agar berhasil seluruhnya atau dibatalkan seluruhnya. Contohnya saat pembayaran, pesanan dan rinciannya harus tersimpan bersama.
 
     BEGIN;
     INSERT INTO pesanan (kode, total) VALUES ('P-001', 150000);
@@ -837,7 +837,7 @@ Jangan lupa unsur sosial. Bergabung di forum atau kelompok belajar membuat Anda 
 # ---------------------------------------------------------------------------
 THREADS = [
     {
-        "title": "Error \"no such table: users\" saat membuka halaman login",
+        "title": "Galat \"no such table: users\" saat membuka halaman masuk",
         "category": "tanya-jawab-teknis", "author": "budi@dke.test", "days_ago": 12, "views": 87,
         "accepted": "t1p1",
         "body": (
@@ -1119,7 +1119,7 @@ def seed_forum(conn, cats, users):
             # dan tiap balasan harus jadi notifikasinya sendiri (kalau tidak, yang belum dibaca tertimpa).
             ensure(conn, "notifications", {
                 "user_id": author_id,
-                "message": f"{name_of[email]} membalas thread Anda: {t['title']}",
+                "message": f"{name_of[email]} membalas topik Anda: {t['title']}",
                 "created_at": ts(t["days_ago"], hours=hours),
             }, {"module_key": "forum", "link_url": f"/forum/thread/{thread_id}"},
                 fixed={"is_read": 0 if unread else 1})
@@ -1218,14 +1218,14 @@ def seed_activity(conn, users, courses, products, tutorials):
 
     # --- log aktivitas lintas modul ---
     for user_id, module_key, action, detail, days_ago in (
-        (demo, "infosys", "login", "Login berhasil", 14),
+        (demo, "infosys", "login", "Berhasil masuk", 14),
         (demo, "elearning", "enroll", "Mendaftar kursus gratis: prinsip-desain-antarmuka-pemula", 9),
         (demo, "ecommerce", "checkout", "Pesanan DKE-20261105-0001", 8),
         (demo, "forum", "create_thread", "Urutan belajar yang disarankan untuk menjadi web developer?", 6),
         (budi, "ecommerce", "checkout", "Pesanan DKE-20261102-0001", 11),
         (budi, "elearning", "enroll", "Kursus dari pesanan DKE-20261102-0001: dasar-pemrograman-python", 11),
         (citra, "elearning", "quiz_passed", "Kuis Prinsip Desain Antarmuka: skor 80", 15),
-        (users[ADMIN_EMAIL], "infosys", "login", "Login admin", 1),
+        (users[ADMIN_EMAIL], "infosys", "login", "Masuk sebagai admin", 1),
     ):
         ensure(conn, "activity_logs",
                {"user_id": user_id, "action": action, "detail": detail, "created_at": ts(days_ago)},
@@ -1346,7 +1346,7 @@ def print_account_report(passwords, created, out=None):
         say("  Pakai hanya di komputer sendiri. Bila aplikasi dapat dijangkau jaringan atau repo dipublikasikan,")
         say("  isi DKE_DEMO_PASSWORD sebelum seed pertama, atau jangan pakai akun ini.")
 
-    say("  Akun komunitas (budi/citra/dewi/eko@dke.test) hanya untuk konten forum dan tidak dapat dipakai login.")
+    say("  Akun komunitas (budi/citra/dewi/eko@dke.test) hanya untuk konten forum dan tidak bisa dipakai untuk masuk.")
     say()
 
 

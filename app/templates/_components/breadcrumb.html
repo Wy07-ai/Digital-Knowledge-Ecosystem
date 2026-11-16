@@ -17,7 +17,7 @@
 
 {% macro breadcrumb(items) -%}
 {%- set n = items|length -%}
-<nav aria-label="Breadcrumb" class="text-sm" data-breadcrumb>
+<nav aria-label="Jejak halaman" class="text-sm" data-breadcrumb>
   <ol class="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-muted">
     {%- if n > 2 %}
       <li class="bc-ellipsis relative items-center gap-1" data-popover>

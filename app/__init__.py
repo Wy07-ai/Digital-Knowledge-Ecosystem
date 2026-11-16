@@ -36,7 +36,7 @@ class ConfigError(RuntimeError):
 # "key" sama dengan nama paket Python (app/<key>/) dan nama Blueprint.
 MODULES = [
     {"key": "infosys",   "name": "Information System", "prefix": "/infosys",   "accent": "#4F46E5", "desc": "Profil, log aktivitas, dan statistik dari semua aplikasi."},
-    {"key": "ecommerce", "name": "E-Commerce",         "prefix": "/ecommerce", "accent": "#F59E0B", "desc": "Katalog produk, keranjang, dan checkout."},
+    {"key": "ecommerce", "name": "E-Commerce",         "prefix": "/ecommerce", "accent": "#F59E0B", "desc": "Katalog produk, keranjang, dan pembayaran."},
     {"key": "elearning", "name": "E-Learning",         "prefix": "/elearning", "accent": "#2563EB", "desc": "Kelas, materi, kuis, dan progres belajar."},
     {"key": "etutorial", "name": "E-Tutorial",         "prefix": "/etutorial", "accent": "#7C3AED", "desc": "Tutorial langkah demi langkah dengan contoh kode."},
     {"key": "portal",    "name": "Portal",             "prefix": "/portal",    "accent": "#E11D48", "desc": "Artikel dan berita pilihan per kategori."},

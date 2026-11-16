@@ -54,6 +54,6 @@
   {% elif total_count %}
     {{ empty_state('Tidak ada tutorial yang cocok', 'Coba kategori atau tingkat lain, atau atur ulang filter.', 'Atur ulang filter', url_for('etutorial.index'), 'filter') }}
   {% else %}
-    {{ empty_state('Belum ada tutorial', 'Tutorial baru akan muncul di sini. Sementara itu, jelajahi aplikasi lain.', 'Kembali ke Beranda', url_for('main.index')) }}
+    {{ empty_state('Belum ada tutorial', 'Tutorial akan muncul di sini setelah ditambahkan.', 'Kembali ke Beranda', url_for('main.index')) }}
   {% endif %}
 {% endblock %}

@@ -21,16 +21,16 @@
     {% endif %}
     {% if p.bio %}<div class="fm-prose mt-5"><p>{{ p.bio }}</p></div>{% endif %}
     <dl class="mt-5 grid grid-cols-3 gap-3 text-center">
-      <div class="rounded-xl border border-line bg-surface p-3"><dt class="text-sm text-muted">Thread</dt><dd class="text-2xl font-bold">{{ p.thread_count }}</dd></div>
+      <div class="rounded-xl border border-line bg-surface p-3"><dt class="text-sm text-muted">Topik</dt><dd class="text-2xl font-bold">{{ p.thread_count }}</dd></div>
       <div class="rounded-xl border border-line bg-surface p-3"><dt class="text-sm text-muted">Balasan</dt><dd class="text-2xl font-bold">{{ p.reply_count }}</dd></div>
-      <div class="rounded-xl border border-line bg-surface p-3"><dt class="text-sm text-muted">Thread Solved</dt><dd class="text-2xl font-bold">{{ p.solved_count }}</dd></div>
+      <div class="rounded-xl border border-line bg-surface p-3"><dt class="text-sm text-muted">Topik Terjawab</dt><dd class="text-2xl font-bold">{{ p.solved_count }}</dd></div>
     </dl>
     <section class="mt-8" aria-labelledby="fm-recent">
-      <h2 id="fm-recent" class="mb-3 text-xl font-bold">Thread terbaru</h2>
+      <h2 id="fm-recent" class="mb-3 text-xl font-bold">Topik terbaru</h2>
       {% if p.recent %}
         <div class="flex flex-col gap-3">{% for t in p.recent %}{{ thread_row(t, show_author=False) }}{% endfor %}</div>
       {% else %}
-        <p class="text-muted">{{ p.name }} belum membuat thread.</p>
+        <p class="text-muted">{{ p.name }} belum membuat topik.</p>
       {% endif %}
     </section>
   {% else %}
@@ -42,7 +42,7 @@
         <a href="{{ login_url() }}" class="btn btn--primary mt-5">Masuk</a>
       {% else %}
         <h2 class="mt-4 text-lg font-semibold">Profil ini privat</h2>
-        <p class="mt-1 text-muted">Pemilik profil memilih untuk tidak membagikan detailnya. Anda tetap bisa membaca thread dan balasannya di Forum.</p>
+        <p class="mt-1 text-muted">Pemilik profil memilih untuk tidak membagikan detailnya. Anda tetap bisa membaca topik dan balasannya di Forum.</p>
         <a href="{{ url_for('forum.index') }}" class="btn btn-secondary mt-5">Kembali ke diskusi</a>
       {% endif %}
     </section>

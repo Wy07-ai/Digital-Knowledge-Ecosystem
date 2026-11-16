@@ -6,7 +6,7 @@ Tes otomatis: `python -m unittest tests.test_theme_transition -v` (pemeriksaan f
 
 | # | Langkah | Hasil yang diharapkan |
 |---|---------|-----------------------|
-| 1 | Guest, tema Terang. Klik ikon tema di Top-Bar, pilih "Gelap" | Lingkaran warna gelap tumbuh dari ikon tema, melebar ke seluruh layar (sekitar 0,5-0,6 detik), lalu berhenti penuh |
+| 1 | Guest, tema Terang. Klik ikon tema di bilah atas, pilih "Gelap" | Lingkaran warna gelap tumbuh dari ikon tema, melebar ke seluruh layar (sekitar 0,5-0,6 detik), lalu berhenti penuh |
 | 2 | Ulangi, pilih "Terang" | Lingkaran terang tumbuh dari ikon yang sama (bukan menyusut) |
 | 3 | Amati awal dan akhir transisi | Tidak ada kedip putih/hitam sebelum lingkaran mulai maupun setelah selesai |
 | 4 | Amati ikon matahari/bulan | Ikon berputar sambil membesar dan berganti, mulus |

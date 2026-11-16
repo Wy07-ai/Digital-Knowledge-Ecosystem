@@ -5,10 +5,10 @@
 {% block title %}Log Aktivitas{% endblock %}
 {% block panel %}
   <h1 class="text-3xl font-bold tracking-tight">Log Aktivitas</h1>
-  <p class="mt-1 text-muted">Jejak aktivitas akun Anda di semua aplikasi, dari yang terbaru. Hanya Anda yang dapat melihatnya.</p>
+  <p class="mt-1 text-muted">Riwayat tindakan akun Anda, dari yang terbaru. Hanya Anda yang bisa melihatnya.</p>
 
   {% if all_total == 0 %}
-    {{ empty_state('Belum ada aktivitas', 'Login, belanja, belajar, dan diskusi Anda akan tercatat di sini secara otomatis.', 'Jelajahi aplikasi', url_for('main.index'), 'list') }}
+    {{ empty_state('Belum ada aktivitas', 'Aktivitas Anda di semua aplikasi akan tercatat di sini.', 'Jelajahi aplikasi', url_for('main.index'), 'list') }}
   {% else %}
     <form method="get" action="{{ url_for('infosys.activity') }}" class="mt-5 flex flex-wrap items-end gap-3" data-filter-form>
       <div>

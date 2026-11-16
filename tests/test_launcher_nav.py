@@ -119,7 +119,7 @@ class BerandaGuestTests(LauncherTestCase):
         # tidak ada lagi teks "Masuk untuk melihat ..." maupun judul konten yang panjang di kartu
         self.assertNotIn("Masuk untuk melihat", html)
         self.assertNotIn("Ebook Flask", html)
-        self.assertNotIn("Thread Pertama", html)
+        self.assertNotIn("Topik Pertama", html)
 
     def test_guest_data_kosong_tetap_ramah(self):
         html = self.html("/")
@@ -129,7 +129,7 @@ class BerandaGuestTests(LauncherTestCase):
 
     def test_subjudul_guest_singkat_dengan_istilah_aplikasi(self):
         html = self.html("/")
-        self.assertIn("Satu akun, enam aplikasi.", html)
+        self.assertIn("Satu akun untuk enam aplikasi", html)
         self.assertNotIn("modul", re.sub(r"data-module|module", "", html.lower().split("<main")[1].split("launcher-grid")[0]))
 
     def test_deskripsi_tampil_di_kartu_dan_direferensikan_oleh_aria(self):

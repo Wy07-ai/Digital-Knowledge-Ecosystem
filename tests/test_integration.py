@@ -213,10 +213,10 @@ class SmartLandingTest(IntegrationCase):
 
     def test_kontrol_di_beranda_menyebut_status(self):
         html = self.html("/")
-        self.assertIn("Smart Landing", html)
-        self.assertRegex(html, r"data-landing-state>nonaktif<")
+        self.assertIn("Saat membuka DKE", html)
+        self.assertRegex(html, r"data-landing-state>Beranda<")
         self.set_mode("last_module")
-        self.assertRegex(self.html("/"), r"data-landing-state>aktif<")
+        self.assertRegex(self.html("/"), r"data-landing-state>aplikasi terakhir<")
 
     def test_nilai_tak_sah_ditolak(self):
         self.assertEqual(self.set_mode("acak").status_code, 400)
@@ -239,7 +239,7 @@ class StatsAllModulesTest(IntegrationCase):
         values = re.findall(r"data-stat-value>([^<]+)<", html)
         # Kuis lulus (1 kuis, bukan 2 percobaan), Artikel Portal, Kategori favorit, Aktivitas tercatat
         self.assertEqual(values[6:], ["1", "2", "1", "3"])
-        self.assertIn("2 kali login.", html)
+        self.assertIn("2 kali masuk.", html)
         self.assertIn("data-module-activity", html)
         for m in MODULES:
             self.assertIn(m["name"], html.split("data-module-activity")[1])
@@ -335,8 +335,8 @@ class NavigationCoverageTest(IntegrationCase):
         self.login(1)
         for path in ("/ecommerce/keranjang", "/ecommerce/pengaturan", "/ecommerce/pesanan", "/ecommerce/produk/paket-python"):
             html = self.html(path)
-            self.assertIn('aria-label="Breadcrumb"', html, path)
-        self.assertIn("Paket Python", self.html("/ecommerce/produk/paket-python").split('aria-label="Breadcrumb"')[1][:900])
+            self.assertIn('aria-label="Jejak halaman"', html, path)
+        self.assertIn("Paket Python", self.html("/ecommerce/produk/paket-python").split('aria-label="Jejak halaman"')[1][:900])
 
 
 if __name__ == "__main__":

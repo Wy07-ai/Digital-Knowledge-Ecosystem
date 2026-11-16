@@ -176,7 +176,7 @@ class DeleteThreadTests(AdminTestCase):
         client = self.login("admin@dke.test")
         r = client.get("/infosys/admin/thread/10/hapus")
         self.assertEqual(r.status_code, 200)
-        self.assertIn("Hapus thread ini?", r.get_data(as_text=True))
+        self.assertIn("Hapus topik ini?", r.get_data(as_text=True))
         self.assertEqual(len(self.sql("SELECT id FROM threads WHERE id = 10")), 1)
 
     def test_admin_menghapus_thread_beserta_balasan_dan_tercatat(self):

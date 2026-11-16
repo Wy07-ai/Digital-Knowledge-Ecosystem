@@ -165,7 +165,7 @@ class LoginTests(AuthTestCase):
     def test_format_errors_are_inline(self):
         html = self.post_login("bukan-email", "").get_data(as_text=True)
         self.assertIn(EMAIL_MSG, html)
-        self.assertIn("Kata sandi wajib diisi.", html)
+        self.assertIn("Kata sandi belum diisi.", html)
         self.assertIn('data-focus="email"', html)
 
     def test_login_does_not_enforce_min_length(self):
@@ -204,7 +204,7 @@ class ProtectedPageTests(AuthTestCase):
         self.assertEqual(parse_qs(loc.query)["next"], ["/infosys/profil"])
         page = self.client.get(r.headers["Location"])
         self.assertIn('name="next" value="/infosys/profil"', page.get_data(as_text=True))
-        self.assertIn("Silakan masuk terlebih dahulu", page.get_data(as_text=True))   # toast peringatan
+        self.assertIn("Masuk dulu untuk membuka halaman ini", page.get_data(as_text=True))   # toast peringatan
         r = self.post_login("demo@dke.test", "Demo12345", next_url="/infosys/profil")
         self.assertEqual(r.headers["Location"], "/infosys/profil")
         self.assertEqual(self.client.get("/infosys/profil").status_code, 200)

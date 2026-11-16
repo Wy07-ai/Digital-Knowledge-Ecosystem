@@ -62,7 +62,7 @@
       throw err;
     }).catch(function (err) {
       onFail(err && err.status === 401
-        ? 'Sesi Anda berakhir. Silakan masuk lagi untuk menyimpan pengaturan.'
+        ? 'Sesi Anda berakhir. Masuk lagi untuk menyimpan pengaturan.'
         : 'Pengaturan belum tersimpan ke akun Anda. Periksa koneksi lalu coba lagi.');
     });
   }

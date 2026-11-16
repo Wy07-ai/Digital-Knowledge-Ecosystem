@@ -9,7 +9,7 @@
       <h1 class="page-title font-bold tracking-tight">Forum diskusi</h1>
       <p class="mt-1 text-muted">{{ current_module.desc }}</p>
     </div>
-    <a href="{{ url_for('forum.new_thread', kategori=category) }}" class="btn btn--primary">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
+    <a href="{{ url_for('forum.new_thread', kategori=category) }}" class="btn btn--primary">{{ icon('plus', 'h-5 w-5') }}Buat topik</a>
   </header>
 
   <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -25,7 +25,7 @@
         {% endfor %}
       </div>
     </nav>
-    <nav aria-label="Urutan thread">
+    <nav aria-label="Urutan topik">
       <div class="fm-seg">
         <a href="{{ url_for('forum.index', kategori=category) }}" class="{{ 'is-active' if sort == 'terbaru' }}"
            {% if sort == 'terbaru' %}aria-current="true"{% endif %}>Terbaru</a>
@@ -36,32 +36,32 @@
   </div>
 
   {% if unknown_filter %}
-    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">Kategori itu tidak dikenal, jadi semua thread ditampilkan.</p>
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">Kategori itu tidak dikenal, jadi semua topik ditampilkan.</p>
   {% endif %}
   {% if unknown_sort %}
-    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">Urutan itu tidak dikenal, jadi thread diurutkan dari yang terbaru.</p>
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status">Urutan itu tidak dikenal, jadi topik diurutkan dari yang terbaru.</p>
   {% endif %}
   {% if sort == 'belum-terjawab' and threads %}
-    <p class="mb-4 text-sm text-muted">Menampilkan thread yang belum punya jawaban bertanda solusi. Yang paling sedikit balasannya ada di atas.</p>
+    <p class="mb-4 text-sm text-muted">Menampilkan topik yang belum punya solusi, dari yang paling sedikit balasannya.</p>
   {% endif %}
 
   {% if threads %}
-    <section aria-label="Daftar thread">
+    <section aria-label="Daftar topik">
       <div class="flex flex-col gap-3">
         {% for t in threads %}{{ thread_row(t) }}{% endfor %}
       </div>
       {{ pagination(pager) }}
     </section>
   {% elif sort == 'belum-terjawab' %}
-    {{ empty_state('Semua thread' ~ (' di ' ~ category_name if category_name else '') ~ ' sudah terjawab',
-                   'Tidak ada pertanyaan yang menunggu solusi. Lihat semua thread atau mulai diskusi baru.',
-                   'Lihat semua thread', url_for('forum.index', kategori=category), 'forum') }}
+    {{ empty_state('Semua topik' ~ (' di ' ~ category_name if category_name else '') ~ ' sudah terjawab',
+                   'Semua pertanyaan di sini sudah punya solusi.',
+                   'Lihat semua topik', url_for('forum.index', kategori=category), 'forum') }}
   {% elif category %}
-    {{ empty_state('Belum ada thread di kategori ' ~ category_name,
+    {{ empty_state('Belum ada topik di kategori ' ~ category_name,
                    'Jadilah yang pertama memulai diskusi di kategori ini.',
-                   'Buat thread', url_for('forum.new_thread', kategori=category), 'forum') }}
+                   'Buat topik', url_for('forum.new_thread', kategori=category), 'forum') }}
   {% else %}
-    {{ empty_state('Belum ada thread', 'Mulai diskusi pertama: ajukan pertanyaan atau bagikan pengalaman belajar Anda.',
-                   'Buat thread pertama', url_for('forum.new_thread'), 'forum') }}
+    {{ empty_state('Belum ada topik', 'Mulai diskusi pertama: ajukan pertanyaan atau bagikan pengalaman belajar Anda.',
+                   'Buat topik pertama', url_for('forum.new_thread'), 'forum') }}
   {% endif %}
 {% endblock %}

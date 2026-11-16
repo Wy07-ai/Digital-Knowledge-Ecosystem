@@ -1,5 +1,5 @@
 {# Komponen Forum. Semua teks buatan pengguna dicetak lewat autoescape Jinja (tanpa filter safe).
-   Status tidak hanya warna: lencana Solved selalu memuat ikon centang dan kata "Solved". #}
+   Status tidak hanya warna: lencana Terjawab selalu memuat ikon centang dan kata "Terjawab". #}
 {% from "_components/_icons.html" import icon %}
 
 {% macro avatar(initials, cls='') -%}
@@ -7,7 +7,7 @@
 {%- endmacro %}
 
 {% macro solved_badge() -%}
-<span class="fm-solved">{{ icon('success', 'h-3.5 w-3.5') }}Solved</span>
+<span class="fm-solved">{{ icon('success', 'h-3.5 w-3.5') }}Terjawab</span>
 {%- endmacro %}
 
 {# Satu baris thread. Judul adalah tautan yang membentang ke seluruh kartu (target sentuh besar);
@@ -47,7 +47,7 @@
 </p>
 {%- endmacro %}
 
-{% macro pagination(p, noun='thread') -%}
+{% macro pagination(p, noun='topik') -%}
 <div class="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm" data-pagination>
   <p class="text-muted" aria-live="polite">{% if p.total %}Menampilkan {{ p.first }}&ndash;{{ p.last }} dari {{ p.total }} {{ noun }}{% endif %}</p>
   {% if p.pages > 1 %}

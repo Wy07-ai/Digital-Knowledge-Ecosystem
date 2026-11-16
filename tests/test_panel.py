@@ -1,4 +1,4 @@
-"""Tes Control Panel Information System (UC-IS-04..08).
+"""Tes Akun Saya (Information System) (UC-IS-04..08).
 
 Jalankan:  python -m unittest discover -s tests -v
 Dua pengguna (Rina dan Budi) berbagi satu database supaya terbukti data tidak bocor antar akun.
@@ -95,7 +95,7 @@ class AksesTest(PanelTestCase):
 
     def test_guest_di_halaman_utama_melihat_ajakan_masuk(self):
         html = self.html("/infosys/")
-        self.assertIn("Masuk untuk membuka Control Panel", html)
+        self.assertIn("Masuk untuk melihat akun Anda", html)
         self.assertNotIn("cp-tabs", html)
 
     def test_sidebar_lima_tab_dan_tab_aktif(self):
@@ -115,7 +115,7 @@ class RingkasanTest(PanelTestCase):
         html = self.html("/infosys/")
         self.assertIn('data-empty="stats"', html)
         self.assertIn('data-empty="recent"', html)
-        self.assertIn("Ini login pertama Anda", html)
+        self.assertIn("Ini pertama kalinya Anda masuk", html)
 
     def test_tanpa_tombol_kembali_di_halaman_utama(self):
         self.login()
@@ -128,8 +128,8 @@ class RingkasanTest(PanelTestCase):
         self.add_logs(2, 2, "ecommerce", "checkout")
         self.login()
         html = self.html("/infosys/")
-        self.assertIn("Balas thread", html)
-        self.assertNotIn("Checkout", html)
+        self.assertIn("Balas topik", html)
+        self.assertNotIn("Bayar pesanan", html)   # log milik pengguna lain
 
 
 class ProfilTest(PanelTestCase):
@@ -177,7 +177,7 @@ class ProfilTest(PanelTestCase):
         r = self.post_profile(name="   ", bio="x" * 301, avatar_url="javascript:alert(1)")
         self.assertEqual(r.status_code, 400)
         html = r.get_data(as_text=True)
-        for msg in ("Nama lengkap wajib diisi.", "Bio maksimal 300 karakter.", "Tautan avatar belum valid."):
+        for msg in ("Nama lengkap belum diisi.", "Bio terlalu panjang. Maksimal 300 karakter.", "Tautan foto belum valid."):
             self.assertIn(msg, html)
         self.assertIn("Periksa kembali isian yang ditandai.", self.flashes(html))
         self.assertEqual(self.sql("SELECT full_name FROM users WHERE id = 1")[0]["full_name"], "Rina Putri")
@@ -196,7 +196,7 @@ class ProfilTest(PanelTestCase):
 
     def test_nama_terlalu_panjang(self):
         r = self.post_profile(name="A" * 101, bio="", avatar_url="")
-        self.assertIn("Nama lengkap maksimal 100 karakter.", r.get_data(as_text=True))
+        self.assertIn("Nama lengkap terlalu panjang. Maksimal 100 karakter.", r.get_data(as_text=True))
 
     def test_xss_di_nama_dan_bio_di_escape(self):
         self.post_profile(name="<script>alert(1)</script>", bio="<img src=x onerror=alert(1)>", avatar_url="")
@@ -244,16 +244,16 @@ class KataSandiTest(PanelTestCase):
 
     def test_validasi_format(self):
         html = self.post_password("", "pendek", "beda").get_data(as_text=True)
-        for msg in ("Kata sandi saat ini wajib diisi.", "Kata sandi minimal 8 karakter.", "Konfirmasi kata sandi baru belum sama."):
+        for msg in ("Ketik kata sandi Anda saat ini.", "Kata sandi minimal 8 karakter.", "Konfirmasi kata sandi baru belum sama."):
             self.assertIn(msg, html)
 
     def test_sandi_baru_tidak_boleh_sama_dengan_lama(self):
         html = self.post_password("Rina12345", "Rina12345", "Rina12345").get_data(as_text=True)
-        self.assertIn("harus berbeda", html)
+        self.assertIn("Pilih kata sandi yang berbeda", html)
 
     def test_batas_maksimal_128(self):
         r = self.post_password("Rina12345", "a" * 129, "a" * 129)
-        self.assertIn("maksimal 128", r.get_data(as_text=True))
+        self.assertIn("Maksimal 128", r.get_data(as_text=True))
 
     def test_kata_sandi_tidak_dikirim_balik_ke_html(self):
         html = self.post_password("Rina12345", "pendek", "beda").get_data(as_text=True)
@@ -312,7 +312,7 @@ class LogAktivitasTest(PanelTestCase):
         html = self.html("/infosys/log?modul=ecommerce")
         self.assertEqual(html.count("<tr>") - 1, 2)
         self.assertIn("Menampilkan 1&ndash;2 dari 2", html)
-        self.assertNotIn("Balas thread", html)
+        self.assertNotIn("Balas topik", html)
         self.assertRegex(html, r'<option value="ecommerce" selected>')
         self.assertIn("Hapus filter", html)
 
@@ -432,23 +432,23 @@ class KeamananTest(PanelTestCase):
 
     def test_empty_state_tanpa_riwayat(self):
         html = self.html("/infosys/keamanan")
-        self.assertIn("Belum ada riwayat login", html)
+        self.assertIn("Belum ada riwayat masuk", html)
 
     def test_hanya_login_milik_sendiri(self):
         self.add_logs(1, 3, "infosys", "login", "10.0.0.1")
         self.add_logs(2, 4, "infosys", "login", "10.9.9.9")
         self.add_logs(1, 2, "forum", "reply", "10.7.7.7")        # bukan login
         html = self.html("/infosys/keamanan")
-        self.assertIn("dari 3 login", html)
+        self.assertIn("dari 3 riwayat masuk", html)
         self.assertIn("10.0.0.1", html)
         self.assertNotIn("10.9.9.9", html)
         self.assertNotIn("10.7.7.7", html)
 
     def test_paginasi_riwayat_login(self):
         self.add_logs(1, 13, "infosys", "login")
-        self.assertIn("dari 13 login", self.html("/infosys/keamanan"))
+        self.assertIn("dari 13 riwayat masuk", self.html("/infosys/keamanan"))
         p2 = self.html("/infosys/keamanan?halaman=2")
-        self.assertIn("Menampilkan 11&ndash;13 dari 13 login", p2)
+        self.assertIn("Menampilkan 11&ndash;13 dari 13 riwayat masuk", p2)
         self.assertNotIn("Terbaru", p2)
 
     def test_peringatan_bila_banyak_ip(self):
@@ -462,7 +462,7 @@ class KeamananTest(PanelTestCase):
         token = re.search(r'name="csrf_token" value="([^"]+)"', guest.get("/infosys/login").get_data(as_text=True)).group(1)
         guest.post("/infosys/login", data={"email": "rina@dke.test", "password": "Rina12345", "csrf_token": token})
         html = guest.get("/infosys/keamanan").get_data(as_text=True)
-        self.assertIn("dari 1 login", html)
+        self.assertIn("dari 1 riwayat masuk", html)
         self.assertIn("Terbaru", html)
 
 

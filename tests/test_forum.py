@@ -51,12 +51,12 @@ class LogicTests(unittest.TestCase):
         _, errors = lg.validate_thread("Judul valid", "Isi cukup panjang", "abc", {1})
         self.assertIn("category", errors)
         _, errors = lg.validate_thread("     ", "          ", 1, {1})  # hanya spasi dianggap kosong
-        self.assertIn("wajib", errors["title"])
-        self.assertIn("wajib", errors["body"])
+        self.assertIn("belum diisi", errors["title"])
+        self.assertIn("belum diisi", errors["body"])
 
     def test_validate_post(self):
         self.assertEqual(lg.validate_post("  Balasan ok ")[1], None)
-        self.assertIn("kosong", lg.validate_post("   ")[1])
+        self.assertIn("belum diisi", lg.validate_post("   ")[1])
         self.assertIn("minimal 3", lg.validate_post("ab")[1])
         self.assertIn("Maksimal 3000", lg.validate_post("x" * 3001)[1])
 
@@ -165,9 +165,9 @@ class ForumTestCase(unittest.TestCase):
         conn.executemany(
             "INSERT INTO threads (id, category_id, user_id, title, body, is_solved, accepted_post_id, views, created_at) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            ((1, 1, 1, "Thread Milik Demo", "Isi thread milik demo yang cukup panjang.", 0, None, 10, "2026-01-01T03:00:00+00:00"),
-             (2, 1, 2, "Thread Orang Lain", "Isi thread orang lain yang cukup panjang.", 0, None, 5, "2026-01-05T03:00:00+00:00"),
-             (3, 2, 3, "Thread Solved", "Isi thread solved yang cukup panjang.", 1, 31, 7, "2026-01-03T03:00:00+00:00")))
+            ((1, 1, 1, "Topik Milik Demo", "Isi topik milik demo yang cukup panjang.", 0, None, 10, "2026-01-01T03:00:00+00:00"),
+             (2, 1, 2, "Topik Orang Lain", "Isi topik orang lain yang cukup panjang.", 0, None, 5, "2026-01-05T03:00:00+00:00"),
+             (3, 2, 3, "Topik Terjawab", "Isi topik solved yang cukup panjang.", 1, 31, 7, "2026-01-03T03:00:00+00:00")))
         conn.executemany(
             "INSERT INTO posts (id, thread_id, user_id, parent_post_id, body, created_at) VALUES (?, ?, ?, ?, ?, ?)",
             ((10, 1, 2, None, "Balasan sepuluh dari orang lain", "2026-01-01T04:00:00+00:00"),
@@ -226,7 +226,7 @@ class ForumTestCase(unittest.TestCase):
             data["parent_post_id"] = str(parent)
         return self.post(f"/forum/thread/{thread_id}/balas", data, client=client, **kw)
 
-    def new_thread(self, title="Judul thread baru", body="Isi thread baru yang cukup panjang.", category=1, **kw):
+    def new_thread(self, title="Judul topik baru", body="Isi topik baru yang cukup panjang.", category=1, **kw):
         return self.post("/forum/buat", {"title": title, "body": body, "category_id": str(category)}, **kw)
 
     @staticmethod
@@ -247,18 +247,18 @@ class ForumTestCase(unittest.TestCase):
 class ListTests(ForumTestCase):
     def test_guest_can_view_list(self):
         html = self.get("/forum/")
-        self.assertEqual(self.titles(html), ["Thread Orang Lain", "Thread Solved", "Thread Milik Demo"])  # terbaru dulu
+        self.assertEqual(self.titles(html), ["Topik Orang Lain", "Topik Terjawab", "Topik Milik Demo"])  # terbaru dulu
         self.assertIn("Forum diskusi", html)
 
     def test_reply_counts_and_solved_badge(self):
         html = self.get("/forum/")
         rows = re.findall(r'<article class="[^"]*\bfm-row\b[^"]*.*?</article>', html, re.S)
         by_title = {self.titles(r)[0]: r for r in rows}
-        self.assertIn('<span class="fm-count-num">2</span>', by_title["Thread Solved"])
-        self.assertIn('<span class="fm-count-num">1</span>', by_title["Thread Orang Lain"])
-        self.assertIn('<span class="fm-count-num">2</span>', by_title["Thread Milik Demo"])
-        self.assertIn("Solved", by_title["Thread Solved"])
-        self.assertNotIn("fm-solved", by_title["Thread Orang Lain"])
+        self.assertIn('<span class="fm-count-num">2</span>', by_title["Topik Terjawab"])
+        self.assertIn('<span class="fm-count-num">1</span>', by_title["Topik Orang Lain"])
+        self.assertIn('<span class="fm-count-num">2</span>', by_title["Topik Milik Demo"])
+        self.assertIn("Terjawab", by_title["Topik Terjawab"])
+        self.assertNotIn("fm-solved", by_title["Topik Orang Lain"])
         self.assertEqual(html.count('<span class="fm-solved">'), 1)
 
     def test_zero_replies_shown(self):
@@ -270,7 +270,7 @@ class ListTests(ForumTestCase):
 
     def test_category_filter_and_counts(self):
         html = self.get("/forum/?kategori=tanya-jawab")
-        self.assertEqual(self.titles(html), ["Thread Solved"])
+        self.assertEqual(self.titles(html), ["Topik Terjawab"])
         self.assertRegex(html, r'aria-current="true">\s*Tanya Jawab')
         all_html = self.get("/forum/")
         self.assertIn("Semua <span", all_html)
@@ -285,13 +285,13 @@ class ListTests(ForumTestCase):
 
     def test_empty_category_state(self):
         html = self.get("/forum/?kategori=kosong")
-        self.assertIn("Belum ada thread di kategori Kosong", html)
+        self.assertIn("Belum ada topik di kategori Kosong", html)
         self.assertEqual(self.titles(html), [])
 
     def test_unanswered_sort(self):
         html = self.get("/forum/?urut=belum-terjawab")
         # Solved disembunyikan; yang paling sedikit balasannya dulu (2: 1 balasan, 1: 2 balasan)
-        self.assertEqual(self.titles(html), ["Thread Orang Lain", "Thread Milik Demo"])
+        self.assertEqual(self.titles(html), ["Topik Orang Lain", "Topik Milik Demo"])
         self.assertRegex(html, r'aria-current="true">Belum terjawab')
         # Angka chip mengikuti urutan terpilih
         self.assertRegex(html, r"Tanya Jawab <span[^>]*>\(0\)")
@@ -304,12 +304,12 @@ class ListTests(ForumTestCase):
     def test_unknown_sort_falls_back(self):
         html = self.get("/forum/?urut=ngawur")
         self.assertIn("Urutan itu tidak dikenal", html)
-        self.assertEqual(self.titles(html)[0], "Thread Orang Lain")
+        self.assertEqual(self.titles(html)[0], "Topik Orang Lain")
 
     def test_empty_forum(self):
         self.sql("DELETE FROM posts")
         self.sql("DELETE FROM threads")
-        self.assertIn("Belum ada thread", self.get("/forum/"))
+        self.assertIn("Belum ada topik", self.get("/forum/"))
 
     def test_pagination(self):
         rows = [(100 + i, 1, 3, f"Massal {100 + i}", "Isi massal cukup panjang.", f"2026-03-{(i % 27) + 1:02d}T03:00:00+00:00")
@@ -322,7 +322,7 @@ class ListTests(ForumTestCase):
         page2 = self.get("/forum/?halaman=2")
         self.assertEqual(len(self.titles(page1)), 8)
         self.assertEqual(len(self.titles(page2)), 7)                  # 15 thread: 8 + 7
-        self.assertIn("Menampilkan 9&ndash;15 dari 15 thread", page2)
+        self.assertIn("Menampilkan 9&ndash;15 dari 15 topik", page2)
         self.assertEqual(self.titles(self.get("/forum/?halaman=999")), self.titles(page2))
         self.assertEqual(self.titles(self.get("/forum/?halaman=abc")), self.titles(page1))
         self.assertNotIn("halaman=1", page1)                          # halaman 1 memakai URL bersih
@@ -381,8 +381,8 @@ class CreateThreadTests(ForumTestCase):
         response = self.post("/forum/buat", {})
         html = response.get_data(as_text=True)
         self.assertEqual(response.status_code, 422)
-        self.assertIn("Judul wajib diisi", html)
-        self.assertIn("Isi thread wajib diisi", html)
+        self.assertIn("Judul belum diisi", html)
+        self.assertIn("Isi topik belum diisi", html)
 
     def test_title_too_long(self):
         self.as_user(1)
@@ -414,8 +414,8 @@ class CreateThreadTests(ForumTestCase):
 class DetailTests(ForumTestCase):
     def test_detail_renders_for_guest(self):
         html = self.get("/forum/thread/1")
-        self.assertIn("Thread Milik Demo", html)
-        self.assertIn("Isi thread milik demo", html)
+        self.assertIn("Topik Milik Demo", html)
+        self.assertIn("Isi topik milik demo", html)
         self.assertIn("Balasan sepuluh dari orang lain", html)
         self.assertIn("2 balasan", html)
         self.assertIn("Masuk untuk membalas", html)                  # tanpa form untuk Guest
@@ -499,7 +499,7 @@ class ReplyTests(ForumTestCase):
         self.assertEqual(row, (1, 2, None, "Balasan baru yang bagus"))
         note = self.sql("SELECT user_id, module_key, message, link_url, is_read FROM notifications")
         self.assertEqual(len(note), 1)
-        self.assertEqual(note[0][:3], (1, "forum", "Orang Lain membalas thread Anda: Thread Milik Demo"))
+        self.assertEqual(note[0][:3], (1, "forum", "Orang Lain membalas topik Anda: Topik Milik Demo"))
         self.assertEqual(note[0][3], f"/forum/thread/1#balasan-{new_id}")
         self.assertEqual(note[0][4], 0)
         self.assertTrue(is_safe_next(note[0][3]))
@@ -511,7 +511,7 @@ class ReplyTests(ForumTestCase):
         self.reply(1, "Balasan untuk dibaca pemilik")
         owner = self.client_for(1)
         html = owner.get("/forum/").get_data(as_text=True)
-        self.assertIn("Orang Lain membalas thread Anda: Thread Milik Demo", html)
+        self.assertIn("Orang Lain membalas topik Anda: Topik Milik Demo", html)
 
     def test_nested_reply_stores_parent(self):
         self.as_user(3)
@@ -522,7 +522,7 @@ class ReplyTests(ForumTestCase):
     def test_reply_to_parent_in_other_thread_rejected(self):
         self.as_user(2)
         before = self.sql("SELECT COUNT(*) FROM posts")[0][0]
-        response = self.reply(1, "Induk dari thread lain", parent=20)
+        response = self.reply(1, "Induk dari topik lain", parent=20)
         self.assertEqual(response.status_code, 422)
         self.assertIn("tidak ditemukan", response.get_data(as_text=True))
         self.assertEqual(self.sql("SELECT COUNT(*) FROM posts")[0][0], before)
@@ -543,7 +543,7 @@ class ReplyTests(ForumTestCase):
         self.assertIn(">ab</textarea>", html)
         self.assertIn('aria-invalid="true"', html)
         empty = self.reply(1, "   ").get_data(as_text=True)
-        self.assertIn("Balasan tidak boleh kosong", empty)
+        self.assertIn("Balasan belum diisi", empty)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM posts WHERE thread_id=1")[0][0], 2)
         self.assertEqual(self.sql("SELECT COUNT(*) FROM notifications")[0][0], 0)
 
@@ -559,7 +559,7 @@ class ReplyTests(ForumTestCase):
 
     def test_reply_to_missing_thread_404(self):
         self.as_user(2)
-        self.assertEqual(self.reply(999, "Balasan ke thread hilang").status_code, 404)
+        self.assertEqual(self.reply(999, "Balasan ke topik hilang").status_code, 404)
 
     def test_csrf_required(self):
         self.as_user(2)
@@ -628,7 +628,7 @@ class SolutionTests(ForumTestCase):
         self.assertTrue(response.headers["Location"].endswith("/forum/thread/1#balasan-10"))
         self.assertEqual(self.state(1), (1, 10))
         self.assertIn("mark_solution", [r[0] for r in self.sql("SELECT action FROM activity_logs")])
-        self.assertIn("Solved", self.get("/forum/"))
+        self.assertIn("Terjawab", self.get("/forum/"))
 
     def test_non_owner_forbidden(self):
         self.as_user(2)
@@ -801,28 +801,28 @@ class MyThreadsTests(ForumTestCase):
     def test_lists_only_own_threads(self):
         self.as_user(1)
         html = self.get("/forum/saya")
-        self.assertEqual(self.titles(html), ["Thread Milik Demo"])
-        self.assertIn("1 thread yang Anda mulai", html)
-        self.assertIn("0 di antaranya sudah Solved", html)
+        self.assertEqual(self.titles(html), ["Topik Milik Demo"])
+        self.assertIn("1 topik yang Anda mulai", html)
+        self.assertIn("0 di antaranya sudah terjawab", html)
 
     def test_solved_count_and_badge(self):
         self.as_user(3)
         html = self.get("/forum/saya")
-        self.assertEqual(self.titles(html), ["Thread Solved"])
-        self.assertIn("1 di antaranya sudah Solved", html)
+        self.assertEqual(self.titles(html), ["Topik Terjawab"])
+        self.assertIn("1 di antaranya sudah terjawab", html)
         self.assertEqual(html.count('<span class="fm-solved">'), 1)
 
     def test_empty_state(self):
         self.sql("UPDATE threads SET user_id = 2 WHERE user_id = 1")
         self.as_user(1)
         html = self.get("/forum/saya")
-        self.assertIn("Anda belum membuat thread", html)
+        self.assertIn("Anda belum membuat topik", html)
         self.assertEqual(self.titles(html), [])
 
     def test_new_thread_appears(self):
         self.as_user(2)
-        self.new_thread(title="Thread terbaru milik dua")
-        self.assertEqual(self.titles(self.get("/forum/saya"))[0], "Thread terbaru milik dua")
+        self.new_thread(title="Topik terbaru milik dua")
+        self.assertEqual(self.titles(self.get("/forum/saya"))[0], "Topik terbaru milik dua")
 
 
 # --------------------------------------------------------------------------
@@ -889,14 +889,14 @@ class ProfilePrivacyTests(ForumTestCase):
     def test_public_profile_visible_to_guest(self):
         html = self.get("/forum/pengguna/1")
         self.assertIn("Bio rahasia demo", html)
-        self.assertIn("Thread Milik Demo", html)
+        self.assertIn("Topik Milik Demo", html)
         self.assertNotIn("demo@dke.test", html)                      # email tidak pernah tampil
 
     def test_members_only(self):
         self.set_privacy(1, "members")
         guest = self.get("/forum/pengguna/1")
         self.assertNotIn("Bio rahasia demo", guest)
-        self.assertNotIn("Thread Milik Demo", guest)
+        self.assertNotIn("Topik Milik Demo", guest)
         self.assertIn("Masuk untuk melihat profil ini", guest)
         member = self.get("/forum/pengguna/1", client=self.client_for(2))
         self.assertIn("Bio rahasia demo", member)
@@ -907,7 +907,7 @@ class ProfilePrivacyTests(ForumTestCase):
             html = self.get("/forum/pengguna/1", client=client)
             self.assertIn("Profil ini privat", html)
             self.assertNotIn("Bio rahasia demo", html)
-            self.assertNotIn("Thread Milik Demo", html)
+            self.assertNotIn("Topik Milik Demo", html)
             self.assertIn("Demo Pengguna", html)                     # nama tetap tampil
         own = self.get("/forum/pengguna/1", client=self.client_for(1))
         self.assertIn("Bio rahasia demo", own)
@@ -959,11 +959,11 @@ class SecurityTests(ForumTestCase):
         self.reply(1, "Balasan memicu notifikasi", client=self.client_for(2))
         html = self.get("/forum/", client=self.client_for(1))
         self.assertNotIn(XSS, html)
-        self.assertIn("membalas thread Anda", html)
+        self.assertIn("membalas topik Anda", html)
 
     def test_xss_payload_stored_verbatim_not_mangled(self):
         self.as_user(1)
-        self.new_thread(title=f"Judul {XSS} ok", body=f"Isi thread {XSS} cukup panjang")
+        self.new_thread(title=f"Judul {XSS} ok", body=f"Isi topik {XSS} cukup panjang")
         row = self.sql("SELECT title, body FROM threads ORDER BY id DESC LIMIT 1")[0]
         self.assertIn(XSS, row[0])                                   # disimpan apa adanya; dilindungi saat dicetak
         self.assertIn(XSS, row[1])
@@ -1025,7 +1025,7 @@ class SecurityTests(ForumTestCase):
 class NavigationAndIntegrationTests(ForumTestCase):
     def test_breadcrumb_for_detail(self):
         html = self.get("/forum/thread/1")
-        self.assertIn("Thread Milik Demo", html)
+        self.assertIn("Topik Milik Demo", html)
         self.assertRegex(html, r'data-breadcrumb')
 
     def test_breadcrumb_and_back_for_edit_goes_to_thread(self):
@@ -1037,7 +1037,7 @@ class NavigationAndIntegrationTests(ForumTestCase):
     def test_tabs_are_present_and_current(self):
         html = self.get("/forum/")
         self.assertRegex(html, r'href="/forum/"\s+class="fm-nav-link is-active"')
-        self.assertIn("Thread Saya", html)
+        self.assertIn("Topik Saya", html)
         self.assertRegex(self.get("/forum/pengaturan", client=self.client_for(1)),
                          r'href="/forum/pengaturan"\s+class="fm-nav-link is-active"')
 
@@ -1051,7 +1051,7 @@ class NavigationAndIntegrationTests(ForumTestCase):
         self.reply(1, "Balasan untuk label", client=owner)
         self.post("/forum/pengaturan", {"profile_privacy": "public", "notify_reply": "1"}, client=owner)
         html = self.get("/infosys/log", client=owner)
-        self.assertIn("Balas thread", html)
+        self.assertIn("Balas topik", html)
         self.assertIn("Ubah pengaturan Forum", html)
 
     def test_accent_is_teal_in_css(self):

@@ -2,7 +2,7 @@
 {% from "_components/_icons.html" import icon %}
 {% block title %}{{ product.name }}{% endblock %}
 {% block module_content %}
-  <nav aria-label="Breadcrumb" class="mb-5 text-sm text-muted">
+  <nav aria-label="Jejak halaman" class="mb-5 text-sm text-muted">
     <a href="{{ url_for('ecommerce.index') }}" class="font-semibold underline underline-offset-2">Katalog</a>
     <span aria-hidden="true"> / </span><span aria-current="page">{{ product.name }}</span>
   </nav>
@@ -23,7 +23,7 @@
       <p class="ecommerce-price mt-4 text-2xl font-bold">{{ product.price|rupiah }}</p>
       <div class="mt-5 border-t border-line pt-5 text-muted">
         <h2 class="font-semibold text-ink">Tentang produk</h2>
-        <p class="mt-2 whitespace-pre-line">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajarmu.' }}</p>
+        <p class="mt-2 whitespace-pre-line">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajar Anda.' }}</p>
       </div>
       <div class="mt-auto pt-8">
         <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">

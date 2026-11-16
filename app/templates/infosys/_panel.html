@@ -7,7 +7,7 @@
 {% block module_content %}
 {% if current_user and tab %}
 <div class="cp-shell animate-fade-in">
-  <aside class="cp-side" aria-label="Menu Control Panel">
+  <aside class="cp-side" aria-label="Menu Akun Saya">
     <div class="cp-user dke-hide-mobile mb-3 flex items-center gap-3 rounded-xl border border-line bg-surface p-3">
       {{ avatar(current_user['full_name'], current_user['avatar_url'], 'h-11 w-11', 'text-base') }}
       <div class="min-w-0">
@@ -15,7 +15,7 @@
         <p class="truncate text-sm text-muted">{{ current_user['email'] }}</p>
       </div>
     </div>
-    <nav class="cp-tabs" aria-label="Tab Control Panel">
+    <nav class="cp-tabs" aria-label="Tab Akun Saya">
       {% for key, endpoint, label, ico in PANEL_TABS %}
         <a href="{{ url_for(endpoint) }}" class="cp-tab{{ ' is-active' if key == tab }}" {% if key == tab %}aria-current="page"{% endif %}>
           {{ icon(ico, 'h-5 w-5 flex-none') }}<span>{{ label }}</span>

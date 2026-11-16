@@ -107,7 +107,7 @@ class ElearningTests(unittest.TestCase):
 
     def test_unknown_level_falls_back_to_all_courses_with_note(self):
         html = self.client.get("/elearning/?level=ngawur").get_data(as_text=True)
-        self.assertIn("Filter level tidak dikenal", html)
+        self.assertIn("Filter tingkat tidak dikenal", html)
         self.assertIn("Desain Dasar", html)
         self.assertIn("Algoritma Lanjut", html)
 
@@ -115,7 +115,7 @@ class ElearningTests(unittest.TestCase):
         self.sql("DELETE FROM lessons WHERE course_id = 3")
         self.sql("DELETE FROM courses WHERE id = 3")
         html = self.client.get("/elearning/?level=lanjut").get_data(as_text=True)
-        self.assertIn("Belum ada kelas level lanjut", html)
+        self.assertIn("Belum ada kelas tingkat lanjut", html)
 
     def test_unpublished_course_is_hidden_and_not_found(self):
         self.sql("UPDATE courses SET is_published = 0 WHERE id = 1")
@@ -237,7 +237,7 @@ class ElearningTests(unittest.TestCase):
             self.assertIn(title, html)                              # sidebar daftar bab
         self.assertIn('href="/elearning/kelas/1/materi/2"', html)
         self.assertNotIn('rel="prev"', html)                        # materi pertama tak punya "sebelumnya"
-        self.assertIn("Tandai Selesai", html)
+        self.assertIn("Tandai selesai", html)
 
         middle = self.client.get("/elearning/kelas/1/materi/3").get_data(as_text=True)
         self.assertIn('rel="prev"', middle)

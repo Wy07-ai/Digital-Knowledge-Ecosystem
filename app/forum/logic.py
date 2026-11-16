@@ -23,9 +23,9 @@ SETTING_PRIVACY = "profile_privacy"
 SETTING_NOTIFY = "notify_reply"
 PRIVACY_CHOICES = ("public", "members", "private")
 PRIVACY_LABELS = {
-    "public": ("Publik", "Siapa pun, termasuk pengunjung yang belum masuk, dapat melihat profil Forum Anda."),
-    "members": ("Hanya anggota", "Hanya pengguna yang sudah masuk yang dapat melihat profil Forum Anda."),
-    "private": ("Privat", "Hanya Anda yang dapat melihat halaman profil Forum Anda."),
+    "public": ("Publik", "Siapa pun, termasuk pengunjung yang belum masuk, bisa melihat profil Forum Anda."),
+    "members": ("Hanya anggota", "Hanya pengguna yang sudah masuk yang bisa melihat profil Forum Anda."),
+    "private": ("Privat", "Hanya Anda yang bisa melihat halaman profil Forum Anda."),
 }
 DEFAULT_PRIVACY = "public"
 
@@ -62,7 +62,7 @@ def validate_thread(title, body, category_id, valid_category_ids):
     body = clean_text(body)
     errors = {}
     if not title:
-        errors["title"] = "Judul wajib diisi."
+        errors["title"] = "Judul belum diisi. Tulis judul yang jelas."
     elif len(title) < TITLE_MIN:
         errors["title"] = f"Judul terlalu pendek. Tulis minimal {TITLE_MIN} karakter."
     elif len(title) > TITLE_MAX:
@@ -77,7 +77,7 @@ def validate_thread(title, body, category_id, valid_category_ids):
         category_id = None
 
     if not body:
-        errors["body"] = "Isi thread wajib diisi."
+        errors["body"] = "Isi topik belum diisi. Jelaskan pertanyaan atau cerita Anda."
     elif len(body) < THREAD_BODY_MIN:
         errors["body"] = f"Isi terlalu pendek. Jelaskan minimal {THREAD_BODY_MIN} karakter agar mudah dijawab."
     elif len(body) > THREAD_BODY_MAX:
@@ -89,7 +89,7 @@ def validate_post(body):
     """Validasi isi balasan. Mengembalikan (isi_bersih, pesan_galat atau None)."""
     body = clean_text(body)
     if not body:
-        return body, "Balasan tidak boleh kosong."
+        return body, "Balasan belum diisi. Tulis balasan Anda."
     if len(body) < POST_MIN:
         return body, f"Balasan terlalu pendek. Tulis minimal {POST_MIN} karakter."
     if len(body) > POST_MAX:

@@ -10,15 +10,15 @@
   'use strict';
 
   var MSG = {
-    nameRequired: 'Nama lengkap wajib diisi.',
-    nameMax: 'Nama lengkap maksimal 100 karakter.',
-    bioMax: 'Bio maksimal 300 karakter.',
-    avatarInvalid: 'Tautan avatar belum valid. Gunakan alamat gambar yang diawali https://',
-    avatarMax: 'Tautan avatar maksimal 500 karakter.',
-    currentRequired: 'Kata sandi saat ini wajib diisi.',
+    nameRequired: 'Nama lengkap belum diisi. Tulis nama Anda.',
+    nameMax: 'Nama lengkap terlalu panjang. Maksimal 100 karakter.',
+    bioMax: 'Bio terlalu panjang. Maksimal 300 karakter.',
+    avatarInvalid: 'Tautan foto belum valid. Gunakan alamat gambar yang diawali https://',
+    avatarMax: 'Tautan foto terlalu panjang. Maksimal 500 karakter.',
+    currentRequired: 'Ketik kata sandi Anda saat ini.',
     passwordMin: 'Kata sandi minimal 8 karakter.',
-    passwordMax: 'Kata sandi maksimal 128 karakter.',
-    newSame: 'Kata sandi baru harus berbeda dari kata sandi saat ini.',
+    passwordMax: 'Kata sandi terlalu panjang. Maksimal 128 karakter.',
+    newSame: 'Kata sandi baru sama dengan yang lama. Pilih kata sandi yang berbeda.',
     confirm: 'Konfirmasi kata sandi baru belum sama. Ketik ulang kata sandi yang sama.',
     formInvalid: 'Periksa kembali isian yang ditandai.'
   };
