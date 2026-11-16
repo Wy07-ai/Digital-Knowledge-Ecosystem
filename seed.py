@@ -18,10 +18,13 @@ Sifat penting:
   * Kata sandi disimpan sebagai hash (werkzeug.security.generate_password_hash).
   * Semua waktu memakai jangkar tetap (ANCHOR) agar hasilnya deterministik.
 
-Kata sandi bawaan (ubah lewat variabel lingkungan sebelum seed pertama):
-    DKE_DEMO_PASSWORD    bawaan: Demo12345     (demo@dke.test)
-    DKE_ADMIN_PASSWORD   bawaan: Admin12345!   (admin@dke.test)
-Ganti kata sandi bawaan ini bila aplikasi diakses di luar komputer sendiri.
+Kata sandi akun (diisi lewat variabel lingkungan sebelum seed pertama):
+    DKE_ADMIN_PASSWORD   kata sandi admin@dke.test. TIDAK ADA nilai bawaan di repositori:
+                         bila kosong, seed.py membuat kata sandi acak dan mencetaknya SATU KALI
+                         di terminal saat akun admin dibuat (tidak disimpan di mana pun).
+    DKE_DEMO_PASSWORD    kata sandi demo@dke.test. Bila kosong dipakai Demo12345 (bawaan, tertulis
+                         di repositori) disertai peringatan: HANYA untuk komputer sendiri.
+Kata sandi akun yang sudah ada tidak pernah diubah; variabel di atas hanya berlaku saat akun dibuat.
 """
 import argparse
 import json
@@ -42,8 +45,11 @@ ANCHOR = datetime(2026, 11, 13, 9, 0, 0, tzinfo=timezone.utc)
 
 DEMO_EMAIL = "demo@dke.test"
 ADMIN_EMAIL = "admin@dke.test"
-DEMO_PASSWORD = os.environ.get("DKE_DEMO_PASSWORD", "Demo12345")
-ADMIN_PASSWORD = os.environ.get("DKE_ADMIN_PASSWORD", "Admin12345!")
+
+# Kata sandi bawaan akun demo. SENGAJA publik (tertulis di repositori dan README): hanya untuk komputer
+# sendiri. Akun admin tidak punya kata sandi bawaan (lihat resolve_passwords).
+DEMO_DEFAULT_PASSWORD = "Demo12345"
+ADMIN_RANDOM_BYTES = 16  # secrets.token_urlsafe(16) -> 22 karakter, ~128 bit
 
 # 23 tabel menurut Blueprint 3.2 (urutan: kelompok seperti di Blueprint).
 EXPECTED_TABLES = [
@@ -135,12 +141,13 @@ def apply_schema(conn):
 # ---------------------------------------------------------------------------
 # DATA: akun
 # ---------------------------------------------------------------------------
-# (email, nama, peran, bio, hari_lalu_dibuat, kata_sandi atau None = tidak dapat dipakai login)
+# (email, nama, peran, bio, hari_lalu_dibuat, kunci_kata_sandi)
+# kunci_kata_sandi: "admin" / "demo" (nilainya dari resolve_passwords) atau None = tidak dapat dipakai login
 USERS = [
     (ADMIN_EMAIL, "Admin DKE", "admin",
-     "Pengelola konten dan moderator Digital Knowledge Ecosystem.", 60, ADMIN_PASSWORD),
+     "Pengelola konten dan moderator Digital Knowledge Ecosystem.", 60, "admin"),
     (DEMO_EMAIL, "Pengguna Demo", "member",
-     "Akun contoh untuk mencoba seluruh modul DKE. Mahasiswa Teknik Informatika semester 3.", 14, DEMO_PASSWORD),
+     "Akun contoh untuk mencoba seluruh modul DKE. Mahasiswa Teknik Informatika semester 3.", 14, "demo"),
     ("budi@dke.test", "Budi Santoso", "member",
      "Mahasiswa semester 5, sedang belajar Flask dan basis data.", 45, None),
     ("citra@dke.test", "Citra Lestari", "member",
@@ -948,12 +955,39 @@ THREADS = [
 # ---------------------------------------------------------------------------
 # PENGISIAN DATA
 # ---------------------------------------------------------------------------
-def seed_users(conn):
-    """Buat akun bila belum ada. Akun yang sudah ada tidak diubah (termasuk kata sandinya)."""
+def resolve_passwords(environ=None):
+    """Tentukan kata sandi akun demo dan admin untuk seed ini.
+
+    Mengembalikan {"demo": (kata_sandi, sumber), "admin": (kata_sandi, sumber)} dengan sumber:
+      "env"     : dari DKE_DEMO_PASSWORD / DKE_ADMIN_PASSWORD (variabel kosong dianggap tidak diisi)
+      "default" : Demo12345, khusus demo (publik, hanya untuk lokal)
+      "random"  : dibuat acak, khusus admin (tidak ada kata sandi admin bawaan di repositori)
+    Nilai ini hanya dipakai bila akunnya benar-benar dibuat; akun yang sudah ada tidak disentuh.
+    """
+    environ = os.environ if environ is None else environ
+
+    def from_env(name):
+        raw = environ.get(name)
+        return raw if raw and raw.strip() else None
+
+    demo_env, admin_env = from_env("DKE_DEMO_PASSWORD"), from_env("DKE_ADMIN_PASSWORD")
+    return {
+        "demo": (demo_env, "env") if demo_env else (DEMO_DEFAULT_PASSWORD, "default"),
+        "admin": (admin_env, "env") if admin_env else (secrets.token_urlsafe(ADMIN_RANDOM_BYTES), "random"),
+    }
+
+
+def seed_users(conn, passwords=None):
+    """Buat akun bila belum ada. Akun yang sudah ada tidak diubah (termasuk kata sandinya).
+
+    passwords: hasil resolve_passwords(); None = ambil dari lingkungan.
+    """
+    passwords = resolve_passwords() if passwords is None else passwords
     ids, created = {}, set()
-    for email, name, role, bio, days_ago, password in USERS:
+    for email, name, role, bio, days_ago, password_key in USERS:
         row = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
         if row is None:
+            password = passwords[password_key][0] if password_key else None
             # Akun komunitas (password None) diberi hash acak yang tidak diketahui siapa pun,
             # sehingga tidak bisa dipakai login tetapi tetap valid sebagai baris users.
             pw_hash = generate_password_hash(password or secrets.token_urlsafe(24))
@@ -1272,6 +1306,50 @@ def print_row_counts(conn):
     print(f"  {'TOTAL'.ljust(width)}  {sum(r[1] for r in rows):>5}   ({len(rows)} tabel)")
 
 
+def print_account_report(passwords, created, out=None):
+    """Cetak ringkasan akun: kata sandi acak admin dicetak SATU KALI, dan hanya saat akun baru dibuat."""
+    out = sys.stdout if out is None else out
+
+    def say(text=""):
+        print(text, file=out)
+
+    say("\nAkun contoh:")
+
+    # --- admin ---
+    admin_pw, admin_src = passwords["admin"]
+    if ADMIN_EMAIL not in created:
+        say(f"  {ADMIN_EMAIL:<16} sudah ada; kata sandi tidak diubah"
+            + ("  (DKE_ADMIN_PASSWORD diabaikan)" if admin_src == "env" else ""))
+    elif admin_src == "env":
+        say(f"  {ADMIN_EMAIL:<16} akun baru dibuat; kata sandi dari DKE_ADMIN_PASSWORD (tidak dicetak)")
+    else:
+        say(f"  {ADMIN_EMAIL:<16} akun baru dibuat dengan kata sandi ACAK (DKE_ADMIN_PASSWORD tidak diisi):")
+        say()
+        say(f"      {admin_pw}")
+        say()
+        say("      Catat SEKARANG. Kata sandi ini hanya ditampilkan sekali dan tidak disimpan di mana pun.")
+        say("      Setelah masuk, ganti lewat Information System > Pengaturan Keamanan. Untuk memilih sendiri sejak")
+        say("      awal, bangun ulang database dengan DKE_ADMIN_PASSWORD terisi (hapus data lama):")
+        say("          export DKE_ADMIN_PASSWORD='<kata sandi pilihan Anda>' && python seed.py --reset")
+
+    # --- demo ---
+    demo_pw, demo_src = passwords["demo"]
+    if DEMO_EMAIL not in created:
+        say(f"  {DEMO_EMAIL:<16} sudah ada; kata sandi tidak diubah"
+            + ("  (DKE_DEMO_PASSWORD diabaikan)" if demo_src == "env" else ""))
+    elif demo_src == "env":
+        say(f"  {DEMO_EMAIL:<16} akun baru dibuat; kata sandi dari DKE_DEMO_PASSWORD (tidak dicetak)")
+    else:
+        say(f"  {DEMO_EMAIL:<16} akun baru dibuat; kata sandi: {demo_pw}")
+        say()
+        say("  PERINGATAN: kata sandi akun demo di atas BAWAAN dan tertulis di repositori/README (publik).")
+        say("  Pakai hanya di komputer sendiri. Bila aplikasi dapat dijangkau jaringan atau repo dipublikasikan,")
+        say("  isi DKE_DEMO_PASSWORD sebelum seed pertama, atau jangan pakai akun ini.")
+
+    say("  Akun komunitas (budi/citra/dewi/eko@dke.test) hanya untuk konten forum dan tidak dapat dipakai login.")
+    say()
+
+
 # ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
@@ -1293,7 +1371,8 @@ def main(argv=None):
         apply_schema(conn)
         print(f"{'Memperbarui' if existed and not args.reset else 'Membuat'} database: {args.db}")
 
-        users, created = seed_users(conn)
+        passwords = resolve_passwords()
+        users, created = seed_users(conn, passwords)
         cats = seed_categories(conn)
         courses = seed_courses(conn, cats)
         products = seed_products(conn, cats, courses)
@@ -1308,14 +1387,7 @@ def main(argv=None):
         print("Seed GAGAL; seluruh perubahan dibatalkan (ROLLBACK).", file=sys.stderr)
         raise
 
-    print("\nAkun contoh:")
-    for email, pw in ((DEMO_EMAIL, DEMO_PASSWORD), (ADMIN_EMAIL, ADMIN_PASSWORD)):
-        if email in created:
-            print(f"  {email:<16} kata sandi: {pw}   (akun baru dibuat)")
-        else:
-            print(f"  {email:<16} sudah ada; kata sandi tidak diubah")
-    print("  Akun komunitas (budi/citra/dewi/eko@dke.test) hanya untuk konten forum dan tidak dapat dipakai login.")
-    print()
+    print_account_report(passwords, created)
 
     failed = run_checks(conn)
     print_row_counts(conn)

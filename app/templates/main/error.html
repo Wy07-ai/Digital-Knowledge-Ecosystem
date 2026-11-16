@@ -1,0 +1,24 @@
+{# Halaman galat (Blueprint 5.5): 403, 404, 405, 500. Dirender oleh app/errors.py.
+   Variabel: error_status (kode), error_title, error_message. Mewarisi base.html, jadi Top-Bar, tema,
+   Dark Mode, dan Mobile View ikut bekerja. Breadcrumb/Kembali sengaja dikosongkan (halaman ini bukan
+   bagian hierarki app/navigation.py, dan tidak perlu didaftarkan sebagai node). Pesan hanya teks tetap:
+   detail galat tidak pernah dicetak di sini. #}
+{% extends "base.html" %}
+{% from '_components/_icons.html' import icon %}
+{% block title %}{{ error_title }}{% endblock %}
+{% block main_class %}max-w-2xl{% endblock %}
+{% block page_nav %}{% endblock %}
+{% block content %}
+  <section class="animate-fade-in mx-auto my-8 flex max-w-md flex-col items-center rounded-xl border border-line bg-surface px-6 py-10 text-center"
+           aria-labelledby="judul-galat" data-error-page="{{ error_status }}">
+    <span class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+      {{ icon('warning' if error_status == 500 else ('lock' if error_status == 403 else 'info'), 'h-8 w-8') }}
+    </span>
+    <p class="mt-4 text-5xl font-bold tracking-tight text-primary" aria-hidden="true">{{ error_status }}</p>
+    <h1 id="judul-galat" class="mt-2 text-xl font-semibold text-ink">{{ error_title }}</h1>
+    <p class="mt-2 text-muted">{{ error_message }}</p>
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-6">
+      {{ icon('arrow-left', 'h-5 w-5') }}<span>Kembali ke Beranda</span>
+    </a>
+  </section>
+{% endblock %}

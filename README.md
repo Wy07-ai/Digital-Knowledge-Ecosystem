@@ -13,7 +13,7 @@ autentikasi: **Information System, E-Commerce, E-Learning, E-Tutorial, Portal, F
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python seed.py        # membuat instance/dke.db, 23 tabel, data contoh, dan akun demo
+python seed.py        # membuat instance/dke.db, 23 tabel, data contoh, akun demo + admin (catat kata sandi admin yang dicetak)
 export DKE_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
 python run.py
 ```
@@ -88,13 +88,31 @@ Isi seed: kategori per modul, 6 produk (2 bertipe kursus, terhubung ke kursus le
 10 artikel (2 featured), 5 thread dengan 20 balasan (thread 3 sengaja berantai 4 tingkat untuk demo batas tampilan), serta data contoh untuk akun demo.
 Seed ditutup dengan pemeriksaan kewajaran data dan jumlah baris tiap tabel.
 
-| Akun  | Email            | Kata sandi bawaan |
-|-------|------------------|-------------------|
-| Demo  | demo@dke.test    | `Demo12345`       |
-| Admin | admin@dke.test   | `Admin12345!`     |
+| Akun  | Email            | Kata sandi |
+|-------|------------------|------------|
+| Demo  | demo@dke.test    | `Demo12345` bila `DKE_DEMO_PASSWORD` kosong (**bawaan publik, hanya untuk lokal**) |
+| Admin | admin@dke.test   | **tidak ada kata sandi bawaan**: dari `DKE_ADMIN_PASSWORD`, atau acak dan dicetak sekali di terminal |
 
-Ubah kata sandi bawaan dengan variabel lingkungan `DKE_DEMO_PASSWORD` / `DKE_ADMIN_PASSWORD`
-sebelum seed pertama. Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten forum dan tidak bisa dipakai login.
+**Akun admin.** Isi kata sandinya lewat variabel lingkungan sebelum seed pertama:
+
+```bash
+export DKE_ADMIN_PASSWORD='<kata sandi pilihan Anda>'      # PowerShell: $env:DKE_ADMIN_PASSWORD="<kata sandi pilihan Anda>"
+python seed.py
+```
+
+Bila `DKE_ADMIN_PASSWORD` kosong, `seed.py` tetap berhasil dan membuat kata sandi **acak** untuk admin yang dicetak
+**satu kali** di terminal, tepat saat akun dibuat. Catat saat itu juga; kata sandi tidak disimpan di mana pun dan tidak
+akan ditampilkan lagi. Setelah masuk, ganti lewat Information System > Pengaturan Keamanan. Lupa kata sandi admin dari
+seed acak: jalankan `python seed.py --reset` (menghapus semua data) dengan `DKE_ADMIN_PASSWORD` terisi.
+
+**Akun demo (peringatan).** `Demo12345` tertulis di repositori ini, jadi siapa pun bisa mencobanya. Pakai **hanya untuk
+lokal** di komputer sendiri; `seed.py` mencetak peringatan yang sama di terminal. Bila aplikasi dapat dijangkau jaringan
+atau repositori dipublikasikan, isi `DKE_DEMO_PASSWORD` sebelum seed pertama.
+
+`seed.py` aman dijalankan ulang: kata sandi akun yang sudah ada tidak pernah ditimpa, dan `DKE_ADMIN_PASSWORD` /
+`DKE_DEMO_PASSWORD` hanya berlaku saat akunnya dibuat (seed ulang menyebutkannya bila variabel itu diabaikan).
+Akun budi/citra/dewi/eko@dke.test hanya pelengkap konten forum dan tidak bisa dipakai login.
+Uji: `python -m unittest tests.test_seed`.
 
 ## E-Tutorial (aksen violet `#7C3AED`)
 
@@ -378,6 +396,20 @@ Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 - **Pengaturan per modul** memakai satu pola: `app/module_settings.py` (`get_setting`, `set_setting`, `MSG_SAVE_FAILED`, `msg_saved`). Modul tidak boleh menulis SQL `module_settings` sendiri (dijaga tes). `set_setting(..., None)` menghapus; `commit=False` untuk transaksi gabungan. Setiap simpan tercatat di log aktivitas.
 - **Navigasi.** Setiap halaman GET modul harus punya node di `app/navigation.py` (dijaga `NavigationCoverageTest`); E-Commerce kini ikut.
 - Uji: `python -m unittest tests.test_integration`; panduan manual: `docs/UJI_MANUAL_INTEGRASI.md`; rincian perubahan: `docs/PERUBAHAN_INTEGRASI.md`.
+
+## Halaman galat (Blueprint 5.5)
+
+`app/errors.py` mendaftarkan `errorhandler` untuk **403, 404, 405, dan 500**.
+
+- **Halaman HTML**: `app/templates/main/error.html` mewarisi `base.html`, sehingga Top-Bar, tema, Dark Mode, dan Mobile View
+  tetap berlaku. Teks Bahasa Indonesia, tombol **Kembali ke Beranda**. Halaman ini bukan rute dan tidak muncul di
+  hierarki `app/navigation.py` (breadcrumb/Kembali sengaja kosong), jadi tidak memengaruhi `NavigationCoverageTest`.
+- **JSON untuk API**: jalur `/api/...` dan `/<modul>/api/...` (mis. `/elearning/api/materi/3/selesai`) menerima
+  `{"ok": false, "error": "...", "status": 404}`, bukan HTML. Kode HTTP lain (mis. 400) pada jalur API juga dijadikan JSON.
+  Respons JSON yang sudah dibuat endpoint sendiri tidak berubah.
+- **500**: hanya pesan umum. Detail galat tidak pernah dikirim ke pengguna (tetap tercatat di log server). Bila template
+  galat sendiri gagal dirender, dipakai halaman cadangan statis tanpa database.
+- Uji: `python -m unittest tests.test_errors`.
 
 ## Roadmap
 

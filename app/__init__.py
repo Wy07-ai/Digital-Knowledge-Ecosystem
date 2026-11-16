@@ -6,6 +6,7 @@ from importlib import import_module
 from flask import Flask, g, request, session
 
 from . import db
+from .errors import register_error_handlers
 from .navigation import build_nav
 from .security import default_security_config, init_security
 from .utils import csrf_token, current_login_url, notification_summary, safe_url_for
@@ -80,6 +81,7 @@ def create_app(test_config=None):
 
     _register_blueprints(app)
     _register_hooks(app)
+    register_error_handlers(app)
     init_security(app)
     return app
 
