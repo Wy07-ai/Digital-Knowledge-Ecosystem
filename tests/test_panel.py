@@ -101,7 +101,7 @@ class AksesTest(PanelTestCase):
     def test_sidebar_lima_tab_dan_tab_aktif(self):
         self.login()
         html = self.html("/infosys/log")
-        for label in ("Ringkasan", "Profil", "Log Aktivitas", "Statistik Lintas Modul", "Pengaturan Keamanan"):
+        for label in ("Ringkasan", "Profil", "Log Aktivitas", "Statistik Semua Aplikasi", "Pengaturan Keamanan"):
             self.assertIn(label, html)
         self.assertEqual(len(re.findall(r'class="cp-tab[ "]', html)), 5)
         sidebar = re.search(r'<nav class="cp-tabs".*?</nav>', html, re.S).group(0)
@@ -326,14 +326,14 @@ class LogAktivitasTest(PanelTestCase):
     def test_empty_state_filter_tanpa_hasil(self):
         self.add_logs(1, 2, "forum")
         html = self.html("/infosys/log?modul=portal")
-        self.assertIn("Belum ada aktivitas di modul ini", html)
+        self.assertIn("Belum ada aktivitas di aplikasi ini", html)
         self.assertIn("Tampilkan semua", html)
 
     def test_filter_tak_dikenal_diabaikan_aman(self):
         self.add_logs(1, 2, "forum")
         for bad in ("hacker", "forum' OR '1'='1", "'; DROP TABLE users;--"):
             html = self.client.get("/infosys/log", query_string={"modul": bad}).get_data(as_text=True)
-            self.assertIn("Filter modul tidak dikenal", html)
+            self.assertIn("Filter aplikasi tidak dikenal", html)
             self.assertIn("dari 2 aktivitas", html)
         self.assertEqual(self.sql("SELECT COUNT(*) AS n FROM users")[0]["n"], 2)
 

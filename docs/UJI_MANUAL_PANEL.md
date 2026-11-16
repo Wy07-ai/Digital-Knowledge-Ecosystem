@@ -14,9 +14,9 @@ Prasyarat: `python seed.py --reset && python run.py` (kunci sesi: lihat README, 
 | 8 | Ganti kata sandi: baru = lama / kurang 8 karakter / konfirmasi beda | Pesan inline sesuai tiap kasus |
 | 9 | Salah 5 kali berturut-turut, lalu coba dengan sandi benar | Status 429 + toast "Terlalu banyak percobaan..." (kunci sampai kegagalan tertua melewati 10 menit). Kunci tetap berlaku setelah cookie dibuang; lihat `docs/UJI_MANUAL_AUTH.md` Skenario F |
 | 10 | Ganti kata sandi dengan benar | Toast hijau, tetap masuk, notifikasi muncul di lonceng, baris "Ubah kata sandi" di log |
-| 11 | Tab Log Aktivitas: pilih modul "Forum" | Tabel hanya baris Forum; tombol "Hapus filter" muncul; pilih modul tanpa data memberi empty state |
+| 11 | Tab Log Aktivitas: pilih aplikasi "Forum" | Tabel hanya baris Forum; tombol "Hapus filter" muncul; pilih aplikasi tanpa data memberi empty state |
 | 12 | Buat 11+ baris log (mis. berkali-kali login/logout) lalu buka halaman 2 | Paginasi "Menampilkan 11-N dari M", filter ikut terbawa di tautan |
-| 13 | Ubah URL jadi `?halaman=999` atau `?modul=ngawur` | Halaman terakhir ditampilkan / catatan "Filter modul tidak dikenal" |
+| 13 | Ubah URL jadi `?halaman=999` atau `?modul=ngawur` | Halaman terakhir ditampilkan / catatan "Filter aplikasi tidak dikenal" |
 | 14 | Tab Statistik: bandingkan dengan akun baru tanpa data | Demo: kartu terisi + progres kelas; akun baru: empty state "Belum ada statistik" |
 | 15 | Tab Pengaturan Keamanan | Login terakhir, total login, tabel riwayat login (baris terbaru berlencana "Terbaru") |
 | 16 | Masuk sebagai akun lain, coba `?user_id=1` di semua tab | Data tetap milik akun yang sedang login |

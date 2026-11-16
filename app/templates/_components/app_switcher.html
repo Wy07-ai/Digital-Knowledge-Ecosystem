@@ -7,13 +7,13 @@
 <div class="relative" data-popover>
   <button type="button" class="tb-btn" data-popover-toggle
           aria-haspopup="true" aria-expanded="false" aria-controls="app-switcher-panel"
-          aria-label="Pindah modul">
+          aria-label="Pindah aplikasi">
     {{ icon('grid9', 'h-6 w-6') }}
   </button>
 
   <div id="app-switcher-panel" data-popover-panel hidden
        class="popover-enter absolute left-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-line bg-surface p-3 text-ink shadow-xl">
-    <p class="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted">Pindah modul</p>
+    <p class="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted">Pindah aplikasi</p>
     <div class="grid grid-cols-3 gap-2">
       {% for m in MODULES %}
         {% set active = current_module and current_module.key == m.key %}
@@ -36,7 +36,7 @@
     </div>
     <a href="{{ url_for('main.index') }}" data-popover-item
        class="menu-item mt-2 border-t border-line text-sm font-medium" {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
-      {{ icon('grid9', 'h-4 w-4') }}<span>Semua modul (Beranda)</span>
+      {{ icon('grid9', 'h-4 w-4') }}<span>Semua aplikasi (Beranda)</span>
     </a>
   </div>
 </div>
