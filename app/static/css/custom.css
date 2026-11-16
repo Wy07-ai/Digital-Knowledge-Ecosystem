@@ -103,7 +103,20 @@ body {
 html[data-theme='light']  [data-theme-icon='light'],
 html[data-theme='dark']   [data-theme-icon='dark'],
 html[data-theme='system'] [data-theme-icon='system'] { display: block; }
-.theme-spin { animation: theme-spin 300ms ease-out; }
+.theme-spin { animation: theme-spin 500ms ease-in-out; }
+
+/* Transisi tema "circular reveal" (theme.js memakai View Transitions API).
+   Lingkaran dianimasikan lewat JS pada ::view-transition-new(root); di sini hanya dasar:
+   tanpa animasi bawaan (crossfade) dan tanpa blending, supaya tidak ada kedip. */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-group(root) { animation: none; }
+/* Selama transisi: matikan transisi CSS lain (warna tidak "menyusul") dan kunci tombol tema. */
+html[data-theme-animating] *,
+html[data-theme-animating] *::before,
+html[data-theme-animating] *::after { transition: none !important; }
+html[data-theme-animating] [data-theme-toggle],
+html[data-theme-animating] [data-theme-option] { pointer-events: none; }
 
 /* Item menu di dalam popover */
 .menu-item {
@@ -125,7 +138,7 @@ html[data-theme='system'] [data-theme-icon='system'] { display: block; }
 @keyframes slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes toast-in  { from { opacity: 0; transform: translateX(1.5rem); } to { opacity: 1; transform: translateX(0); } }
 @keyframes toast-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(1.5rem); } }
-@keyframes theme-spin { from { transform: rotate(-180deg); opacity: .3; } to { transform: rotate(0); opacity: 1; } }
+@keyframes theme-spin { from { transform: rotate(-180deg) scale(.5); opacity: 0; } to { transform: rotate(0) scale(1); opacity: 1; } }
 
 .animate-fade-in  { animation: fade-in 300ms ease-out backwards; }
 .animate-slide-up { animation: slide-up 300ms ease-out backwards; }
@@ -186,6 +199,9 @@ html[data-view='mobile'] #toast-root {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 
