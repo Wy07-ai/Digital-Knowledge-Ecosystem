@@ -8,6 +8,8 @@ Variabel lingkungan:
                     debugger Flask dapat menjalankan kode dari peramban. Dengan debug aktif,
                     DKE_SECRET_KEY boleh kosong (dipakai kunci bawaan khusus pengembangan).
     HOST, PORT      alamat dan port (bawaan 127.0.0.1:5000)
+    DKE_HTTPS=1     cookie sesi Secure (hanya bila dilayani lewat https://)
+    DKE_BEHIND_PROXY=1  percayai X-Forwarded-For/-Proto dari reverse proxy (DKE_PROXY_HOPS=jumlah proxy)
 """
 import os
 import sys

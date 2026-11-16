@@ -7,6 +7,7 @@ from flask import Flask, g, request, session
 
 from . import db
 from .navigation import build_nav
+from .security import default_security_config, init_security
 from .utils import csrf_token, current_login_url, notification_summary, safe_url_for
 
 # Kunci bawaan HANYA untuk pengembangan lokal (mode debug). Nilainya tertulis di repositori, jadi siapa pun
@@ -67,6 +68,8 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, "dke.db"),
         # Halaman uji komponen (/dev/ui-test). Matikan di produksi: DKE_UI_TEST=0
         UI_TEST_PAGE=os.environ.get("DKE_UI_TEST", "1") == "1",
+        # Cookie sesi, ProxyFix, dan header keamanan (lihat app/security.py): DKE_HTTPS, DKE_BEHIND_PROXY, DKE_PROXY_HOPS
+        **default_security_config(os.environ),
     )
     if test_config:
         app.config.update(test_config)
@@ -77,6 +80,7 @@ def create_app(test_config=None):
 
     _register_blueprints(app)
     _register_hooks(app)
+    init_security(app)
     return app
 
 

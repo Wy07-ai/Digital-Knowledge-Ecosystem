@@ -8,7 +8,8 @@ Dua kunci dihitung terpisah, dan salah satunya cukup untuk menolak:
   - per akun : `login_failed` per email (disimpan sebagai hash HMAC di kolom `detail`, jadi email
                tak dikenal tidak tersimpan mentah) atau `password_change_failed` per user_id;
   - per IP   : alamat `request.remote_addr`. Sengaja tidak membaca X-Forwarded-For karena header itu
-               bisa dipalsukan klien. Di belakang reverse proxy, IP yang terlihat adalah IP proxy.
+               bisa dipalsukan klien. Di belakang reverse proxy, nyalakan DKE_BEHIND_PROXY=1 (ProxyFix, lihat
+               app/security.py) agar remote_addr berisi IP klien, bukan IP proxy.
 
 Batas per IP lebih longgar daripada per akun supaya satu jaringan bersama (kampus, kantor) tidak
 terkunci hanya karena satu orang salah ketik. Semua nilai dapat diganti lewat `app.config`.
