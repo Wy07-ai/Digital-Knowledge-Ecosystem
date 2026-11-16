@@ -1,6 +1,6 @@
 # Uji manual Control Panel (UC-IS-04..08)
 
-Prasyarat: `python seed.py --reset && python run.py`, buka http://127.0.0.1:5000/infosys/ , masuk sebagai `demo@dke.test` / `Demo12345`.
+Prasyarat: `python seed.py --reset && python run.py` (kunci sesi: lihat README, bagian Menjalankan), buka http://127.0.0.1:5000/infosys/ , masuk sebagai `demo@dke.test` / `Demo12345`.
 
 | # | Langkah | Hasil yang diharapkan |
 |---|---------|-----------------------|
@@ -12,7 +12,7 @@ Prasyarat: `python seed.py --reset && python run.py`, buka http://127.0.0.1:5000
 | 6 | Simpan tanpa mengubah apa pun | Toast biru "Tidak ada perubahan untuk disimpan." |
 | 7 | Ganti kata sandi dengan sandi lama salah | Pesan inline di kolom "Kata sandi saat ini" + toast merah |
 | 8 | Ganti kata sandi: baru = lama / kurang 8 karakter / konfirmasi beda | Pesan inline sesuai tiap kasus |
-| 9 | Salah 5 kali berturut-turut, lalu coba dengan sandi benar | Toast "Terlalu banyak percobaan..." (kunci 5 menit) |
+| 9 | Salah 5 kali berturut-turut, lalu coba dengan sandi benar | Status 429 + toast "Terlalu banyak percobaan..." (kunci sampai kegagalan tertua melewati 10 menit). Kunci tetap berlaku setelah cookie dibuang; lihat `docs/UJI_MANUAL_AUTH.md` Skenario F |
 | 10 | Ganti kata sandi dengan benar | Toast hijau, tetap masuk, notifikasi muncul di lonceng, baris "Ubah kata sandi" di log |
 | 11 | Tab Log Aktivitas: pilih modul "Forum" | Tabel hanya baris Forum; tombol "Hapus filter" muncul; pilih modul tanpa data memberi empty state |
 | 12 | Buat 11+ baris log (mis. berkali-kali login/logout) lalu buka halaman 2 | Paginasi "Menampilkan 11-N dari M", filter ikut terbawa di tautan |

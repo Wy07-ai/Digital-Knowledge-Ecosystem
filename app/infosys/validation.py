@@ -13,6 +13,7 @@ import re
 MSG_EMAIL_INVALID = "Email belum valid. Contoh: nama@email.com"
 MSG_PASSWORD_MIN = "Kata sandi minimal 8 karakter."
 MSG_LOGIN_FAILED = "Email atau kata sandi salah. Periksa kembali dan coba lagi."  # toast merah
+MSG_LOGIN_THROTTLED = "Terlalu banyak percobaan. Coba lagi dalam beberapa menit."  # status 429
 
 # --- Pesan tambahan, gaya sama --------------------------------------------
 MSG_NAME_REQUIRED = "Nama lengkap wajib diisi."

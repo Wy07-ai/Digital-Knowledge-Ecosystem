@@ -1,6 +1,6 @@
 # Uji manual E-Learning bagian 1 (UC-EL-01..04, 07)
 
-Prasyarat: `python seed.py --reset && python run.py`, buka http://127.0.0.1:5000/elearning/ .
+Prasyarat: `python seed.py --reset && python run.py` (kunci sesi: lihat README, bagian Menjalankan), buka http://127.0.0.1:5000/elearning/ .
 Akun: `demo@dke.test` / `Demo12345` (sudah terdaftar di kelas gratis "Prinsip Desain Antarmuka", 2 dari 5 materi).
 
 | # | Langkah | Hasil yang diharapkan |

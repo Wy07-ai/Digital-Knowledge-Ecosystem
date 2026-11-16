@@ -14,10 +14,42 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python seed.py        # membuat instance/dke.db, 23 tabel, data contoh, dan akun demo
+export DKE_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
 python run.py
 ```
 
-Buka http://127.0.0.1:5000. Variabel opsional: `DKE_SECRET_KEY`, `FLASK_DEBUG`, `HOST`, `PORT`.
+Windows PowerShell:
+
+```powershell
+$env:DKE_SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
+python run.py
+```
+
+Buka http://127.0.0.1:5000.
+
+**Kunci sesi (`DKE_SECRET_KEY`) wajib diisi.** Kunci ini menandatangani cookie sesi; siapa pun yang tahu kuncinya bisa
+memalsukan cookie dan login sebagai pengguna mana pun. Bila mode debug mati (bawaan) dan `DKE_SECRET_KEY` kosong atau
+masih nilai bawaan lama, `python run.py` berhenti dengan pesan yang menjelaskan cara mengisinya, dan tidak menjalankan
+server. Simpan kunci di tempat aman (jangan di-commit) dan pakai kunci yang sama setiap kali aplikasi dijalankan ulang;
+mengganti kunci membuat semua sesi login berakhir. Berkas `.env` **tidak** dibaca otomatis oleh aplikasi ini.
+
+**Mode debug mati secara bawaan.** Debugger Flask dapat menjalankan kode dari peramban, jadi jangan menyalakannya pada
+aplikasi yang terjangkau jaringan. Untuk pengembangan di komputer sendiri:
+
+```bash
+FLASK_DEBUG=1 python run.py      # PowerShell: $env:FLASK_DEBUG="1"; python run.py
+```
+
+Dengan debug menyala, `DKE_SECRET_KEY` boleh kosong (dipakai kunci khusus pengembangan, disertai peringatan di terminal).
+`run.py` juga memberi peringatan bila debug menyala sementara `HOST` bukan alamat lokal.
+
+| Variabel | Bawaan | Fungsi |
+|----------|--------|--------|
+| `DKE_SECRET_KEY` | (tidak ada) | Kunci sesi. Wajib saat debug mati; hasilkan dengan `secrets.token_hex(32)` |
+| `FLASK_DEBUG` | `0` | `1` menyalakan mode debug (hanya untuk komputer sendiri) |
+| `HOST`, `PORT` | `127.0.0.1`, `5000` | Alamat dan port server pengembangan |
+
+Tes otomatis tidak terpengaruh: setiap tes memberi `SECRET_KEY` sendiri lewat `create_app(test_config)`.
 
 ## Database dan data contoh
 
@@ -136,11 +168,11 @@ Uji: `python -m unittest tests.test_quiz`; panduan manual: `docs/UJI_MANUAL_KUIS
 
 ```
 dke/
-├── run.py                  # titik masuk
+├── run.py                  # titik masuk (SECRET_KEY wajib saat debug mati)
 ├── requirements.txt
 ├── instance/               # dke.db dibuat di sini (tidak masuk Git)
 └── app/
-    ├── __init__.py         # create_app, MODULES, registrasi blueprint, hook, context processor
+    ├── __init__.py         # create_app (+ cek SECRET_KEY), MODULES, registrasi blueprint, hook, context processor
     ├── db.py               # get_db, close_db, init_app
     ├── utils.py            # login_required, log_activity, notify, slugify
     ├── main/               # Beranda, API pengaturan global (api.py), halaman uji
@@ -211,6 +243,35 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 - Kata sandi: `werkzeug.security.generate_password_hash`; kredensial salah memberi pesan sama untuk email tak dikenal dan kata sandi salah.
 - `next` hanya diterima bila jalur lokal (`utils.safe_next` memakai `is_safe_next`, menolak URL absolut, `//`, backslash, karakter kontrol, dan halaman login/register/logout).
 - Form dilindungi token CSRF per sesi (`utils.csrf_token` / `csrf_valid`); tombol Keluar memakai POST.
+- **Pembatas percobaan login** (`app/infosys/throttle.py`). Kegagalan login dicatat sebagai baris `activity_logs`
+  dengan `action = 'login_failed'` (tanpa tabel baru, skema tetap 23 tabel) lalu dihitung dalam jendela geser:
+  - Setelah **5 kegagalan dalam 10 menit untuk satu email**, `POST /infosys/login` ditolak dengan **status 429** dan pesan
+    *"Terlalu banyak percobaan. Coba lagi dalam beberapa menit."*, **walau kata sandinya benar**. Kunci pulih sendiri
+    begitu kegagalan tertua keluar dari jendela 10 menit.
+  - Ada hitungan kedua **per alamat IP** (20 kegagalan dalam 10 menit, untuk email apa pun). Batasnya lebih longgar supaya
+    jaringan bersama (kampus, kantor) tidak terkunci karena satu orang salah ketik.
+  - Hitungan ada di database, bukan di cookie, jadi membuang cookie atau memakai peramban lain tidak melewatinya.
+    Kegagalan satu email tidak mengunci email lain (selama batas IP belum tercapai).
+  - Pesan untuk email tak dikenal dan kata sandi salah tetap sama (401). Email tak dikenal juga dihitung dan dikunci
+    dengan cara yang sama, sehingga 429 tidak membocorkan email mana yang terdaftar. Hash tiruan tetap dijalankan agar
+    waktu respons seragam; percobaan yang sudah ditolak 429 tidak menjalankan hash sama sekali (hemat CPU).
+  - Yang dihitung hanya kata sandi salah atau email tak dikenal. Isian berformat salah (400), akun nonaktif (403), dan
+    percobaan yang ditolak 429 tidak dicatat dan tidak memperpanjang kunci.
+  - Email tidak disimpan mentah: kolom `detail` memuat hash HMAC (kunci = `SECRET_KEY`) sebagai kunci hitung. Baris milik
+    akun terdaftar terisi `user_id`-nya sehingga tampil di Log Aktivitas pemiliknya ("Gagal login"); baris email tak
+    dikenal berisi `user_id` NULL.
+  - Alamat IP diambil dari `request.remote_addr`; header `X-Forwarded-For` sengaja **tidak** dipercaya karena bisa
+    dipalsukan klien. Di belakang reverse proxy, atur proxy lebih dulu (mis. `werkzeug.middleware.proxy_fix.ProxyFix`
+    dengan jumlah proxy yang benar) agar IP yang terlihat adalah IP klien.
+  - Pembatas yang sama dipakai oleh form **Ganti kata sandi** (kunci akun = `user_id`, hitungan dari baris
+    `password_change_failed`), menggantikan penghitung berbasis sesi yang lama.
+  - Nilai dapat diubah lewat `app.config`: `LOGIN_MAX_FAILS` (5), `LOGIN_MAX_FAILS_PER_IP` (20),
+    `LOGIN_FAIL_WINDOW_SECONDS` (600).
+  - Keterbatasan: penyerang yang tahu email korban dapat membuat email itu terkunci sementara dengan sengaja gagal
+    login (jalan tengah yang umum untuk pembatas per akun). Untuk produksi, tambahkan rate-limit di tingkat server
+    (reverse proxy) sebagai lapisan kedua.
+  - Indeks `idx_activity_logs_action` (bukan tabel) ditambahkan ke `schema.sql` agar penghitungan tetap cepat. Pada
+    database lama, jalankan `python seed.py` (aman diulang) atau `python seed.py --reset`.
 - Tes otomatis: `python -m unittest discover -s tests -v` (autentikasi, Beranda, dan navigasi). Skenario uji manual: `docs/UJI_MANUAL_AUTH.md`.
 
 ## Beranda dan navigasi 3 level (Fase 1, Prompt 6)
@@ -269,20 +330,21 @@ paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` ba
 - **Data hanya milik pengguna yang login.** Id pengguna selalu diambil dari sesi (`g.user["id"]`), tidak pernah dari
   query string atau form. Semua kueri di `app/infosys/panel.py` memakai `WHERE user_id = ?`. Tes `tests/test_panel.py`
   memakai dua akun yang berbagi satu database untuk membuktikan tidak ada kebocoran (termasuk `?user_id=2`).
-- **Riwayat login memakai `activity_logs`** (`action = 'login'`), bukan tabel baru, supaya skema tetap 23 tabel sesuai Blueprint 3.3.
+- **Riwayat login memakai `activity_logs`** (`action = 'login'`; kegagalan: `login_failed`), bukan tabel baru, supaya skema tetap 23 tabel sesuai Blueprint 3.3.
   Skema tidak punya kolom user-agent, jadi yang ditampilkan waktu dan alamat IP.
 - **Setiap aksi form memberi toast** (`flash()` Flask atau `toast()` JS), dan **validasi inline** ada di server
   (`app/infosys/validation.py`) dan peramban (`static/js/panel.js`); aturannya harus sama. Form selalu `novalidate`,
   dilindungi token CSRF, dan kata sandi tidak pernah dikirim balik ke HTML.
-- **Ganti kata sandi:** kata sandi saat ini diverifikasi dengan hash; setelah 5 kali salah beruntun, form dikunci 5 menit
-  (penghitung di sesi, jadi ini pembatas ringan, bukan pengganti rate-limit di tingkat server). Berhasil atau gagal,
+- **Ganti kata sandi:** kata sandi saat ini diverifikasi dengan hash; setelah 5 kali salah dalam 10 menit, form ditolak
+  dengan status 429 (pembatas bersama dengan login, `app/infosys/throttle.py`, dihitung dari `activity_logs` per akun dan
+  per IP sehingga tidak bisa dilewati dengan membuang cookie; lihat bagian Autentikasi). Berhasil atau gagal,
   kejadiannya dicatat di `activity_logs`, dan keberhasilan juga membuat notifikasi.
 - **Empty state** ditangani per tab (log kosong, filter tanpa hasil, statistik nol semua, riwayat login kosong) memakai
   komponen `empty_state()`; bagian kecil di Ringkasan memakai pesan ringkas.
 - Filter `modul` yang tidak dikenal diabaikan (bukan error) dan nomor halaman dijepit ke rentang sah.
 - Waktu ditampilkan dalam WIB (UTC+7); database tetap menyimpan UTC ISO-8601.
 
-Tes otomatis: `python -m unittest discover -s tests -v` (400 tes, termasuk 62 tes Portal dan 108 tes Forum).
+Tes otomatis: `python -m unittest discover -s tests -v` (464 tes, termasuk 62 tes Portal, 108 tes Forum, dan 24 tes pembatas login).
 Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 
 ## Integrasi lintas modul (notifikasi, Smart Landing, statistik, pengaturan)

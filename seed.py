@@ -1323,7 +1323,7 @@ def main(argv=None):
     if failed:
         print(f"\n{failed} pemeriksaan GAGAL.", file=sys.stderr)
         return 1
-    print("\nSeed selesai. Jalankan aplikasi dengan: python run.py")
+    print("\nSeed selesai. Isi DKE_SECRET_KEY (lihat README, bagian Menjalankan), lalu jalankan: python run.py")
     return 0
 
 

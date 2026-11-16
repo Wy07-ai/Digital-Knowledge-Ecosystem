@@ -16,6 +16,7 @@ WIB = timezone(timedelta(hours=7))
 ACTION_LABELS = {
     "register": "Registrasi akun",
     "login": "Login",
+    "login_failed": "Gagal login",
     "logout": "Logout",
     "update_profile": "Ubah profil",
     "change_password": "Ubah kata sandi",

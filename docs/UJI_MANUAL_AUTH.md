@@ -1,6 +1,8 @@
 # Skenario Uji Manual: UC-IS-01 Registrasi, UC-IS-02 Login, UC-IS-03 Logout
 
-Persiapan (sekali): `python seed.py --reset` lalu `python run.py`, buka http://127.0.0.1:5000.
+Persiapan (sekali): `python seed.py --reset` lalu jalankan aplikasi, buka http://127.0.0.1:5000.
+Aplikasi menolak start tanpa kunci sesi saat debug mati, jadi isi `DKE_SECRET_KEY` lebih dulu (README, bagian Menjalankan),
+atau untuk uji lokal pakai `FLASK_DEBUG=1 python run.py` (PowerShell: `$env:FLASK_DEBUG="1"; python run.py`).
 Akun demo: `demo@dke.test` / `Demo12345`. Gunakan jendela biasa (bukan sesi yang sudah login).
 Periksa database kapan saja dengan:
 
@@ -41,7 +43,7 @@ Pesan yang diharapkan mengikuti Blueprint 5.5. Tes otomatis padanannya: `python 
 |---|---------|-----------------------|
 | C1 | Buka `/infosys/login`, isi `demo@dke.test` dan `salah12345`, tekan **Masuk**. | **Toast merah** di kanan atas: **Email atau kata sandi salah. Periksa kembali dan coba lagi.** Kursor kembali ke kolom **Kata sandi** (kosong); email tetap terisi. Tidak ada teks merah di bawah kolom (ini bukan galat format). |
 | C2 | Isi `tidakada@mail.test` dan `apasaja123`. | Pesan toast **sama persis** seperti C1 (tidak membocorkan apakah email terdaftar). |
-| C3 | Cek `activity_logs`. | Tidak ada baris `login` baru dari percobaan gagal. Top-Bar masih menampilkan **Masuk** (masih Guest). |
+| C3 | Cek `activity_logs`. | Tidak ada baris `login` baru dari percobaan gagal; yang tercatat adalah baris `login_failed` (satu per percobaan, tanpa email mentah di `detail`). Top-Bar masih menampilkan **Masuk** (masih Guest). |
 | C4 | Isi kata sandi benar `Demo12345`, tekan **Masuk**. | Masuk ke Beranda. Toast hijau *Selamat datang kembali, Demo.* Top-Bar menampilkan nama pengguna. |
 | C5 | Cek database: `SELECT last_login_at FROM users WHERE email='demo@dke.test';` dan `activity_logs`. | `last_login_at` terisi; ada baris `infosys | login | Login berhasil` untuk user tersebut. |
 
@@ -67,3 +69,28 @@ Halaman terlindungi yang tersedia saat ini: `/infosys/profil` (penampung UC-IS-0
 | E2 | Cek `activity_logs`. | Baris `infosys | logout | Logout` untuk user tersebut. |
 | E3 | Tekan tombol Kembali peramban, lalu muat ulang `/infosys/profil`. | Dialihkan ke login (sesi sudah hilang di server). |
 | E4 | Sudah login, ketik `/infosys/logout` di address bar. | Hanya kembali ke Beranda; **tidak** logout (keluar hanya lewat tombol, memakai POST + token CSRF). |
+
+## Skenario F. Pembatasan percobaan login dan ganti kata sandi (429)
+
+Aturan bawaan: **5 kegagalan dalam 10 menit per email** (dan 20 per IP) menolak percobaan berikutnya dengan **status 429**,
+walau kata sandinya benar. Hitungan berasal dari `activity_logs` (`login_failed`, `password_change_failed`), bukan cookie.
+Status HTTP terlihat di DevTools > Network. Mulai dari database segar (`python seed.py --reset`), lalu jalankan aplikasi ulang.
+
+| # | Langkah | Hasil yang diharapkan |
+|---|---------|-----------------------|
+| F1 | Di `/infosys/login`, masukkan `demo@dke.test` dengan kata sandi salah, 4 kali berturut-turut. | Setiap kali status 401 dan toast merah **Email atau kata sandi salah. Periksa kembali dan coba lagi.** |
+| F2 | Kata sandi salah untuk kelima kalinya. | Masih 401 dengan pesan yang sama. |
+| F3 | Masukkan kata sandi **benar** `Demo12345`. | **Status 429**, toast merah **Terlalu banyak percobaan. Coba lagi dalam beberapa menit.** Tidak masuk (Top-Bar tetap **Masuk**). |
+| F4 | Cek: `SELECT user_id,action,detail,ip_address FROM activity_logs WHERE action='login_failed';` | Tepat 5 baris (percobaan F3 yang ditolak tidak dicatat), `user_id` terisi, `detail` berisi `ref <hash>` tanpa alamat email. |
+| F5 | Hapus cookie situs (DevTools > Application > Cookies) atau buka jendela privat, lalu coba `demo@dke.test` / `Demo12345` lagi. | Tetap **429**. Membuang cookie tidak melewati batas. |
+| F6 | Di jendela yang sama, masuk dengan akun lain: `admin@dke.test` / `Admin12345!`. | Berhasil. Kegagalan satu email tidak mengunci email lain. |
+| F7 | Logout. Gagal 5 kali dengan `hantu@mail.test` (tidak terdaftar), lalu coba keenam kalinya. | 5 kali pertama 401 dengan pesan yang sama seperti F1; percobaan keenam **429** dengan pesan yang sama seperti F3. Status 429 tidak membedakan email terdaftar dan tidak. |
+| F8 | Percepat jendela waktu: `UPDATE activity_logs SET created_at = strftime('%Y-%m-%dT%H:%M:%S+00:00','now','-11 minutes') WHERE action='login_failed';` lalu login `demo@dke.test` / `Demo12345`. | Berhasil masuk (jendela 10 menit sudah lewat). Tanpa perintah SQL, tunggu 10 menit sejak kegagalan terakhir. |
+| F9 | Setelah masuk, buka **Profil**, ganti kata sandi dengan kata sandi saat ini yang salah, 5 kali. Lalu isi yang benar. | Status **429**, toast **Terlalu banyak percobaan. Tunggu beberapa menit, lalu coba lagi.** Kata sandi tidak berubah. |
+| F10 | Logout, login lagi (kata sandi lama benar, login memakai hitungan terpisah), buka Profil, coba ganti kata sandi dengan benar. | Tetap **429**. Kunci ganti kata sandi melekat pada akun, bukan pada cookie sesi. |
+| F11 | Percepat: `UPDATE activity_logs SET created_at = strftime('%Y-%m-%dT%H:%M:%S+00:00','now','-11 minutes') WHERE action='password_change_failed';` lalu ganti kata sandi dengan benar. | Berhasil (toast hijau). |
+| F12 | Buka **Log Aktivitas** sebagai Demo. | Baris **Gagal login** dan **Gagal ubah kata sandi** tampil di samping baris Login. |
+
+Batas per IP (20) dan perilaku header `X-Forwarded-For` (diabaikan) dicakup tes otomatis `tests/test_login_throttle.py`,
+karena sulit diuji dengan tangan. Batas dapat diubah lewat `app.config`: `LOGIN_MAX_FAILS`, `LOGIN_MAX_FAILS_PER_IP`,
+`LOGIN_FAIL_WINDOW_SECONDS`.

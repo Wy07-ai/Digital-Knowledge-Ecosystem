@@ -9,6 +9,27 @@ from . import db
 from .navigation import build_nav
 from .utils import csrf_token, current_login_url, notification_summary, safe_url_for
 
+# Kunci bawaan HANYA untuk pengembangan lokal (mode debug). Nilainya tertulis di repositori, jadi siapa pun
+# bisa memalsukan cookie sesi bila kunci ini dipakai di server yang terjangkau jaringan.
+DEV_SECRET_KEY = "dev-only-ganti-di-produksi"
+
+SECRET_KEY_HELP = """\
+SECRET_KEY belum aman: DKE_SECRET_KEY tidak diisi (atau masih nilai bawaan) padahal mode debug mati.
+Kunci ini menandatangani cookie sesi; siapa pun yang mengetahuinya bisa login sebagai pengguna mana pun.
+
+Buat kunci acak, lalu isi sebelum menjalankan aplikasi:
+    python -c "import secrets; print(secrets.token_hex(32))"
+    export DKE_SECRET_KEY=<hasil perintah di atas>      # PowerShell: $env:DKE_SECRET_KEY="<hasil>"
+    python run.py
+
+Hanya untuk pengembangan di komputer sendiri (kunci bawaan boleh, debugger aktif):
+    FLASK_DEBUG=1 python run.py                         # PowerShell: $env:FLASK_DEBUG="1"; python run.py"""
+
+
+class ConfigError(RuntimeError):
+    """Konfigurasi tidak aman atau tidak lengkap; aplikasi menolak start."""
+
+
 # Daftar 6 modul. Satu modul = satu Blueprint = satu folder template.
 # "key" sama dengan nama paket Python (app/<key>/) dan nama Blueprint.
 MODULES = [
@@ -41,14 +62,15 @@ NO_TRACK_ENDPOINTS = {"infosys.login", "infosys.register", "infosys.logout"}
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        # Ganti lewat variabel lingkungan DKE_SECRET_KEY saat dipakai sungguhan.
-        SECRET_KEY=os.environ.get("DKE_SECRET_KEY", "dev-only-ganti-di-produksi"),
+        # Wajib diisi lewat DKE_SECRET_KEY kecuali mode debug (lihat _check_secret_key).
+        SECRET_KEY=os.environ.get("DKE_SECRET_KEY", "").strip() or DEV_SECRET_KEY,
         DATABASE=os.path.join(app.instance_path, "dke.db"),
         # Halaman uji komponen (/dev/ui-test). Matikan di produksi: DKE_UI_TEST=0
         UI_TEST_PAGE=os.environ.get("DKE_UI_TEST", "1") == "1",
     )
     if test_config:
         app.config.update(test_config)
+    _check_secret_key(app)
 
     os.makedirs(app.instance_path, exist_ok=True)
     db.init_app(app)
@@ -56,6 +78,23 @@ def create_app(test_config=None):
     _register_blueprints(app)
     _register_hooks(app)
     return app
+
+
+def _check_secret_key(app):
+    """Tolak start bila mode debug mati dan SECRET_KEY kosong atau masih kunci bawaan.
+
+    Mode debug = app.debug (dari FLASK_DEBUG atau config DEBUG). Tes boleh memberi kunci sendiri
+    lewat test_config (mis. SECRET_KEY="test"), yang lolos karena bukan kunci bawaan.
+    """
+    key = app.config.get("SECRET_KEY")
+    if key and key != DEV_SECRET_KEY:
+        return
+    if not app.debug:
+        raise ConfigError(SECRET_KEY_HELP)
+    app.logger.warning(
+        "Mode debug memakai SECRET_KEY bawaan. Jangan jalankan begini di jaringan yang bisa dijangkau orang lain.")
+    if not key:
+        app.config["SECRET_KEY"] = DEV_SECRET_KEY
 
 
 def _register_blueprints(app):
