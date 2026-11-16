@@ -42,37 +42,15 @@
     })();
   </script>
 
-  {# 2. Inter (fallback system-ui) #}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-
-  {# 3. Tailwind v3 Play CDN + design token Blueprint 5.4 (nilai ada di custom.css) #}
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script nonce="{{ csp_nonce() }}">
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'] },
-          colors: {
-            page:    'rgb(var(--c-page) / <alpha-value>)',
-            surface: 'rgb(var(--c-surface) / <alpha-value>)',
-            ink:     'rgb(var(--c-ink) / <alpha-value>)',
-            muted:   'rgb(var(--c-muted) / <alpha-value>)',
-            line:    'rgb(var(--c-border) / <alpha-value>)',
-            primary: 'rgb(var(--c-primary) / <alpha-value>)',
-            'on-primary':   'rgb(var(--c-on-primary) / <alpha-value>)',
-            header:  'rgb(var(--c-header) / <alpha-value>)',
-            success: 'rgb(var(--c-success) / <alpha-value>)',
-            'success-fill': 'rgb(var(--c-success-fill) / <alpha-value>)'
-          }
-        }
-      }
-    };
-  </script>
+  {# 2. Tailwind v3 hasil build statis (npm run build:css; di-commit, tanpa Node saat dijalankan) +
+        Inter lokal (@font-face ada di tailwind.css). Tanpa CDN: tampil sama tanpa internet.
+        Design token Blueprint 5.4: nilai di custom.css, pemetaan kelas di tailwind.config.js. #}
+  <link rel="preload" href="{{ url_for('static', filename='fonts/inter-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
   {% block head_extra %}{% endblock %}
+  {# tailwind.css SENGAJA dimuat terakhir: Play CDN dulu menyisipkan <style> di akhir <head>, jadi urutan
+     kaskade (utilitas menang atas custom.css pada spesifisitas sama) harus tetap sama. #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}">
 
   <script defer src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/toast.js') }}"></script>

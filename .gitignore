@@ -1,3 +1,6 @@
+# Node (hanya untuk build CSS; hasil build app/static/css/tailwind.css DI-COMMIT)
+node_modules/
+
 # Python
 __pycache__/
 *.py[cod]

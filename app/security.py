@@ -14,11 +14,8 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 TRUE_VALUES = {"1", "true", "yes", "on"}
 
-# Sumber eksternal yang benar-benar dipakai aplikasi (lihat base.html, elearning.js, routes E-Learning):
-#   Tailwind Play CDN (skrip), Google Fonts (stylesheet + berkas font), embed video YouTube/Vimeo (iframe).
-TAILWIND_CDN = "https://cdn.tailwindcss.com"
-GOOGLE_FONTS_CSS = "https://fonts.googleapis.com"
-GOOGLE_FONTS_FILES = "https://fonts.gstatic.com"
+# Satu-satunya sumber eksternal yang masih dipakai: embed video YouTube/Vimeo (iframe, lihat routes E-Learning).
+# Tailwind dan font Inter sudah statis/lokal (app/static/css/tailwind.css, app/static/fonts), tanpa CDN.
 VIDEO_FRAME_HOSTS = ("https://www.youtube-nocookie.com", "https://player.vimeo.com")
 
 
@@ -62,18 +59,19 @@ def csp_nonce():
 def build_csp(nonce):
     """Susun nilai header Content-Security-Policy.
 
-    - script-src : hanya berkas sendiri, Tailwind CDN, dan skrip inline ber-nonce (tema anti-kedip,
-                   tailwind.config). Tanpa 'unsafe-inline' dan tanpa 'unsafe-eval'.
-    - style-src  : 'unsafe-inline' tetap perlu karena Tailwind Play CDN menyisipkan <style> saat runtime
-                   dan templat memakai atribut style="width: N%". Turunkan setelah Tailwind dibuat statis.
+    - script-src : hanya berkas sendiri dan skrip inline ber-nonce (tema anti-kedip).
+                   Tanpa 'unsafe-inline' dan tanpa 'unsafe-eval'.
+    - style-src  : 'unsafe-inline' tetap perlu hanya karena templat memakai atribut style="width: N%"
+                   (bukan lagi karena Tailwind: CSS-nya kini berkas statis).
+    - font-src   : hanya berkas sendiri (Inter lokal).
     - img-src    : gambar produk/avatar/sampul dapat berasal dari URL https mana pun (tersimpan di database).
     """
     frames = " ".join(VIDEO_FRAME_HOSTS)
     directives = [
         "default-src 'self'",
-        f"script-src 'self' 'nonce-{nonce}' {TAILWIND_CDN}",
-        f"style-src 'self' 'unsafe-inline' {GOOGLE_FONTS_CSS}",
-        f"font-src 'self' {GOOGLE_FONTS_FILES}",
+        f"script-src 'self' 'nonce-{nonce}'",
+        "style-src 'self' 'unsafe-inline'",
+        "font-src 'self'",
         "img-src 'self' data: https:",
         "media-src 'self' https:",
         f"frame-src {frames}",

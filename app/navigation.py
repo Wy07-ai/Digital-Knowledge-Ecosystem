@@ -105,6 +105,11 @@ node("infosys.profile", "Profil & Pengaturan", parent="infosys.index")
 node("infosys.activity", "Log Aktivitas", parent="infosys.index")
 node("infosys.stats", "Statistik Lintas Modul", parent="infosys.index")
 node("infosys.security", "Pengaturan Keamanan", parent="infosys.index")
+node("infosys.admin", "Admin", parent="infosys.index")
+node("infosys.admin_delete_thread", "Hapus Thread", parent="infosys.admin")
+node("infosys.admin_delete_post", "Hapus Balasan", parent="infosys.admin")
+node("infosys.admin_deactivate_user", "Nonaktifkan Akun", parent="infosys.admin")
+node("infosys.admin_activate_user", "Aktifkan Akun", parent="infosys.admin")
 
 # E-Commerce: E-Commerce > <nama produk>; E-Commerce > Keranjang > Checkout; E-Commerce > Pesanan Saya > <kode>
 node("ecommerce.product", _product_name, parent="ecommerce.index")

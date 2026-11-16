@@ -130,6 +130,9 @@ def _register_hooks(app):
             if user is None:  # akun sudah tidak ada -> anggap Guest
                 session.pop("user_id", None)
                 return
+            if not user["is_active"]:  # akun dinonaktifkan admin -> sesi tidak lagi berlaku (anggap Guest)
+                session.pop("user_id", None)
+                return
             g.user = user
             if request.endpoint != "main.index" and not session.get(LANDED_KEY):
                 session[LANDED_KEY] = True  # Member membuka halaman lain dulu: Beranda tidak dialihkan lagi

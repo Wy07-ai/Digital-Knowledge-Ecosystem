@@ -1,0 +1,18 @@
+{% extends "infosys/_panel.html" %}
+{% from "_components/_icons.html" import icon %}
+{% block title %}{{ title }}{% endblock %}
+{% block panel %}
+  <section class="max-w-2xl rounded-xl border border-line bg-surface p-5 shadow-sm sm:p-6" aria-labelledby="ad-confirm-title">
+    <h1 id="ad-confirm-title" class="text-2xl font-bold tracking-tight">{{ title }}</h1>
+    <p class="mt-1 text-muted">{{ lead }}</p>
+    <blockquote class="mt-4 break-words rounded-lg border-l-4 border-line bg-page px-4 py-3">{{ subject }}</blockquote>
+    <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-muted">
+      {% for n in notes %}<li>{{ n }}</li>{% endfor %}
+    </ul>
+    <form method="post" action="{{ action_url }}" class="mt-6 flex flex-wrap gap-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn {{ 'btn-danger' if danger else 'btn-primary' }}" data-admin-confirm>{{ confirm_label }}</button>
+      <a href="{{ cancel_url }}" class="btn btn-secondary">Batal</a>
+    </form>
+  </section>
+{% endblock %}

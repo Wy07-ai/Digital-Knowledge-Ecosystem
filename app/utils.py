@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from functools import wraps
 from urllib.parse import urlencode, urlsplit
 
-from flask import flash, g, redirect, request, session, url_for
+from flask import abort, flash, g, redirect, request, session, url_for
 from werkzeug.routing import BuildError
 
 from .db import get_db
@@ -86,6 +86,20 @@ def login_required(view):
         if g.get("user") is None:
             flash("Silakan masuk terlebih dahulu untuk mengakses halaman ini.", "warning")
             return redirect(_login_url(_origin_path()))
+        return view(*args, **kwargs)
+
+    return wrapped
+
+
+def admin_required(view):
+    """Khusus admin (users.role = 'admin'). Guest diarahkan ke login (seperti login_required);
+    Member biasa mendapat 403. Pemeriksaan ada di server, bukan hanya menyembunyikan tautan."""
+
+    @login_required
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if g.user["role"] != "admin":
+            abort(403)
         return view(*args, **kwargs)
 
     return wrapped

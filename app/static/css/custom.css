@@ -83,6 +83,8 @@ body {
   border-color: rgb(var(--c-border));
 }
 .btn-secondary:hover { background: rgb(var(--c-border) / .5); }
+.btn-danger { background: #B91C1C; color: #fff; }               /* aksi merusak (hapus/nonaktifkan) */
+.btn-danger:hover { background: #991B1B; }
 
 /* Tombol di Top-Bar (latar Deep Blue, teks putih) */
 .tb-btn {

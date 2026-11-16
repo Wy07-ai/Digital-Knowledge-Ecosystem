@@ -5,7 +5,7 @@ Tugas Besar IMK · Teknik Informatika, Universitas Bale Bandung.
 Platform web dengan 6 modul independen yang memakai satu database SQLite dan satu sistem
 autentikasi: **Information System, E-Commerce, E-Learning, E-Tutorial, Portal, Forum**.
 
-**Stack:** Python 3.10+, Flask (Blueprint), sqlite3, Jinja2, HTML5, Tailwind CDN, JavaScript biasa.
+**Stack:** Python 3.10+, Flask (Blueprint), sqlite3, Jinja2, HTML5, Tailwind CSS (hasil build statis, tanpa CDN), JavaScript biasa.
 
 ## Menjalankan
 
@@ -62,16 +62,67 @@ Nilai aktif untuk variabel bertanda `1`: `1`, `true`, `yes`, atau `on`. Nilai la
   pembatas login per IP tidak akurat. Proxy harus menimpa/menambahkan `X-Forwarded-For` dan `X-Forwarded-Proto`.
 - Setiap respons (halaman HTML, API JSON, berkas statis, redirect, galat) membawa `X-Content-Type-Options: nosniff`,
   `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, dan `Content-Security-Policy`.
-- CSP mengizinkan hanya sumber yang dipakai: skrip dari berkas sendiri + Tailwind CDN + skrip inline ber-`nonce`,
-  stylesheet Google Fonts, berkas font `fonts.gstatic.com`, iframe YouTube (`youtube-nocookie.com`) dan Vimeo,
-  gambar `https:`/`data:`, `connect-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`.
+- CSP mengizinkan hanya sumber yang dipakai: skrip dari berkas sendiri + skrip inline ber-`nonce` (hanya skrip tema
+  anti-kedip), stylesheet dan font dari berkas sendiri (Tailwind dan Inter lokal, **tanpa CDN**), iframe YouTube
+  (`youtube-nocookie.com`) dan Vimeo, gambar `https:`/`data:`, `connect-src 'self'`, `object-src 'none'`,
+  `frame-ancestors 'none'`.
 - **Skrip inline wajib memakai nonce**: tulis `<script nonce="{{ csp_nonce() }}">`. Nonce dibuat baru tiap permintaan.
   Atribut event (`onclick=...`) dan URL `javascript:` akan diblokir; pasang handler lewat berkas JS.
-- `style-src` masih memuat `'unsafe-inline'` karena Tailwind Play CDN menyisipkan `<style>` saat runtime dan beberapa
-  templat memakai `style="width: N%"`. Bila Tailwind dibuat statis, hapus Play CDN dari `script-src` dan perketat `style-src`.
+- `style-src` masih memuat `'unsafe-inline'`, kini hanya karena beberapa templat memakai `style="width: N%"`
+  (bukan lagi karena Tailwind). Menghapusnya butuh mengganti atribut `style` itu dengan kelas/variabel CSS.
 - Tes: `python -m unittest tests.test_security`.
 
 Tes otomatis tidak terpengaruh: setiap tes memberi `SECRET_KEY` sendiri lewat `create_app(test_config)`.
+
+## Build CSS Tailwind (Blueprint 6.7)
+
+Tailwind **tidak lagi dimuat dari CDN**. `app/static/css/tailwind.css` adalah hasil build yang **di-commit ke Git**,
+jadi menjalankan atau mendemokan aplikasi **tidak butuh Node maupun internet**.
+
+Node hanya diperlukan bila Anda menambah/mengubah kelas Tailwind di templat atau JS:
+
+```bash
+npm install                 # sekali saja: tailwindcss 3.4.17 + @fontsource/inter (devDependencies)
+npm run build:css           # = npx tailwindcss -c tailwind.config.js -i app/static/css/tailwind.src.css -o app/static/css/tailwind.css --minify
+npm run watch:css           # build ulang otomatis saat berkas berubah (pengembangan)
+npm run build:fonts         # hanya bila ingin menyalin ulang Inter ke app/static/fonts
+```
+
+- `tailwind.config.js`: `darkMode: 'class'`, token warna (nilainya di `custom.css`, variabel `--c-*`), dan `content` yang
+  memindai `app/templates/**/*.html`, `app/static/js/**/*.js`, dan `app/**/*.py`.
+- **Kelas yang dirangkai di JS/Python** (mis. `'bg-' + warna`) tidak terdeteksi pemindai. Tulis nama kelas **utuh**
+  (`'bg-red-600'`) atau daftarkan di `safelist` pada `tailwind.config.js`.
+- Setelah mengubah templat/JS dengan kelas baru, jalankan `npm run build:css` lalu **commit `tailwind.css`**.
+  Tes `tests.test_security.StaticAssetsTests` gagal bila build basi untuk kelas inti.
+- `tailwind.css` dimuat **setelah** `custom.css` dan blok `head_extra` di `base.html`. Urutan ini meniru Play CDN
+  (yang menyisipkan `<style>` di akhir `<head>`) agar kaskade tidak berubah. Jangan dipindah.
+- Font Inter (subset latin, 4 bobot) ada di `app/static/fonts/` dan dideklarasikan lewat `@font-face` di `tailwind.src.css`;
+  `font-display: swap` dengan cadangan `system-ui`.
+
+## Admin minimal (UC-AD-01 dan UC-AD-02, prioritas C)
+
+Hanya akun `users.role = 'admin'` (seed membuat `admin@dke.test`). Tab **Admin** muncul di sidebar Control Panel
+hanya untuk admin. Guest diarahkan ke login; Member biasa mendapat **403** di semua rute admin (GET maupun POST).
+
+| URL | Fungsi |
+|-----|--------|
+| `/infosys/admin?tab=thread\|balasan\|akun&halaman=N` | Daftar thread, balasan, dan akun (10 per halaman) |
+| `/infosys/admin/thread/<id>/hapus` | GET konfirmasi, POST hapus thread (balasannya ikut terhapus) |
+| `/infosys/admin/balasan/<id>/hapus` | GET konfirmasi, POST hapus balasan (anak naik satu tingkat; solusi dihapus -> thread belum terjawab) |
+| `/infosys/admin/akun/<id>/nonaktifkan` dan `/aktifkan` | GET konfirmasi, POST ubah `users.is_active` |
+
+- Setiap POST memeriksa token CSRF dan dilakukan dalam satu transaksi.
+- Setiap aksi dicatat di `activity_logs` (`user_id` = admin, `module_key = 'infosys'`) dengan action `admin_delete_thread`,
+  `admin_delete_reply`, `admin_deactivate_user`, `admin_activate_user`; tampil di Log Aktivitas admin.
+- Akun nonaktif tidak bisa login, dan **sesi yang sedang berjalan langsung tidak berlaku** (dicek tiap permintaan di
+  `load_user_and_settings`).
+- Admin tidak bisa menonaktifkan dirinya sendiri maupun admin lain (tidak ada jalur kunci-keluar).
+- **Batasan yang disengaja** (untuk responsi): cakupan "kelola konten" dibatasi pada *menghapus* konten Forum; tidak ada
+  tambah/ubah konten Portal, E-Learning, E-Tutorial, atau katalog E-Commerce lewat UI admin (diisi lewat `seed.py`).
+  Tidak ada pengelolaan peran (tak ada UI mengangkat/menurunkan admin) dan tidak ada notifikasi ke penulis yang kontennya
+  dihapus. Forum tetap menolak admin mengubah/menghapus balasan orang lain lewat rute Forum; moderasi hanya lewat halaman
+  ini agar selalu tercatat.
+- Tes: `python -m unittest tests.test_admin`. Uji manual: `docs/UJI_MANUAL_ADMIN.md`.
 
 ## Database dan data contoh
 
@@ -210,6 +261,7 @@ Uji: `python -m unittest tests.test_quiz`; panduan manual: `docs/UJI_MANUAL_KUIS
 dke/
 ├── run.py                  # titik masuk (SECRET_KEY wajib saat debug mati)
 ├── requirements.txt
+├── package.json, tailwind.config.js, scripts/   # HANYA untuk build CSS (Node tidak perlu saat menjalankan)
 ├── instance/               # dke.db dibuat di sini (tidak masuk Git)
 └── app/
     ├── __init__.py         # create_app (+ cek SECRET_KEY), MODULES, registrasi blueprint, hook, context processor
@@ -219,14 +271,18 @@ dke/
     ├── main/               # Beranda, API pengaturan global (api.py), halaman uji
     ├── infosys/ ecommerce/ elearning/ etutorial/ portal/ forum/
     │   ├── __init__.py     # Blueprint
-    │   └── routes.py       # rute modul
+    │   ├── routes.py       # rute modul
+    │   └── admin.py        # (khusus infosys) halaman admin minimal, UC-AD-01/02
     ├── templates/
-    │   ├── base.html       # Tailwind CDN, tema anti-kedip, Top-Bar sticky, toast-root
+    │   ├── base.html       # tailwind.css lokal, tema anti-kedip, Top-Bar sticky, toast-root
     │   ├── _components/    # topbar, app_switcher, breadcrumb, module_card, empty_state, _icons
     │   ├── main/
     │   └── <modul>/        # layout_<modul>.html + halaman modul
     └── static/
         ├── css/custom.css  # token Light/Dark, keyframes, Mobile View, reduced-motion
+        ├── css/tailwind.css      # HASIL BUILD (di-commit; jangan diedit tangan)
+        ├── css/tailwind.src.css  # sumber build: @font-face Inter + @tailwind
+        ├── fonts/          # Inter latin 400/500/600/700 (woff2)
         └── js/             # theme.js toast.js switcher.js app.js elearning.js quiz.js ...
 ```
 
@@ -268,8 +324,8 @@ karena Blueprint hanya mendefinisikan kolom `message`.
   Nilainya di `custom.css`, sehingga satu kelas berlaku untuk Light dan Dark.
 - **Halaman uji**: http://127.0.0.1:5000/dev/ui-test (semua jenis toast, flash() dari server, status tema).
   Matikan di produksi dengan `DKE_UI_TEST=0`.
-- Tailwind dimuat dari CDN (`cdn.tailwindcss.com/3.4.17`) dan font Inter dari Google Fonts, jadi
-  perlu internet saat demo; tanpa internet tampilan jatuh ke `system-ui` dan tanpa gaya Tailwind.
+- Tailwind dan font Inter **dilayani dari berkas sendiri** (lihat bagian "Build CSS Tailwind"), jadi tampilan sama
+  persis tanpa internet.
 
 ## Autentikasi (Fase 1, UC-IS-01..03)
 
@@ -414,4 +470,5 @@ Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 ## Roadmap
 
 Fase 0 skeleton (selesai) → schema.sql + seed.py (selesai) → Fase 1 fondasi tampilan dan autentikasi (selesai) →
-Fase 2: Control Panel Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum (selesai) → Fase 6 QA dan laporan.
+Fase 2: Control Panel Information System (selesai) → E-Commerce, E-Learning, E-Tutorial, Portal, Forum (selesai) →
+Tailwind statis/offline dan Admin minimal (selesai) → Fase 6 QA dan laporan.

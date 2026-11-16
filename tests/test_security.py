@@ -152,9 +152,12 @@ class SecurityHeaderTests(SecurityTestCase):
 
     def test_csp_memuat_sumber_yang_dipakai(self):
         csp = self.csp(self.client.get("/"))
-        self.assertIn("https://cdn.tailwindcss.com", csp["script-src"])
-        self.assertIn("https://fonts.googleapis.com", csp["style-src"])
-        self.assertIn("https://fonts.gstatic.com", csp["font-src"])
+        # Tanpa CDN: Tailwind dan Inter dilayani dari berkas sendiri (aplikasi tampil sama tanpa internet).
+        for directive in ("script-src", "style-src", "font-src"):
+            self.assertNotIn("cdn.tailwindcss.com", csp[directive])
+            self.assertNotIn("googleapis.com", csp[directive])
+            self.assertNotIn("gstatic.com", csp[directive])
+        self.assertEqual(csp["font-src"], "'self'")
         self.assertIn("https://www.youtube-nocookie.com", csp["frame-src"])
         self.assertIn("https://player.vimeo.com", csp["frame-src"])
         self.assertEqual(csp["frame-ancestors"], "'none'")
@@ -169,7 +172,7 @@ class SecurityHeaderTests(SecurityTestCase):
         html = r.get_data(as_text=True)
         inline = re.findall(r"<script(?![^>]*\bsrc=)([^>]*)>", html)
         executable = [a for a in inline if "application/json" not in a]
-        self.assertGreaterEqual(len(executable), 2)           # tema anti-kedip + tailwind.config
+        self.assertGreaterEqual(len(executable), 1)           # skrip tema anti-kedip
         for attrs in executable:
             self.assertIn(f'nonce="{nonce}"', attrs)
 
@@ -214,6 +217,48 @@ class SecurityHeaderTests(SecurityTestCase):
         self.assertTrue(embed["src"].startswith("https://www.youtube-nocookie.com/embed/"))
         embed = video_embed("https://vimeo.com/123456789")
         self.assertTrue(embed["src"].startswith("https://player.vimeo.com/"))
+
+
+class StaticAssetsTests(SecurityTestCase):
+    """Tailwind dan Inter dilayani lokal: tanpa internet tampilan tetap sama (Blueprint 6.7)."""
+
+    def setUp(self):
+        super().setUp()
+        self.client = make_app(self.db_path).test_client()
+
+    def test_halaman_tidak_memuat_sumber_eksternal_untuk_gaya_dan_skrip(self):
+        for path in ("/", "/infosys/login", "/forum/", "/portal/", "/ecommerce/", "/elearning/", "/etutorial/"):
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertNotIn("cdn.tailwindcss.com", html)
+                self.assertNotIn("fonts.googleapis.com", html)
+                self.assertNotIn("fonts.gstatic.com", html)
+                self.assertNotIn("tailwind.config", html)
+                self.assertIn("css/tailwind.css", html)
+
+    def test_tailwind_css_dan_font_tersedia_dan_dikomit(self):
+        r = self.client.get("/static/css/tailwind.css")
+        self.assertEqual(r.status_code, 200)
+        css = r.get_data(as_text=True)
+        r.close()
+        self.assertIn("@font-face", css)
+        # Token warna dan varian dark (darkMode: 'class') ikut terbangun.
+        for needle in (".bg-page", ".bg-surface", ".text-ink", ".border-line", ".bg-primary", ".dark\\:"):
+            self.assertIn(needle, css)
+        # Kelas responsif yang dipakai templat.
+        self.assertIn("@media(min-width:768px)", css.replace(" ", ""))
+        for w in (400, 500, 600, 700):
+            with self.client.get(f"/static/fonts/inter-latin-{w}-normal.woff2") as f:
+                self.assertEqual(f.status_code, 200)
+                self.assertGreater(len(f.get_data()), 1000)
+
+    def test_semua_kelas_tailwind_di_templat_dan_js_terbangun(self):
+        """Pindai kelas utilitas dari templat/JS (bukan hanya yang tampak di HTML terakhir) terhadap CSS hasil build."""
+        css = open(os.path.join(ROOT, "app", "static", "css", "tailwind.css"), encoding="utf-8").read()
+        # Kelas inti yang dipakai Top-Bar/kartu; bila build basi, tes ini gagal -> jalankan `npm run build:css`.
+        for cls in ("flex", "min-h-screen", "flex-col", "bg-page", "font-sans", "text-ink", "antialiased",
+                    "mx-auto", "max-w-6xl", "px-4", "py-6", "rounded-full", "text-primary", "bg-primary\\/10"):
+            self.assertIn("." + cls, css, f"kelas .{cls} tidak ada di tailwind.css (build basi?)")
 
 
 if __name__ == "__main__":

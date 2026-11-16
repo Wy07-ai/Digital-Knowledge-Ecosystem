@@ -1,0 +1,79 @@
+{% extends "infosys/_panel.html" %}
+{% from "_components/empty_state.html" import empty_state %}
+{% from "_components/_icons.html" import icon %}
+{% from "infosys/_panel_macros.html" import pagination with context %}
+{% block title %}Admin{% endblock %}
+{% block panel %}
+  <h1 class="text-3xl font-bold tracking-tight">Admin</h1>
+  <p class="mt-1 text-muted">Moderasi konten Forum dan pengelolaan akun. Setiap tindakan dicatat di Log Aktivitas Anda.</p>
+
+  <nav class="mt-5 flex flex-wrap gap-2" aria-label="Bagian admin">
+    {% for key, label in admin_tabs %}
+      <a href="{{ url_for('infosys.admin', tab=key if key != 'thread' else None) }}"
+         class="btn {{ 'btn-primary' if key == admin_tab else 'btn-secondary' }}" data-admin-tab="{{ key }}"
+         {% if key == admin_tab %}aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if not rows %}
+    {{ empty_state('Belum ada data', 'Tidak ada ' ~ noun ~ ' untuk ditampilkan.', 'Kembali ke Ringkasan', url_for('infosys.index'), 'inbox') }}
+  {% else %}
+    <div class="relative mt-4 overflow-x-auto rounded-xl border border-line bg-surface" data-admin-table="{{ admin_tab }}">
+      <table class="w-full min-w-[40rem] text-left text-sm">
+        <caption class="sr-only">Daftar {{ noun }}, halaman {{ pager.page }} dari {{ pager.pages }}</caption>
+        <thead class="border-b border-line bg-page text-muted">
+          {% if admin_tab == 'thread' %}
+            <tr><th scope="col" class="px-4 py-3 font-semibold">Judul</th><th scope="col" class="px-4 py-3 font-semibold">Penulis</th>
+                <th scope="col" class="px-4 py-3 font-semibold">Balasan</th><th scope="col" class="px-4 py-3 font-semibold">Dibuat</th>
+                <th scope="col" class="px-4 py-3 font-semibold"><span class="sr-only">Aksi</span></th></tr>
+          {% elif admin_tab == 'balasan' %}
+            <tr><th scope="col" class="px-4 py-3 font-semibold">Isi</th><th scope="col" class="px-4 py-3 font-semibold">Penulis</th>
+                <th scope="col" class="px-4 py-3 font-semibold">Thread</th><th scope="col" class="px-4 py-3 font-semibold">Dibuat</th>
+                <th scope="col" class="px-4 py-3 font-semibold"><span class="sr-only">Aksi</span></th></tr>
+          {% else %}
+            <tr><th scope="col" class="px-4 py-3 font-semibold">Nama</th><th scope="col" class="px-4 py-3 font-semibold">Email</th>
+                <th scope="col" class="px-4 py-3 font-semibold">Peran</th><th scope="col" class="px-4 py-3 font-semibold">Status</th>
+                <th scope="col" class="px-4 py-3 font-semibold"><span class="sr-only">Aksi</span></th></tr>
+          {% endif %}
+        </thead>
+        <tbody class="divide-y divide-line">
+          {% for r in rows %}
+            {% if admin_tab == 'thread' %}
+              <tr>
+                <td class="max-w-xs break-words px-4 py-3"><a href="{{ url_for('forum.thread', thread_id=r.id) }}" class="font-semibold underline underline-offset-2">{{ r.title }}</a>
+                  {% if r.category_name %}<span class="block text-xs text-muted">{{ r.category_name }}</span>{% endif %}</td>
+                <td class="px-4 py-3">{{ r.author_name }}</td>
+                <td class="px-4 py-3 tabular-nums">{{ r.reply_count }}</td>
+                <td class="whitespace-nowrap px-4 py-3 text-muted">{{ r.created_at|waktu }}</td>
+                <td class="px-4 py-3 text-right"><a href="{{ url_for('infosys.admin_delete_thread', thread_id=r.id) }}" class="btn btn-secondary" data-admin-delete>{{ icon('trash', 'h-4 w-4') }}<span>Hapus<span class="sr-only"> thread {{ r.title }}</span></span></a></td>
+              </tr>
+            {% elif admin_tab == 'balasan' %}
+              <tr>
+                <td class="max-w-xs break-words px-4 py-3">{{ r.excerpt }}</td>
+                <td class="px-4 py-3">{{ r.author_name }}</td>
+                <td class="max-w-[12rem] break-words px-4 py-3"><a href="{{ url_for('forum.thread', thread_id=r.thread_id) }}#balasan-{{ r.id }}" class="underline underline-offset-2">{{ r.thread_title }}</a></td>
+                <td class="whitespace-nowrap px-4 py-3 text-muted">{{ r.created_at|waktu }}</td>
+                <td class="px-4 py-3 text-right"><a href="{{ url_for('infosys.admin_delete_post', post_id=r.id) }}" class="btn btn-secondary" data-admin-delete>{{ icon('trash', 'h-4 w-4') }}<span>Hapus<span class="sr-only"> balasan #{{ r.id }}</span></span></a></td>
+              </tr>
+            {% else %}
+              <tr>
+                <td class="px-4 py-3 font-semibold">{{ r.full_name }}</td>
+                <td class="break-words px-4 py-3 text-muted">{{ r.email }}</td>
+                <td class="px-4 py-3">{{ 'Admin' if r.role == 'admin' else 'Member' }}</td>
+                <td class="px-4 py-3">{% if r.is_active %}<span class="font-semibold text-success">Aktif</span>{% else %}<span class="font-semibold text-red-700 dark:text-red-300">Nonaktif</span>{% endif %}</td>
+                <td class="px-4 py-3 text-right">
+                  {% if not r.is_active %}
+                    <a href="{{ url_for('infosys.admin_activate_user', user_id=r.id) }}" class="btn btn-secondary" data-admin-activate>Aktifkan<span class="sr-only"> akun {{ r.full_name }}</span></a>
+                  {% elif r.role != 'admin' %}
+                    <a href="{{ url_for('infosys.admin_deactivate_user', user_id=r.id) }}" class="btn btn-secondary" data-admin-deactivate>Nonaktifkan<span class="sr-only"> akun {{ r.full_name }}</span></a>
+                  {% else %}<span class="text-muted">&mdash;</span>{% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {{ pagination(pager, noun) }}
+  {% endif %}
+{% endblock %}

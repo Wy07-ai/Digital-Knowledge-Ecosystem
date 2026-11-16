@@ -21,6 +21,11 @@
           {{ icon(ico, 'h-5 w-5 flex-none') }}<span>{{ label }}</span>
         </a>
       {% endfor %}
+      {% if current_user['role'] == 'admin' %}
+        <a href="{{ url_for('infosys.admin') }}" class="cp-tab{{ ' is-active' if tab == 'admin' }}" {% if tab == 'admin' %}aria-current="page"{% endif %}>
+          {{ icon('lock', 'h-5 w-5 flex-none') }}<span>Admin</span>
+        </a>
+      {% endif %}
     </nav>
   </aside>
   <div class="cp-main">
