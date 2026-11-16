@@ -5,6 +5,8 @@
 <svg class="{{ cls }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 {%- if name == 'grid9' -%}
   {% for cy in (5, 12, 19) %}{% for cx in (5, 12, 19) %}<circle cx="{{ cx }}" cy="{{ cy }}" r="1.6" fill="currentColor" stroke="none"/>{% endfor %}{% endfor %}
+{%- elif name == 'home' -%}
+  <path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/>
 {%- elif name == 'infosys' -%}
   <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
 {%- elif name == 'ecommerce' -%}

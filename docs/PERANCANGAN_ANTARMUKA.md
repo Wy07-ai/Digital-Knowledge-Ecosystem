@@ -2,6 +2,28 @@
 
 Dokumen ini menjadi catatan desain antarmuka di repositori untuk Blueprint 5.4. Aturan implementasi berada di `app/static/css/custom.css`.
 
+## Token visual
+
+| Token | Nilai | Pemakaian |
+|---|---|---|
+| `--c-header-deep` | `19 39 85` (`#132755`) | Awal gradien Top-Bar dan hero |
+| `--c-header` | `30 58 138` (`#1E3A8A`) | Deep Blue ekosistem |
+| `--radius-card` | `1.25rem` | Hero, kartu Beranda, empty state |
+| `--radius-control` | `.875rem` | Tombol utama |
+| `--shadow-card` | Berlapis, lembut | Permukaan kartu dan empty state |
+| `--text-hero` | `clamp(2rem, 4vw, 3rem)` | Judul hero responsif |
+| `--text-page` | `clamp(1.75rem, 3vw, 2.25rem)` | Judul halaman |
+| `--text-section` | `1.25rem` | Judul bagian |
+
+Warna aksen kartu mengikuti warna tiap aplikasi; nama dan deskripsi tetap tertulis agar warna bukan satu-satunya pembeda. Hero memakai teks putih di atas Deep Blue, sedangkan latar dan teks isi mengikuti token Light/Dark yang sudah ada. Body tetap 16 px dengan line-height 1.6.
+
+## Polesan halaman
+
+- Hero Beranda memberi sambutan sesuai status Guest/Member, satu CTA utama, dan motif aplikasi dekoratif.
+- Ikon kartu Beranda memakai latar gradien warna aksen yang lembut; deskripsi aplikasi tampil dua baris.
+- Top-Bar menampilkan ikon Beranda dan ikon aplikasi aktif, serta menyamakan ukuran aksi Masuk/Daftar dengan gaya sekunder/primer.
+- Empty state memakai bidang ilustrasi berbasis SVG inline dan aksen modul dengan tetap mempertahankan judul, pesan, serta aksi yang jelas.
+
 ## Token gerak
 
 | Token | Nilai | Pemakaian |

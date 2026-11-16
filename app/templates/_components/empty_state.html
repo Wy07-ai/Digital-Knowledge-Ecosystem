@@ -4,8 +4,8 @@
      {{ empty_state('Keranjang masih kosong', 'Jelajahi katalog untuk mulai.', 'Lihat katalog', url_for('ecommerce.index')) }} #}
 {% from '_components/_icons.html' import icon %}
 {% macro empty_state(title, message=None, action_label=None, action_url=None, icon_name='inbox') -%}
-<section class="animate-fade-in mx-auto my-8 flex max-w-md flex-col items-center rounded-xl border border-dashed border-line bg-surface px-6 py-10 text-center">
-  <span class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+<section class="empty-state animate-fade-in mx-auto my-8 flex max-w-md flex-col items-center rounded-xl border border-line bg-surface px-6 py-10 text-center">
+  <span class="empty-state-visual" aria-hidden="true">
     {{ icon(icon_name, 'h-8 w-8') }}
   </span>
   <h2 class="mt-4 text-lg font-semibold text-ink">{{ title }}</h2>

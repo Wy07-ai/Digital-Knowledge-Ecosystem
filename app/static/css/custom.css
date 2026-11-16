@@ -31,6 +31,13 @@
   --c-success:     4 120 87;      /* #047857 teks sukses */
   --c-success-fill:16 185 129;    /* #10B981 isi/ikon sukses */
   --c-outer:       226 232 240;   /* latar di luar bingkai Mobile View */
+  --c-header-deep: 19 39 85;      /* deep navy untuk hero dan top-bar */
+  --radius-card:   1.25rem;
+  --radius-control:.875rem;
+  --shadow-card:   0 18px 38px -28px rgb(15 23 42 / .36), 0 3px 8px -5px rgb(15 23 42 / .16);
+  --text-hero:     clamp(2rem, 4vw, 3rem);
+  --text-page:     clamp(1.75rem, 3vw, 2.25rem);
+  --text-section:  1.25rem;
 }
 html.dark {
   --c-page:        15 23 42;      /* #0F172A */
@@ -73,7 +80,7 @@ body {
 /* ---------- 3. Komponen kecil ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-  min-height: 44px; padding: .5rem 1rem; border-radius: .5rem;
+  min-height: 44px; padding: .5rem 1rem; border-radius: var(--radius-control);
   font-weight: 600; line-height: 1.25; text-decoration: none; cursor: pointer;
   border: 1px solid transparent;
   transition: transform 150ms ease-out, background-color 150ms ease-out, opacity 150ms;
@@ -93,7 +100,7 @@ body {
 /* Tombol di Top-Bar (latar Deep Blue, teks putih) */
 .tb-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .375rem;
-  min-width: 44px; min-height: 44px; padding: 0 .5rem; border-radius: .5rem;
+  min-width: 44px; min-height: 44px; padding: 0 .5rem; border-radius: var(--radius-control);
   color: #fff; font-size: .875rem; font-weight: 500; text-decoration: none; cursor: pointer;
   transition: background-color 150ms ease-out, transform 150ms ease-out;
 }
@@ -101,6 +108,29 @@ body {
 .tb-btn:active { transform: scale(.95); }
 .tb-btn[aria-pressed='true'],
 .tb-btn[aria-expanded='true'] { background: rgb(255 255 255 / .22); }
+
+/* Hierarki Top-Bar: identitas DKE, ruang aktif, lalu aksi akun. */
+.topbar {
+  background: linear-gradient(112deg, rgb(var(--c-header-deep)) 0%, rgb(var(--c-header)) 68%, #24499a 100%);
+  box-shadow: 0 8px 22px -16px rgb(2 6 23 / .72);
+}
+.brand-link { gap: .5rem; padding-inline: .5rem .75rem; font-weight: 750; letter-spacing: -.025em; }
+.brand-mark {
+  display: inline-flex; width: 1.875rem; height: 1.875rem; align-items: center; justify-content: center;
+  border: 1px solid rgb(255 255 255 / .26); border-radius: .625rem;
+  background: rgb(255 255 255 / .14);
+}
+.topbar-current { border-color: rgb(255 255 255 / .24); }
+.topbar-module-icon {
+  display: inline-flex; width: 1.875rem; height: 1.875rem; flex: none; align-items: center; justify-content: center;
+  border: 1px solid rgb(255 255 255 / .24); border-radius: .625rem;
+  background: rgb(255 255 255 / .12); color: #fff;
+}
+.auth-action { min-height: 44px; margin-left: .25rem; padding-inline: .875rem; border: 1px solid transparent; font-weight: 650; }
+.auth-login { border-color: rgb(255 255 255 / .55); background: rgb(255 255 255 / .08); }
+.auth-login:hover { background: rgb(255 255 255 / .18); }
+.auth-register { background: #fff; color: #172e68; }
+.auth-register:hover { background: #e8edff; }
 
 /* Ikon tema dan tampilan mengikuti atribut <html>; tanpa JS, tanpa kedip */
 [data-theme-icon], [data-view-label-on] { display: none; }
@@ -261,31 +291,171 @@ html[data-view='mobile'] #toast-root {
 }
 
 /* ---------- 8. Kartu modul Beranda ----------
-   Hover lift 4 px + glow aksen modul, 200 ms (Blueprint 5.4). Hanya perangkat dengan hover
+   Hover lift + glow aksen modul. Hanya perangkat dengan hover
    sungguhan, supaya kartu tidak "menempel" naik setelah disentuh di ponsel. Aksen kartu
    dikirim lewat variabel --card-accent (lihat _components/module_card.html). */
 .launcher-card {
+  position: relative; isolation: isolate; overflow: hidden;
+  gap: .75rem; min-height: 13rem; border-radius: var(--radius-card);
+  background: linear-gradient(145deg, rgb(var(--c-surface)) 0%, rgb(var(--c-page)) 100%);
+  box-shadow: var(--shadow-card);
   transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+.launcher-card::before {
+  content: ""; position: absolute; z-index: 0; top: -4.25rem; right: -3.25rem;
+  width: 11rem; height: 11rem; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--card-accent) 18%, transparent), transparent 70%);
+}
+.launcher-card > * { position: relative; z-index: 1; }
+.module-card-heading { display: flex; align-items: center; gap: 1rem; }
+.module-card-icon {
+  display: inline-flex; width: 3.75rem; height: 3.75rem; flex: none; align-items: center; justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 24%, rgb(var(--c-border)));
+  border-radius: 1.125rem;
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--card-accent) 18%, rgb(var(--c-surface))),
+    color-mix(in srgb, var(--card-accent) 7%, rgb(var(--c-surface))));
+  color: rgb(var(--c-ink));
+  box-shadow: inset 0 1px rgb(255 255 255 / .56), 0 7px 15px -12px color-mix(in srgb, var(--card-accent) 70%, transparent);
+}
+.module-card-heading h3 {
+  margin: 0; color: rgb(var(--c-ink)); font-size: 1.125rem; font-weight: 750; line-height: 1.3; letter-spacing: -.02em;
+}
+.module-card-desc {
+  display: -webkit-box; min-height: 3em; overflow: hidden;
+  color: rgb(var(--c-muted)); font-size: .875rem; line-height: 1.5;
+  -webkit-box-orient: vertical; -webkit-line-clamp: 2;
 }
 @media (hover: hover) {
   .launcher-card:hover, .launcher-card:focus-within {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px -8px rgb(79 70 229 / .30), 0 4px 10px -4px rgb(0 0 0 / .12);   /* cadangan */
-    box-shadow: 0 12px 24px -8px color-mix(in srgb, var(--card-accent) 45%, transparent),
-                0 4px 10px -4px rgb(0 0 0 / .12);
+    box-shadow: 0 20px 34px -26px color-mix(in srgb, var(--card-accent) 66%, transparent),
+                0 9px 22px -15px rgb(15 23 42 / .28);
   }
 }
 .launcher-card:active { transform: translateY(-1px) scale(.99); }
 
 /* Kartu produk: hover lift tidak memakai utility "transition" (yang mencakup semua properti). */
 .product-grid > article {
+  border-color: rgb(var(--c-border)); border-radius: var(--radius-card); box-shadow: var(--shadow-card);
   transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
+.ecom-product-art { background: linear-gradient(135deg, #fff5cc, #fce7a8 62%, #f8d77b); color: #78350f; }
+html.dark .ecom-product-art { background: linear-gradient(135deg, #422006, #713f12 62%, #854d0e); color: #fde68a; }
 @media (hover: hover) {
   .product-grid > article:hover, .product-grid > article:focus-within {
     transform: translateY(-3px);
     box-shadow: 0 12px 24px -10px rgb(180 83 9 / .30), 0 4px 10px -4px rgb(0 0 0 / .12);
   }
+
+  /* Hero Beranda: satu fokus visual, satu aksi yang jelas, dan motif aplikasi dekoratif. */
+  .home-hero {
+    position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(15rem, .65fr);
+    align-items: center; gap: 2rem; min-height: 17rem; overflow: hidden;
+    padding: clamp(1.5rem, 4vw, 3rem); border: 1px solid rgb(255 255 255 / .15);
+    border-radius: var(--radius-card);
+    background:
+      radial-gradient(ellipse at 12% 0%, rgb(255 255 255 / .12), transparent 34%),
+      linear-gradient(118deg, rgb(var(--c-header-deep)) 0%, rgb(var(--c-header)) 62%, #294eaa 100%);
+    color: #fff;
+    box-shadow: 0 22px 48px -36px rgb(15 23 42 / .72), 0 8px 20px -16px rgb(var(--c-header) / .42);
+  }
+  .home-hero::after {
+    content: ""; position: absolute; z-index: -1; right: -5rem; bottom: -10rem;
+    width: 25rem; height: 25rem; border: 1px solid rgb(255 255 255 / .12); border-radius: 50%;
+    box-shadow: 0 0 0 2.5rem rgb(255 255 255 / .035), 0 0 0 5rem rgb(255 255 255 / .025);
+  }
+  .home-hero-copy { position: relative; z-index: 1; max-width: 42rem; }
+  .home-eyebrow { margin: 0; color: #c7d2fe; font-size: .7rem; font-weight: 750; letter-spacing: .16em; line-height: 1.4; }
+  .home-hero h1 {
+    max-width: 18ch; margin: .65rem 0 0; color: #fff;
+    font-size: var(--text-hero); font-weight: 750; line-height: 1.08; letter-spacing: -.035em;
+  }
+  .home-hero-copy > p:not(.home-eyebrow) {
+    max-width: 54ch; margin: .875rem 0 0; color: rgb(255 255 255 / .86); font-size: 1rem; line-height: 1.65;
+  }
+  .home-hero-cta {
+    display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: .625rem;
+    margin-top: 1.375rem; padding: .625rem 1rem; border: 1px solid rgb(255 255 255 / .6); border-radius: var(--radius-control);
+    background: #fff; color: #172e68; font-weight: 700; line-height: 1.25; text-decoration: none;
+    box-shadow: 0 8px 18px -14px rgb(2 6 23 / .7);
+    transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+  }
+  .home-hero-cta:hover { transform: translateY(-2px); }
+  .home-hero-cta:active { transform: scale(.97); }
+  .home-orbit { position: relative; width: min(100%, 17rem); height: 12rem; justify-self: center; }
+  .home-orbit-ring {
+    position: absolute; inset: 1rem .25rem; border: 1px solid rgb(255 255 255 / .24); border-radius: 50%;
+    transform: rotate(-17deg);
+  }
+  .home-orbit-core {
+    position: absolute; top: 50%; left: 50%; display: flex; width: 5.5rem; height: 5.5rem;
+    align-items: center; justify-content: center; transform: translate(-50%, -50%);
+    border: 1px solid rgb(255 255 255 / .7); border-radius: 1.5rem;
+    background: #fff; color: #172e68; font-size: 1.25rem; font-weight: 800; letter-spacing: -.04em;
+    box-shadow: 0 16px 30px -20px rgb(2 6 23 / .78);
+  }
+  .home-orbit-node {
+    position: absolute; display: flex; width: 3.5rem; height: 3.5rem; align-items: center; justify-content: center;
+    border: 1px solid rgb(255 255 255 / .36); border-radius: 1.125rem; background: rgb(255 255 255 / .14);
+    color: #fff; box-shadow: 0 12px 22px -18px rgb(2 6 23 / .85); backdrop-filter: blur(8px);
+  }
+  .home-orbit-node-one { top: .125rem; left: 1rem; }
+  .home-orbit-node-two { top: .5rem; right: .25rem; }
+  .home-orbit-node-three { right: 1rem; bottom: -.125rem; }
+  .home-apps { margin-top: 2.5rem; }
+  .home-section-heading {
+    display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem;
+  }
+  .home-eyebrow-muted { color: rgb(var(--c-muted)); }
+  .home-section-heading h2 {
+    margin: .25rem 0 0; color: rgb(var(--c-ink)); font-size: var(--text-section); font-weight: 750; line-height: 1.3;
+  }
+  .page-title { color: rgb(var(--c-ink)); font-size: var(--text-page); line-height: 1.2; letter-spacing: -.03em; }
+  .home-section-note { color: rgb(var(--c-muted)); font-size: .875rem; }
+
+  /* Empty states use the module accent without relying on color to communicate the message. */
+  .empty-state {
+    border-radius: var(--radius-card);
+    background: linear-gradient(150deg, rgb(var(--c-surface)), rgb(var(--c-page)));
+    box-shadow: var(--shadow-card);
+  }
+  .empty-state-visual {
+    position: relative; display: flex; width: 7rem; height: 7rem; align-items: center; justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--accent, #4f46e5) 18%, rgb(var(--c-border)));
+    border-radius: 2rem;
+    background: radial-gradient(circle at 35% 25%,
+      color-mix(in srgb, var(--accent, #4f46e5) 22%, rgb(var(--c-surface))),
+      color-mix(in srgb, var(--accent, #4f46e5) 7%, rgb(var(--c-page))));
+    color: rgb(var(--c-ink));
+    box-shadow: inset 0 1px rgb(255 255 255 / .7), 0 12px 24px -20px color-mix(in srgb, var(--accent, #4f46e5) 70%, transparent);
+  }
+  .empty-state-visual::before, .empty-state-visual::after {
+    content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+  }
+  .empty-state-visual::before { top: .5rem; right: .625rem; width: .625rem; height: .625rem; background: var(--accent, #4f46e5); opacity: .48; }
+  .empty-state-visual::after { bottom: .75rem; left: .625rem; width: .375rem; height: .375rem; background: var(--accent, #4f46e5); opacity: .3; }
+  .empty-state h2 { font-size: 1.25rem; font-weight: 750; line-height: 1.3; }
+  .empty-state p { max-width: 36ch; line-height: 1.6; }
+
+  @media (max-width: 767px) {
+    .home-hero { grid-template-columns: minmax(0, 1fr) minmax(10rem, .65fr); gap: 1rem; }
+    .home-orbit { width: 12rem; }
+    .home-section-note { display: none; }
+  }
+  @media (max-width: 639px) {
+    .home-hero { display: block; min-height: 0; padding: 1.5rem; }
+    .home-orbit { display: none; }
+    .home-hero h1 { max-width: 16ch; }
+    .home-apps { margin-top: 2rem; }
+    .home-section-heading { margin-bottom: .75rem; }
+    .module-card-desc { min-height: 0; }
+  }
+
+  .card-grid .el-card, .card-grid .et-card, .card-grid .pt-card {
+    border-color: rgb(var(--c-border)); border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+  }
+  .fm-row:is(article) { border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 }
 
 /* ---------- 9. Control Panel Information System ----------

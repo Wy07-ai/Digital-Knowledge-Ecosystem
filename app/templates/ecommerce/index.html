@@ -8,7 +8,7 @@
     <p class="text-sm font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-300">Belajar dan berkarya</p>
     <div class="mt-1 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Katalog Produk</h1>
+        <h1 class="page-title font-bold tracking-tight">Katalog Produk</h1>
         <p class="mt-1 text-muted">Temukan kursus, e-book, dan aset digital untuk kebutuhanmu.</p>
       </div>
       <a href="{{ url_for('ecommerce.cart') if current_user else url_for('infosys.login', next=url_for('ecommerce.cart')) }}"
@@ -76,7 +76,7 @@
       {% for product in products %}
         <article class="flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
           <a href="{{ url_for('ecommerce.product', slug=product.slug) }}"
-             class="ecom-product-art flex h-44 items-center justify-center overflow-hidden bg-amber-100 text-amber-950"
+             class="ecom-product-art flex h-44 items-center justify-center overflow-hidden"
              aria-label="Lihat {{ product.name }}">
             {% if product.image_url %}
               <img src="{{ product.image_url }}" alt="{{ product.name }}" class="h-full w-full object-cover" loading="lazy">

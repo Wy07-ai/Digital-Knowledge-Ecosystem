@@ -4,38 +4,66 @@
 {% block title %}Beranda{% endblock %}
 {% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/launcher.js') }}"></script>{% endblock %}
 {% block content %}
-  {# Baris atas: sapaan di kiri, tombol Lanjutkan di kanan. Di mobile menjadi banner di atas kartu. #}
-  <div class="stack-mobile flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight">{% if first_name %}Halo, {{ first_name }}{% else %}Beranda{% endif %}</h1>
-      <p class="mt-1 text-muted">
-        {% if current_user %}Pilih aplikasi untuk mulai, atau lanjutkan yang terakhir.
-        {% else %}Satu akun, enam aplikasi. <a href="{{ login_url() }}" class="font-semibold text-primary underline">Masuk</a> untuk ringkasan pribadi.{% endif %}
-      </p>
+  <section class="home-hero" aria-labelledby="home-hero-title">
+    <div class="home-hero-copy">
+      {% if first_name %}
+        <p class="home-eyebrow">SELAMAT DATANG KEMBALI</p>
+        <h1 id="home-hero-title">Halo, {{ first_name }}.</h1>
+        <p>Pilih ruang belajarmu, atau lanjutkan aktivitas terakhir.</p>
+      {% else %}
+        <p class="home-eyebrow">EKOSISTEM BELAJAR DIGITAL</p>
+        <h1 id="home-hero-title">Belajar lebih mudah, saat semuanya terhubung.</h1>
+        <p>Satu akun, enam aplikasi. Temukan ruang baru untuk belajar dan berkarya.</p>
+      {% endif %}
+
+      {% if resume %}
+        <a href="{{ resume.url }}" class="home-hero-cta" data-resume
+           aria-label="Lanjutkan: {{ resume.labels|join(' ke ') }}">
+          {{ icon(resume.module.key, 'h-5 w-5 flex-none') }}
+          <span class="min-w-0 truncate">
+            <span class="font-bold">Lanjutkan:</span>
+            {% for label in resume.labels %}
+              {% if not loop.first %}<span aria-hidden="true"> &rsaquo; </span>{% endif %}
+              <span class="{{ 'dke-hide-mobile' if (not loop.first and not loop.last) }}">{{ label }}</span>
+            {% endfor %}
+          </span>
+          {{ icon('arrow-right', 'h-4 w-4 flex-none') }}
+        </a>
+      {% elif current_user %}
+        <a href="{{ url_for('elearning.index') }}" class="home-hero-cta">
+          {{ icon('elearning', 'h-5 w-5') }}Jelajahi kelas{{ icon('arrow-right', 'h-4 w-4') }}
+        </a>
+      {% else %}
+        <a href="{{ url_for('elearning.index') }}" class="home-hero-cta">
+          {{ icon('arrow-right', 'h-5 w-5') }}Mulai belajar
+        </a>
+      {% endif %}
     </div>
 
-    {% if resume %}
-      <a href="{{ resume.url }}" class="btn btn-primary min-w-0 justify-start text-left" data-resume
-         style="background: {{ resume.module.accent }}; color: #fff"
-         aria-label="Lanjutkan: {{ resume.labels|join(' ke ') }}">
-        {{ icon(resume.module.key, 'h-5 w-5 flex-none') }}
-        <span class="min-w-0 truncate">
-          <span class="font-bold">Lanjutkan:</span>
-          {% for label in resume.labels %}
-            {% if not loop.first %}<span aria-hidden="true"> &rsaquo; </span>{% endif %}
-            <span class="{{ 'dke-hide-mobile' if (not loop.first and not loop.last) }}">{{ label }}</span>
-          {% endfor %}
-        </span>
-      </a>
-    {% endif %}
-  </div>
+    <div class="home-orbit" aria-hidden="true">
+      <span class="home-orbit-ring"></span>
+      <span class="home-orbit-core">DKE</span>
+      <span class="home-orbit-node home-orbit-node-one">{{ icon('elearning', 'h-6 w-6') }}</span>
+      <span class="home-orbit-node home-orbit-node-two">{{ icon('portal', 'h-6 w-6') }}</span>
+      <span class="home-orbit-node home-orbit-node-three">{{ icon('forum', 'h-6 w-6') }}</span>
+    </div>
+  </section>
 
-  <div class="launcher-grid mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" data-launcher-grid>
+  <section class="home-apps" aria-labelledby="home-apps-title">
+    <div class="home-section-heading">
+      <div>
+        <p class="home-eyebrow home-eyebrow-muted">SATU PINTU, ENAM RUANG</p>
+        <h2 id="home-apps-title">Pilih perjalananmu</h2>
+      </div>
+      <span class="home-section-note">Mulai dari yang kamu butuhkan hari ini.</span>
+    </div>
+    <div class="launcher-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" data-launcher-grid>
     {% for m in MODULES %}
       {% set wd = widgets[m.key] %}
       {{ module_card(m, value=wd.value, label=wd.label, progress=wd.progress, empty=wd.empty, cta=wd.cta) }}
     {% endfor %}
-  </div>
+    </div>
+  </section>
 
   {% if current_user %}
     {# landing_mode: simpan lewat POST /api/settings/global (launcher.js) #}
