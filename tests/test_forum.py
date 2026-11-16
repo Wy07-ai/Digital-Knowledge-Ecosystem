@@ -231,7 +231,7 @@ class ForumTestCase(unittest.TestCase):
 
     @staticmethod
     def titles(html):
-        return [re.sub(r"\s+", " ", t).strip() for t in re.findall(r'<h3[^>]*>\s*<a[^>]*class="fm-link"[^>]*>(.*?)</a>', html, re.S)]
+        return [re.sub(r"\s+", " ", t).strip() for t in re.findall(r'<h3[^>]*>\s*<a[^>]*class="card-link"[^>]*>(.*?)</a>', html, re.S)]
 
     @staticmethod
     def levels(html):
@@ -252,7 +252,7 @@ class ListTests(ForumTestCase):
 
     def test_reply_counts_and_solved_badge(self):
         html = self.get("/forum/")
-        rows = re.findall(r'<article class="fm-row.*?</article>', html, re.S)
+        rows = re.findall(r'<article class="[^"]*\bfm-row\b[^"]*.*?</article>', html, re.S)
         by_title = {self.titles(r)[0]: r for r in rows}
         self.assertIn('<span class="fm-count-num">2</span>', by_title["Thread Solved"])
         self.assertIn('<span class="fm-count-num">1</span>', by_title["Thread Orang Lain"])
@@ -265,7 +265,7 @@ class ListTests(ForumTestCase):
         self.sql("INSERT INTO threads (id, category_id, user_id, title, body, created_at) VALUES (9, 3, 3, 'Tanpa Balasan', "
                  "'Isi tanpa balasan sama sekali.', '2026-02-01T00:00:00+00:00')")
         html = self.get("/forum/")
-        row = re.search(r'<article class="fm-row(?:(?!</article>).)*Tanpa Balasan.*?</article>', html, re.S).group(0)
+        row = re.search(r'<article class="[^"]*\bfm-row\b[^"]*(?:(?!</article>).)*Tanpa Balasan.*?</article>', html, re.S).group(0)
         self.assertIn('<span class="fm-count-num">0</span>', row)
 
     def test_category_filter_and_counts(self):

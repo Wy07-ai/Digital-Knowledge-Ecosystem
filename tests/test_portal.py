@@ -148,14 +148,14 @@ class PortalTests(unittest.TestCase):
     def test_pages_use_rose_accent_and_module_name(self):
         html = self.get("/portal/")
         self.assertIn("--accent: #E11D48", html)
-        self.assertIn("pt-card", html)
+        self.assertIn("card--clickable", html)
 
     # ---- UC-PT-02: chip kategori ----
     def test_category_chips_list_all_portal_categories_with_counts_only_for_portal(self):
         html = self.get("/portal/")
-        self.assertRegex(html, r"Semua\s*<span class=\"pt-count\">\(5\)</span>")
-        self.assertRegex(html, r"Teknologi\s*<span class=\"pt-count\">\(2\)</span>")
-        self.assertRegex(html, r"Kesehatan\s*<span class=\"pt-count\">\(0\)</span>")
+        self.assertRegex(html, r"Semua\s*<span class=\"chip-count\">\(5\)</span>")
+        self.assertRegex(html, r"Teknologi\s*<span class=\"chip-count\">\(2\)</span>")
+        self.assertRegex(html, r"Kesehatan\s*<span class=\"chip-count\">\(0\)</span>")
         self.assertNotIn("Python", html)  # kategori modul lain tidak bocor
 
     def test_filter_by_category_shows_only_that_category(self):
@@ -489,7 +489,7 @@ class PortalTests(unittest.TestCase):
         self.login()
         self.save_prefs(["karier"])
         html = self.get("/portal/")
-        chips = re.findall(r'class="pt-chip[^"]*"[^>]*>\s*(?:<span aria-hidden="true">&#9733;</span>)?\s*([A-Za-z]+)', html)
+        chips = re.findall(r'class="chip[^"]*"[^>]*>\s*(?:<span aria-hidden="true">&#9733;</span>)?\s*([A-Za-z]+)', html)
         self.assertEqual(chips[:3], ["Semua", "Karier", "Kesehatan"])
         self.assertIn("(favorit)", html)
 

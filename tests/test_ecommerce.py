@@ -143,7 +143,7 @@ class EcommerceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("Keranjang masih kosong", html)
-        self.assertRegex(html, r'<button type="button" class="btn ecom-button" disabled')
+        self.assertRegex(html, r'<button type="button" class="btn btn--primary" disabled')
 
     def test_member_add_update_remove_and_live_totals(self):
         self.login()

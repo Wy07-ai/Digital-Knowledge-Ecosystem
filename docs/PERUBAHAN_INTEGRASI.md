@@ -16,9 +16,12 @@
 - Kalimat CSRF punya dua versi: satu `utils.MSG_CSRF`.
 - Tab Pengaturan: kartu/lebar (E-Commerce, E-Learning), judul tab E-Commerce, label tombol Portal, kalimat sukses/gagal.
 
-## Sengaja dibiarkan
-- CSS tombol dasar terduplikasi (`.btn`, `.el-btn`, `.et-btn`, `.pt-btn`, `.fm-btn`, `.ecom-button`) dengan ukuran sama; hanya warna aksen yang berbeda. Menyatukannya butuh refaktor lebih besar.
-- `fm-btn:disabled` memakai kursor "progress" (status sibuk).
+## Komponen UI bersama
+- Tombol, kartu, badge, chip, dan field memakai dasar bersama di `app/static/css/custom.css`; aksen tiap aplikasi diatur melalui `--accent` dan token terkait pada `body[data-app-key]`.
+- Template E-Commerce, E-Learning, E-Tutorial, Portal, dan Forum telah dimigrasikan ke komponen bersama. Varian yang ditampilkan di `/dev/ui-test`: tombol primary/secondary/ghost/danger, kartu aksen/tepi/lift/clickable, badge semantik, chip, dan field.
+- Perilaku khusus dipertahankan: kursor `progress` pada tombol Forum nonaktif, keadaan selesai pada E-Learning, ukuran huruf pembaca E-Tutorial, serta target sentuh minimal 44 px.
+
+## Catatan lain
 - `quiz.js` memakai `window.confirm` hanya sebagai cadangan peramban tanpa `<dialog>`.
 - Empty state mini inline (garis putus) vs makro `empty_state` halaman penuh.
 

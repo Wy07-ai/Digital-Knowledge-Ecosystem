@@ -56,12 +56,12 @@
     <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5" data-controls hidden>
       <button type="button" class="btn btn-secondary" data-prev>{{ icon('arrow-left', 'h-4 w-4') }}<span>Sebelumnya</span></button>
       <div class="flex flex-wrap gap-3">
-        <button type="button" class="el-btn" data-next><span>Selanjutnya</span>{{ icon('chevron-right', 'h-4 w-4') }}</button>
-        <button type="submit" class="el-btn" data-finish hidden>{{ icon('check', 'h-5 w-5') }}<span>Kumpulkan</span></button>
+        <button type="button" class="btn btn--primary" data-next><span>Selanjutnya</span>{{ icon('chevron-right', 'h-4 w-4') }}</button>
+        <button type="submit" class="btn btn--primary" data-finish hidden>{{ icon('check', 'h-5 w-5') }}<span>Kumpulkan</span></button>
       </div>
     </div>
     <div class="mt-6 border-t border-line pt-5" data-fallback>
-      <button type="submit" class="el-btn">{{ icon('check', 'h-5 w-5') }}<span>Kumpulkan jawaban</span></button>
+      <button type="submit" class="btn btn--primary">{{ icon('check', 'h-5 w-5') }}<span>Kumpulkan jawaban</span></button>
     </div>
 
     {# Dialog konfirmasi bila ada soal kosong #}
@@ -71,7 +71,7 @@
       <p class="mt-2 text-sm text-muted">Soal yang tidak dijawab dihitung salah, dan kuis yang sudah dikumpulkan tidak bisa diubah.</p>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <button type="button" class="btn btn-secondary" data-confirm-back>Periksa lagi</button>
-        <button type="button" class="el-btn" data-confirm-submit>Kumpulkan sekarang</button>
+        <button type="button" class="btn btn--primary" data-confirm-submit>Kumpulkan sekarang</button>
       </div>
     </dialog>
   </form>

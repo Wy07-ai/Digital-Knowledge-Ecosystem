@@ -10,10 +10,10 @@
   </header>
 
   <nav class="mb-6 flex flex-wrap gap-2" aria-label="Filter level kelas">
-    <a href="{{ url_for('elearning.index') }}" class="el-pill {{ 'is-active' if not level }}"
+    <a href="{{ url_for('elearning.index') }}" class="chip {{ 'is-active' if not level }}"
        {% if not level %}aria-current="true"{% endif %}>Semua level <span class="el-count">({{ total_count }})</span></a>
     {% for key, label in levels %}
-      <a href="{{ url_for('elearning.index', level=key) }}" class="el-pill {{ 'is-active' if level == key }}"
+      <a href="{{ url_for('elearning.index', level=key) }}" class="chip {{ 'is-active' if level == key }}"
          {% if level == key %}aria-current="true"{% endif %}>{{ label }} <span class="el-count">({{ counts[key] }})</span></a>
     {% endfor %}
   </nav>

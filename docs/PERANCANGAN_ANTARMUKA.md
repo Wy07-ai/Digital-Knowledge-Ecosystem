@@ -9,13 +9,30 @@ Dokumen ini menjadi catatan desain antarmuka di repositori untuk Blueprint 5.4. 
 | `--c-header-deep` | `19 39 85` (`#132755`) | Awal gradien Top-Bar dan hero |
 | `--c-header` | `30 58 138` (`#1E3A8A`) | Deep Blue ekosistem |
 | `--radius-card` | `1.25rem` | Hero, kartu Beranda, empty state |
-| `--radius-control` | `.875rem` | Tombol utama |
+| `--radius-control` | `.875rem` | Kontrol Top-Bar |
+| Radius `.btn` | `.5rem` | Tombol bersama lintas aplikasi |
 | `--shadow-card` | Berlapis, lembut | Permukaan kartu dan empty state |
 | `--text-hero` | `clamp(2rem, 4vw, 3rem)` | Judul hero responsif |
 | `--text-page` | `clamp(1.75rem, 3vw, 2.25rem)` | Judul halaman |
 | `--text-section` | `1.25rem` | Judul bagian |
 
 Warna aksen kartu mengikuti warna tiap aplikasi; nama dan deskripsi tetap tertulis agar warna bukan satu-satunya pembeda. Hero memakai teks putih di atas Deep Blue, sedangkan latar dan teks isi mengikuti token Light/Dark yang sudah ada. Body tetap 16 px dengan line-height 1.6.
+
+## Komponen bersama
+
+Komponen dasar didefinisikan satu kali di `app/static/css/custom.css`; template memakai kelas bersama, sementara warna disetel lewat `--accent`, `--accent-action`, `--accent-action-hover`, `--accent-soft`, dan `--accent-text` pada `body[data-app-key]`.
+
+| Komponen | Kelas dasar dan varian |
+|---|---|
+| Tombol | `.btn`, `.btn--primary`, `.btn--secondary`, `.btn--ghost`, `.btn--danger` |
+| Kartu | `.card`, `.card--accent`, `.card--edge-left`, `.card--lift`, `.card--clickable` |
+| Badge | `.badge`, `.badge--accent`, `.badge--solid`, `.badge--outline`, `.badge--muted`, `.badge--success`, `.badge--warning` |
+| Filter | `.chip`, `.chip.is-active` |
+| Isian | `.field`, termasuk fokus dan keadaan `aria-invalid` |
+
+Aksen aplikasi: E-Commerce `#92400E`, E-Learning `#2563EB`, E-Tutorial `#7C3AED`, Portal `#E11D48`, dan Forum `#0D9488`. Tombol aktif memakai warna aksi dengan kontras teks putih yang memadai; warna teks/aksen menyesuaikan tema gelap. Badge status sukses/peringatan memakai varian semantik, tidak bergantung hanya pada warna.
+
+Modul tetap boleh memakai kelas khusus untuk fungsi yang tidak sama dengan komponen dasar, seperti status Solved dan avatar Forum, progress E-Learning, serta pengaturan ukuran huruf E-Tutorial. Target sentuh tombol dan filter minimal 44 px; tombol Forum yang nonaktif mempertahankan kursor `progress`.
 
 ## Polesan halaman
 

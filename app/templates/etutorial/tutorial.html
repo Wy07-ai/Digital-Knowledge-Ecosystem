@@ -15,8 +15,8 @@
 
   <header class="mb-6">
     <div class="flex flex-wrap items-center gap-2">
-      {% if tutorial.category_name %}<span class="et-badge">{{ tutorial.category_name }}</span>{% endif %}
-      <span class="et-badge et-badge-diff">{{ tutorial.difficulty_label }}</span>
+      {% if tutorial.category_name %}<span class="badge badge--accent">{{ tutorial.category_name }}</span>{% endif %}
+      <span class="badge badge--outline">{{ tutorial.difficulty_label }}</span>
       {% if tutorial.est_minutes %}
         <span class="inline-flex items-center gap-1.5 text-sm text-muted">{{ icon('clock', 'h-4 w-4') }}Estimasi {{ format_minutes(tutorial.est_minutes) }}</span>
       {% endif %}
@@ -103,11 +103,11 @@
         <button type="button" class="btn btn-secondary et-nav-btn" disabled>{{ icon('arrow-left', 'h-5 w-5') }}Sebelumnya</button>
       {% endif %}
       {% if current < total %}
-        <a href="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=current + 1) }}" class="et-btn et-nav-btn" data-et-next rel="next">
+        <a href="{{ url_for('etutorial.tutorial', slug=tutorial.slug, step_no=current + 1) }}" class="btn btn--primary et-nav-btn" data-et-next rel="next">
           Berikutnya{{ icon('arrow-right', 'h-5 w-5') }}
         </a>
       {% else %}
-        <a href="{{ url_for('etutorial.index') }}" class="et-btn et-nav-btn">Selesai{{ icon('check', 'h-5 w-5') }}</a>
+        <a href="{{ url_for('etutorial.index') }}" class="btn btn--primary et-nav-btn">Selesai{{ icon('check', 'h-5 w-5') }}</a>
       {% endif %}
     </div>
 

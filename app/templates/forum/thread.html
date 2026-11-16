@@ -8,7 +8,7 @@
   <article class="fm-thread rounded-2xl border border-line bg-surface p-5 shadow-sm sm:p-7" aria-labelledby="fm-title">
     <div class="flex flex-wrap items-center gap-2">
       {% if thread.category_name %}
-        <a href="{{ url_for('forum.index', kategori=thread.category_slug) }}" class="fm-badge hover:underline">{{ thread.category_name }}</a>
+        <a href="{{ url_for('forum.index', kategori=thread.category_slug) }}" class="badge badge--accent hover:underline">{{ thread.category_name }}</a>
       {% endif %}
       {% if thread.is_solved %}{{ solved_badge() }}{% endif %}
     </div>
@@ -49,7 +49,7 @@
               <header class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {{ avatar(p.initials, 'fm-avatar-sm') }}
                 <a href="{{ url_for('forum.profile', user_id=p.user_id) }}" class="fm-author font-semibold">{{ p.author_name }}</a>
-                {% if p.user_id == thread.user_id %}<span class="fm-badge">Penulis thread</span>{% endif %}
+                {% if p.user_id == thread.user_id %}<span class="badge badge--accent">Penulis thread</span>{% endif %}
                 {% if p.is_solution %}<span class="fm-solved">{{ icon('success', 'h-3.5 w-3.5') }}Solusi</span>{% endif %}
                 <time class="text-sm text-muted" datetime="{{ p.created_at }}" title="{{ p.datetime_label }}">{{ p.time_label }}</time>
               </header>
@@ -119,13 +119,13 @@
             <textarea id="f-reply" name="body" rows="5" required aria-required="true" data-validate data-draft data-label="Balasan"
                       data-min="{{ limits.post_min }}" data-max="{{ limits.post_max }}"
                       aria-describedby="err-body" {% if reply_error %}aria-invalid="true"{% endif %}
-                      class="fm-field block w-full rounded-lg border bg-surface px-3 py-2 leading-relaxed text-ink placeholder:text-muted"
+                      class="field block w-full rounded-lg border bg-surface px-3 py-2 leading-relaxed text-ink placeholder:text-muted"
                       placeholder="Tulis balasan yang membantu. Teks ditampilkan apa adanya.">{{ reply_body }}</textarea>
             <div class="mt-1 flex justify-end"><p class="fm-counter text-sm" data-counter-for="body" aria-hidden="true"></p></div>
             {{ field_error('body', reply_error) }}
           </div>
           <div class="mt-4 flex flex-wrap gap-3">
-            <button type="submit" class="fm-btn" data-busy="Mengirim&hellip;">Kirim balasan</button>
+            <button type="submit" class="btn btn--primary" data-busy="Mengirim&hellip;">Kirim balasan</button>
           </div>
         </form>
       </section>
@@ -133,7 +133,7 @@
       <section class="rounded-xl border border-dashed border-line bg-surface p-6 text-center">
         <h2 class="text-lg font-bold">Ingin ikut membahas?</h2>
         <p class="mt-1 text-muted">Masuk dulu untuk membalas thread ini. Setelah masuk, Anda kembali ke halaman ini.</p>
-        <a href="{{ login_url() }}" class="fm-btn mt-4">Masuk untuk membalas</a>
+        <a href="{{ login_url() }}" class="btn btn--primary mt-4">Masuk untuk membalas</a>
       </section>
     {% endif %}
   </div>

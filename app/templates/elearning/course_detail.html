@@ -6,7 +6,7 @@
     <div class="el-cover !aspect-auto min-h-[9rem] sm:min-h-[11rem]">
       {% if course.thumbnail_url and course.thumbnail_url.startswith('https://') %}<img src="{{ course.thumbnail_url }}" alt="">{% endif %}
       <div>
-        <span class="el-badge !bg-white/20 !text-white">{{ course.level_label }}</span>
+        <span class="badge badge--accent !bg-white/20 !text-white">{{ course.level_label }}</span>
         <h1 class="mt-2 text-2xl font-bold leading-tight sm:text-3xl">{{ course.title }}</h1>
         {% if course.instructor_name %}<p class="mt-1 text-sm text-white/90">Pengajar: {{ course.instructor_name }}</p>{% endif %}
       </div>
@@ -58,7 +58,7 @@
               </div>
             </div>
             {% if resume %}
-              <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=resume.order_no) }}" class="el-btn mt-5 w-full">
+              <a href="{{ url_for('elearning.lesson', course_id=course.id, order_no=resume.order_no) }}" class="btn btn--primary mt-5 w-full">
                 {% if progress.percent >= 100 %}Tinjau ulang{% elif progress.done %}Lanjutkan belajar{% else %}Mulai belajar{% endif %}
               </a>
             {% endif %}
@@ -73,23 +73,23 @@
             {% endif %}
             <p class="mt-3 text-center text-xs text-muted">Anda sudah terdaftar di kelas ini.</p>
           {% elif not lessons %}
-            <button type="button" class="el-btn mt-5 w-full" disabled>Belum ada materi</button>
+            <button type="button" class="btn btn--primary mt-5 w-full" disabled>Belum ada materi</button>
           {% elif course.is_free %}
             {% if current_user %}
               <form method="post" action="{{ url_for('elearning.enroll', course_id=course.id) }}" class="mt-5">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="el-btn w-full">Ikuti kelas gratis</button>
+                <button type="submit" class="btn btn--primary w-full">Ikuti kelas gratis</button>
               </form>
             {% else %}
-              <a href="{{ login_url() }}" class="el-btn mt-5 w-full">Masuk untuk mengikuti kelas</a>
+              <a href="{{ login_url() }}" class="btn btn--primary mt-5 w-full">Masuk untuk mengikuti kelas</a>
               <p class="mt-3 text-center text-xs text-muted">Kelas ini gratis. Setelah masuk, Anda kembali ke halaman ini.</p>
             {% endif %}
           {% else %}
             {% if course.product_slug %}
-              <a href="{{ url_for('ecommerce.product', slug=course.product_slug) }}" class="el-btn mt-5 w-full">Beli di E-Commerce</a>
+              <a href="{{ url_for('ecommerce.product', slug=course.product_slug) }}" class="btn btn--primary mt-5 w-full">Beli di E-Commerce</a>
               <p class="mt-3 text-center text-xs text-muted">Setelah checkout, kelas langsung muncul di Kelas Saya.</p>
             {% else %}
-              <button type="button" class="el-btn mt-5 w-full" disabled>Belum dijual</button>
+              <button type="button" class="btn btn--primary mt-5 w-full" disabled>Belum dijual</button>
             {% endif %}
           {% endif %}
         </div>

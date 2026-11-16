@@ -39,7 +39,7 @@
       {% if p.privacy == 'members' and p.viewer_is_guest %}
         <h2 class="mt-4 text-lg font-semibold">Masuk untuk melihat profil ini</h2>
         <p class="mt-1 text-muted">Pemilik profil hanya membagikannya kepada anggota yang sudah masuk.</p>
-        <a href="{{ login_url() }}" class="fm-btn mt-5">Masuk</a>
+        <a href="{{ login_url() }}" class="btn btn--primary mt-5">Masuk</a>
       {% else %}
         <h2 class="mt-4 text-lg font-semibold">Profil ini privat</h2>
         <p class="mt-1 text-muted">Pemilik profil memilih untuk tidak membagikan detailnya. Anda tetap bisa membaca thread dan balasannya di Forum.</p>

@@ -9,18 +9,18 @@
       <h1 class="page-title font-bold tracking-tight">Forum diskusi</h1>
       <p class="mt-1 text-muted">{{ current_module.desc }}</p>
     </div>
-    <a href="{{ url_for('forum.new_thread', kategori=category) }}" class="fm-btn">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
+    <a href="{{ url_for('forum.new_thread', kategori=category) }}" class="btn btn--primary">{{ icon('plus', 'h-5 w-5') }}Buat thread</a>
   </header>
 
   <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
     {# Filter kategori: tautan biasa (tanpa JS). Angka = jumlah thread pada urutan yang sedang dipilih. #}
     <nav aria-label="Filter kategori" class="min-w-0 flex-1">
       <div class="flex flex-wrap gap-2">
-        <a href="{{ url_for('forum.index', urut=sort if sort != 'terbaru' else None) }}" class="fm-chip {{ 'is-active' if not category }}"
+        <a href="{{ url_for('forum.index', urut=sort if sort != 'terbaru' else None) }}" class="chip {{ 'is-active' if not category }}"
            {% if not category %}aria-current="true"{% endif %}>Semua <span class="fm-count-note">({{ all_total }})</span></a>
         {% for c in chips %}
           <a href="{{ url_for('forum.index', kategori=c.slug, urut=sort if sort != 'terbaru' else None) }}"
-             class="fm-chip {{ 'is-active' if category == c.slug }}" {% if category == c.slug %}aria-current="true"{% endif %}>
+             class="chip {{ 'is-active' if category == c.slug }}" {% if category == c.slug %}aria-current="true"{% endif %}>
             {{ c.name }} <span class="fm-count-note">({{ c.count }})</span></a>
         {% endfor %}
       </div>

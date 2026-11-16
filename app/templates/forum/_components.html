@@ -13,15 +13,15 @@
 {# Satu baris thread. Judul adalah tautan yang membentang ke seluruh kartu (target sentuh besar);
    nama penulis tetap bisa diklik karena diberi z-index di atasnya. #}
 {% macro thread_row(t, show_author=True) -%}
-<article class="fm-row relative flex gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm sm:gap-4">
+<article class="card card--edge-left card--lift card--clickable fm-row relative flex gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm sm:gap-4">
   {{ avatar(t.initials) }}
   <div class="min-w-0 flex-1">
     <div class="flex flex-wrap items-center gap-2">
-      {% if t.category_name %}<span class="fm-badge">{{ t.category_name }}</span>{% endif %}
+      {% if t.category_name %}<span class="badge badge--accent">{{ t.category_name }}</span>{% endif %}
       {% if t.is_solved %}{{ solved_badge() }}{% endif %}
     </div>
     <h3 class="mt-1.5 text-lg font-bold leading-snug">
-      <a href="{{ url_for('forum.thread', thread_id=t.id) }}" class="fm-link">{{ t.title }}</a>
+      <a href="{{ url_for('forum.thread', thread_id=t.id) }}" class="card-link">{{ t.title }}</a>
     </h3>
     <ul class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
       {% if show_author %}
@@ -59,7 +59,7 @@
         {% if n is none %}<li class="px-1 text-muted" aria-hidden="true">&hellip;</li>
         {% else %}<li class="dke-hide-mobile">
           <a href="{{ p.url(n) }}" {% if n == p.page %}aria-current="page"{% endif %}
-             class="btn {{ 'fm-btn' if n == p.page else 'btn-secondary' }} min-w-[44px]"
+             class="btn {{ 'btn--primary' if n == p.page else 'btn-secondary' }} min-w-[44px]"
              aria-label="Halaman {{ n }}">{{ n }}</a></li>{% endif %}
       {% endfor %}
       <li class="px-2 text-muted sm:hidden">{{ p.page }}/{{ p.pages }}</li>

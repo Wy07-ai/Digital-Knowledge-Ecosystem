@@ -14,10 +14,10 @@
     <nav aria-label="Filter kategori">
       <p class="mb-2 text-sm font-semibold">Kategori</p>
       <div class="flex flex-wrap gap-2">
-        <a href="{{ url_for('etutorial.index', tingkat=difficulty) }}" class="et-pill {{ 'is-active' if not category }}"
+        <a href="{{ url_for('etutorial.index', tingkat=difficulty) }}" class="chip {{ 'is-active' if not category }}"
            {% if not category %}aria-current="true"{% endif %}>Semua kategori <span class="et-count">({{ all_cat_count }})</span></a>
         {% for c in categories %}
-          <a href="{{ url_for('etutorial.index', kategori=c.slug, tingkat=difficulty) }}" class="et-pill {{ 'is-active' if category == c.slug }}"
+          <a href="{{ url_for('etutorial.index', kategori=c.slug, tingkat=difficulty) }}" class="chip {{ 'is-active' if category == c.slug }}"
              {% if category == c.slug %}aria-current="true"{% endif %}>{{ c.name }} <span class="et-count">({{ cat_counts[c.slug] }})</span></a>
         {% endfor %}
       </div>
@@ -25,10 +25,10 @@
     <nav aria-label="Filter tingkat kesulitan">
       <p class="mb-2 text-sm font-semibold">Tingkat kesulitan</p>
       <div class="flex flex-wrap gap-2">
-        <a href="{{ url_for('etutorial.index', kategori=category) }}" class="et-pill {{ 'is-active' if not difficulty }}"
+        <a href="{{ url_for('etutorial.index', kategori=category) }}" class="chip {{ 'is-active' if not difficulty }}"
            {% if not difficulty %}aria-current="true"{% endif %}>Semua tingkat <span class="et-count">({{ all_diff_count }})</span></a>
         {% for key, label in difficulties %}
-          <a href="{{ url_for('etutorial.index', kategori=category, tingkat=key) }}" class="et-pill {{ 'is-active' if difficulty == key }}"
+          <a href="{{ url_for('etutorial.index', kategori=category, tingkat=key) }}" class="chip {{ 'is-active' if difficulty == key }}"
              {% if difficulty == key %}aria-current="true"{% endif %}>{{ label }} <span class="et-count">({{ diff_counts[key] }})</span></a>
         {% endfor %}
       </div>
