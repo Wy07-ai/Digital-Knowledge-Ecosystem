@@ -1,10 +1,10 @@
 """Data Beranda (Dashboard Launcher): widget ringkas tiap modul dan tujuan "Lanjutkan".
 
 Semua angka dan judul berasal dari database (bukan data tiruan). Setiap widget:
-  * mengembalikan dict {summary, detail, progress, empty, error} yang dipakai _components/module_card.html
+  * mengembalikan dict {value, label, progress, empty, error, cta} (satu baris metrik) yang dipakai _components/module_card.html
   * menangani data kosong dengan pesan yang ramah (empty=True), bukan angka 0 yang membingungkan
   * gagal dengan aman: bila tabel belum ada atau kueri error, kartu tetap tampil
-Guest tidak punya data pribadi, jadi widget memakai konten publik (produk, tutorial, artikel, thread).
+Guest tidak punya data pribadi, jadi tiap kartu hanya berisi satu ajakan pendek ("Lihat kelas", "Baca artikel").
 """
 import os
 import sqlite3
@@ -71,8 +71,17 @@ def _start_of_today_utc():
 # --------------------------------------------------------------------------
 # Widget per modul
 # --------------------------------------------------------------------------
-def _w(summary, detail=None, progress=None, empty=False, error=False):
-    return {"summary": summary, "detail": detail, "progress": progress, "empty": empty, "error": error}
+# Setiap widget hanya satu baris metrik (maks. ~40 karakter), tanpa deskripsi dan tanpa baris detail:
+#   value : angka/kata pendek yang ditonjolkan (opsional), mis. "2"
+#   label : sisa kalimat, mis. "di keranjang"
+#   cta   : True bila ini ajakan untuk Guest ("Lihat kelas"), bukan data
+#   empty : True bila datanya kosong (tampil redup)
+def _w(label, value=None, progress=None, empty=False, error=False, cta=False):
+    return {"value": value, "label": label, "progress": progress, "empty": empty, "error": error, "cta": cta}
+
+
+def _cta(label):
+    return _w(label, cta=True)
 
 
 def _scalar(db, sql, params=()):
@@ -81,40 +90,31 @@ def _scalar(db, sql, params=()):
 
 def _infosys(db, uid):
     if uid is None:
-        return _w("Masuk untuk melihat aktivitas Anda", "Profil, log, dan statistik dari semua aplikasi.", empty=True)
+        return _cta("Masuk ke akun")
     total = _scalar(
         db,
         "SELECT COUNT(*) FROM activity_logs WHERE user_id = ? AND datetime(created_at) >= datetime(?)",
         (uid, _start_of_today_utc()),
     )
-    last = friendly_when(g.user["last_login_at"])
-    detail = f"Login terakhir: {last}" if last else None
     if total == 0:
-        return _w("Belum ada aktivitas hari ini", detail, empty=True)
-    return _w(f"{total} aktivitas hari ini", detail)
+        return _w("Belum ada aktivitas hari ini", empty=True)
+    return _w("aktivitas hari ini", value=total)
 
 
 def _ecommerce(db, uid):
-    latest = db.execute(
-        "SELECT name FROM products WHERE is_active = 1 ORDER BY datetime(created_at) DESC, id DESC LIMIT 1"
-    ).fetchone()
-    newest = latest["name"] if latest else None
     if uid is None:
-        return _w(f"Terbaru: {newest}") if newest else _w("Belum ada produk", empty=True)
+        has_products = _scalar(db, "SELECT COUNT(*) FROM products WHERE is_active = 1")
+        return _cta("Lihat produk") if has_products else _w("Belum ada produk", empty=True)
     items = _scalar(db, "SELECT COALESCE(SUM(qty), 0) FROM cart_items WHERE user_id = ?", (uid,))
-    detail = f"Produk terbaru: {newest}" if newest else None
     if items:
-        return _w(f"{items} item di keranjang", detail)
-    return _w("Keranjang masih kosong", detail, empty=True)
+        return _w("di keranjang", value=items)
+    return _w("Keranjang masih kosong", empty=True)
 
 
 def _elearning(db, uid):
-    available = _scalar(db, "SELECT COUNT(*) FROM courses WHERE is_published = 1")
-    catalog = f"{available} kelas tersedia" if available else None
     if uid is None:
-        if not available:
-            return _w("Belum ada kelas", empty=True)
-        return _w(catalog, "Masuk untuk melihat progres belajar.")
+        available = _scalar(db, "SELECT COUNT(*) FROM courses WHERE is_published = 1")
+        return _cta("Lihat kelas") if available else _w("Belum ada kelas", empty=True)
     row = db.execute(
         """
         SELECT c.title,
@@ -133,60 +133,47 @@ def _elearning(db, uid):
         (uid,),
     ).fetchone()
     if row is None:
-        return _w("Belum mengikuti kelas", catalog, empty=True)
+        return _w("Belum mengikuti kelas", empty=True)
     if not row["total"]:
-        return _w(row["title"], "Belum ada materi")
+        return _w(row["title"])
     percent = min(100, round(row["done"] * 100 / row["total"]))
-    detail = "Kelas selesai" if row["done"] >= row["total"] else f"{row['done']} dari {row['total']} materi selesai"
-    return _w(row["title"], detail, progress=percent)
+    return _w(row["title"], progress=percent)
 
 
 def _etutorial(db, uid):
-    popular = db.execute(
-        """
-        SELECT t.title FROM tutorials t
-          LEFT JOIN tutorial_bookmarks b ON b.tutorial_id = t.id
-         GROUP BY t.id
-         ORDER BY COUNT(b.user_id) DESC, datetime(t.created_at) DESC, t.id DESC
-         LIMIT 1
-        """
-    ).fetchone()
-    name = popular["title"] if popular else None
     if uid is None:
-        return _w(f"Populer: {name}") if name else _w("Belum ada tutorial", empty=True)
+        has_tutorials = _scalar(db, "SELECT COUNT(*) FROM tutorials")
+        return _cta("Lihat tutorial") if has_tutorials else _w("Belum ada tutorial", empty=True)
     saved = _scalar(db, "SELECT COUNT(*) FROM tutorial_bookmarks WHERE user_id = ?", (uid,))
-    detail = f"Populer: {name}" if name else None
     if saved:
-        return _w(f"{saved} tutorial tersimpan", detail)
-    return _w("Belum ada tutorial tersimpan", detail, empty=True)
+        return _w("tersimpan", value=saved)
+    return _w("Belum ada tutorial tersimpan", empty=True)
 
 
 def _portal(db, uid):
-    row = db.execute(
-        "SELECT title, read_minutes FROM articles ORDER BY datetime(published_at) DESC, id DESC LIMIT 1"
-    ).fetchone()
-    if row is None:
+    total = _scalar(db, "SELECT COUNT(*) FROM articles")
+    if total == 0:
         return _w("Belum ada artikel", empty=True)
-    detail = "Artikel terbaru" + (f" · {row['read_minutes']} menit baca" if row["read_minutes"] else "")
-    return _w(row["title"], detail)
+    if uid is None:
+        return _cta("Baca artikel")
+    recent = _scalar(db, "SELECT COUNT(*) FROM articles WHERE datetime(published_at) >= datetime('now', '-7 days')")
+    if recent:
+        return _w("artikel baru minggu ini", value=recent)
+    return _w("Belum ada artikel baru", empty=True)
 
 
 def _forum(db, uid):
-    row = db.execute(
-        "SELECT title FROM threads ORDER BY datetime(created_at) DESC, id DESC LIMIT 1"
-    ).fetchone()
-    newest = row["title"] if row else None
     if uid is None:
-        return _w(f"Thread terbaru: {newest}") if newest else _w("Belum ada thread", empty=True)
+        has_threads = _scalar(db, "SELECT COUNT(*) FROM threads")
+        return _cta("Lihat diskusi") if has_threads else _w("Belum ada diskusi", empty=True)
     unread = _scalar(
         db,
         "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND module_key = 'forum' AND is_read = 0",
         (uid,),
     )
-    detail = f"Thread terbaru: {newest}" if newest else None
     if unread:
-        return _w(f"{unread} balasan baru", detail)
-    return _w("Tidak ada balasan baru", detail, empty=True)
+        return _w("balasan baru", value=unread)
+    return _w("Tidak ada balasan baru", empty=True)
 
 
 _BUILDERS = {
@@ -208,7 +195,7 @@ def build_widgets():
             widgets[module["key"]] = _BUILDERS[module["key"]](get_db(), uid)
         except sqlite3.Error:
             current_app.logger.warning("Widget %s gagal dimuat", module["key"], exc_info=True)
-            widgets[module["key"]] = _w("Ringkasan belum tersedia", "Buka aplikasi untuk melihat isinya.", empty=True, error=True)
+            widgets[module["key"]] = _w("Ringkasan belum tersedia", empty=True, error=True)
     return widgets
 
 

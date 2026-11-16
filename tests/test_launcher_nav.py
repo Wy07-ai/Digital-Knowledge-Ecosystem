@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 
 from werkzeug.security import generate_password_hash
 
-from app import create_app
+from app import MODULES, create_app
 from app.main.launcher import friendly_when
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -76,7 +76,7 @@ class LauncherTestCase(unittest.TestCase):
             self.sql("INSERT INTO lessons (course_id, order_no, title) VALUES (1, ?, ?)", (n, f"Pelajaran {n}"))
         self.sql("INSERT INTO products (id, name, slug, price) VALUES (1, 'Ebook Flask', 'ebook-flask', 50000)")
         self.sql("INSERT INTO tutorials (id, title, slug) VALUES (1, 'Tutorial Flask', 'tutorial-flask')")
-        self.sql("INSERT INTO articles (title, slug, body, read_minutes) VALUES ('Artikel Baru', 'artikel-baru', 'isi', 4)")
+        self.sql("INSERT INTO articles (title, slug, body, read_minutes, published_at) VALUES ('Artikel Baru', 'artikel-baru', 'isi', 4, ?)", (iso(),))
         self.sql("INSERT INTO threads (user_id, title, body) VALUES (1, 'Thread Pertama', 'isi')")
 
 
@@ -106,16 +106,67 @@ class BerandaGuestTests(LauncherTestCase):
         html = self.html("/")
         self.assertNotIn("data-resume", html)
         self.assertNotIn("data-landing-section", html)
-        self.assertIn("Masuk untuk melihat aktivitas Anda", html)
+        self.assertIn("Masuk ke akun", self.widget_text(html, "infosys"))
 
-    def test_guest_melihat_konten_publik_bukan_angka_pribadi(self):
+    def test_guest_melihat_satu_ajakan_pendek_per_kartu(self):
         self.seed_content()
         html = self.html("/")
-        self.assertIn("Terbaru: Ebook Flask", self.widget_text(html, "ecommerce"))
-        self.assertIn("1 kelas tersedia", self.widget_text(html, "elearning"))
-        self.assertIn("Populer: Tutorial Flask", self.widget_text(html, "etutorial"))
-        self.assertIn("Artikel Baru", self.widget_text(html, "portal"))
-        self.assertIn("Thread terbaru: Thread Pertama", self.widget_text(html, "forum"))
+        for key, cta in (("infosys", "Masuk ke akun"), ("ecommerce", "Lihat produk"), ("elearning", "Lihat kelas"),
+                         ("etutorial", "Lihat tutorial"), ("portal", "Baca artikel"), ("forum", "Lihat diskusi")):
+            self.assertIn(cta, self.widget_text(html, key), key)
+        # tidak ada lagi teks "Masuk untuk melihat ..." maupun judul konten yang panjang di kartu
+        self.assertNotIn("Masuk untuk melihat", html)
+        self.assertNotIn("Ebook Flask", html)
+        self.assertNotIn("Thread Pertama", html)
+
+    def test_guest_data_kosong_tetap_ramah(self):
+        html = self.html("/")
+        self.assertIn("Belum ada produk", self.widget_text(html, "ecommerce"))
+        self.assertIn("Belum ada kelas", self.widget_text(html, "elearning"))
+        self.assertIn("Belum ada artikel", self.widget_text(html, "portal"))
+
+    def test_subjudul_guest_singkat_dengan_istilah_aplikasi(self):
+        html = self.html("/")
+        self.assertIn("Satu akun, enam aplikasi.", html)
+        self.assertNotIn("modul", re.sub(r"data-module|module", "", html.lower().split("<main")[1].split("launcher-grid")[0]))
+
+    def test_deskripsi_tidak_tampil_di_kartu_tetapi_ada_di_tooltip_dan_aria(self):
+        html = self.html("/")
+        for key, desc in (("infosys", "Profil, log aktivitas, dan statistik dari semua aplikasi."),
+                          ("forum", "Diskusi, tanya jawab, dan balasan komunitas.")):
+            card = re.search(rf'<a [^>]*data-module="{key}".*?</a>', html, re.S).group(0)
+            self.assertIn(f'title="{desc}"', card)
+            self.assertIn(f'aria-describedby="card-desc-{key}"', card)
+            self.assertIn(f'id="card-desc-{key}" class="sr-only"', card)
+            visible = re.sub(r'<span id="card-desc-[^>]*>.*?</span>', "", card, flags=re.S)
+            self.assertEqual(re.sub(r"<[^>]+>", "", visible).count(desc), 0)
+
+    def test_kartu_maksimal_dua_baris_teks_selain_nama_dan_tanpa_pengulangan(self):
+        self.seed_content()
+        for login in (False, True):
+            if login:
+                self.login()
+            html = self.html("/")
+            for key in ("infosys", "ecommerce", "elearning", "etutorial", "portal", "forum"):
+                card = re.search(rf'<a [^>]*data-module="{key}".*?</a>', html, re.S).group(0)
+                self.assertEqual(card.count("<p "), 1, key)           # satu baris metrik
+                self.assertNotIn("<hr", card)
+                text = re.sub(r'<span id="card-desc-[^>]*>.*?</span>', "", card, flags=re.S)
+                text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text)).strip()
+                words = text.lower().split()
+                self.assertLessEqual(len(words), 12, text)
+
+    def test_zona_metrik_seragam_dan_menempel_di_dasar(self):
+        html = self.html("/")
+        zones = re.findall(r'<div class="mt-auto pt-4">\s*<div class="(h-16[^"]*)"', html)
+        self.assertEqual(len(zones), 6)
+        self.assertEqual(len(set(zones)), 1)   # tinggi sama di semua kartu, jadi garis sejajar
+
+    def test_status_bukan_hanya_warna_dan_nama_aplikasi_selalu_tertulis(self):
+        html = self.html("/")
+        for m in MODULES:
+            self.assertIn(m["name"], self.widget_text(html, m["key"]))
+        self.assertIn("Masuk ke akun", html)   # ajakan berupa teks, bukan hanya warna
 
     def test_database_belum_ada_tabel_tidak_membuat_error(self):
         os.remove(self.db_path)
@@ -123,7 +174,7 @@ class BerandaGuestTests(LauncherTestCase):
         with self.assertLogs(self.app.logger, level="WARNING"):
             html = self.html("/")
         # 5 widget gagal dengan aman; widget Information System untuk Guest memang statis
-        self.assertEqual(html.count("Ringkasan belum tersedia"), 5)
+        self.assertEqual(sum("Ringkasan belum tersedia" in self.widget_text(html, m["key"]) for m in MODULES), 5)
         self.assertEqual(len(re.findall(r'data-module="', html)), 6)
 
 
@@ -143,6 +194,14 @@ class BerandaMemberTests(LauncherTestCase):
         self.assertIn("Belum ada artikel", self.widget_text(html, "portal"))
         self.assertIn("Tidak ada balasan baru", self.widget_text(html, "forum"))
 
+    def test_member_artikel_baru_minggu_ini_dan_tanpa_artikel_baru(self):
+        self.seed_content()
+        self.assertIn("1 artikel baru minggu ini", self.widget_text(self.html("/"), "portal"))
+        self.sql("UPDATE articles SET published_at = ?", (iso(timedelta(days=30)),))
+        html = self.html("/")
+        self.assertIn("Belum ada artikel baru", self.widget_text(html, "portal"))
+        self.assertEqual(html.count("data-widget-empty") >= 1, True)
+
     def test_widget_dari_data_nyata(self):
         self.seed_content()
         self.sql("INSERT INTO cart_items (user_id, product_id, qty) VALUES (1, 1, 2)")
@@ -157,13 +216,13 @@ class BerandaMemberTests(LauncherTestCase):
         html = self.html("/")
         self.assertEqual(html.count("data-widget-empty"), 0)
         self.assertIn("1 aktivitas hari ini", self.widget_text(html, "infosys"))
-        self.assertIn("Login terakhir: hari ini", self.widget_text(html, "infosys"))
-        self.assertIn("2 item di keranjang", self.widget_text(html, "ecommerce"))
+        self.assertIn("2 di keranjang", self.widget_text(html, "ecommerce"))
         self.assertIn("Python Dasar", self.widget_text(html, "elearning"))
-        self.assertIn("2 dari 5 materi selesai", self.widget_text(html, "elearning"))
+        self.assertIn("40%", self.widget_text(html, "elearning"))
         self.assertIn('aria-valuenow="40"', html)
-        self.assertIn("1 tutorial tersimpan", self.widget_text(html, "etutorial"))
+        self.assertIn("1 tersimpan", self.widget_text(html, "etutorial"))
         self.assertIn("2 balasan baru", self.widget_text(html, "forum"))
+        self.assertNotIn("Login terakhir", html)
 
     def test_kelas_selesai_progres_100(self):
         self.seed_content()
@@ -172,7 +231,7 @@ class BerandaMemberTests(LauncherTestCase):
             self.sql("INSERT INTO lesson_progress (user_id, lesson_id) VALUES (1, ?)", (lesson_id,))
         html = self.html("/")
         self.assertIn('aria-valuenow="100"', html)
-        self.assertIn("Kelas selesai", html)
+        self.assertIn("100%", self.widget_text(html, "elearning"))
 
 
 class LanjutkanDanLandingTests(LauncherTestCase):

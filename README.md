@@ -382,11 +382,12 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 **Beranda** (`/`, `app/main/routes.py` + `app/main/launcher.py`)
 
 - Grid kartu aplikasi: 3 kolom (3x2) di desktop (`lg`), 2 kolom di tablet, 1 kolom di mobile dan Mobile View.
-  Setiap kartu memuat aksen warna, ikon, nama aplikasi, dan widget ringkas; hover lift 4 px + glow 200 ms
+  Setiap kartu hanya memuat aksen warna, ikon, nama aplikasi, dan satu baris metrik (maks. ~40 karakter, angka ditonjolkan);
+  deskripsi aplikasi ada di `title` dan `aria-describedby`, bukan di kartu. Zona metrik menempel di dasar kartu dengan tinggi tetap; hover lift 4 px + glow 200 ms
   (`.launcher-card` di `custom.css`, nonaktif di layar sentuh dan saat reduced-motion).
 - Widget dibaca dari database, satu fungsi per modul di `launcher.py`. Data kosong tampil sebagai pesan
   ramah berwarna redup ("Keranjang masih kosong"), dan kegagalan satu widget tidak merusak halaman.
-  Guest melihat konten publik (produk, tutorial, artikel, thread terbaru).
+  Guest melihat satu ajakan pendek per kartu ("Lihat produk", "Lihat kelas", "Baca artikel", "Lihat diskusi").
 - Tombol **Lanjutkan: aplikasi > halaman terakhir** dibangun dari `user_settings.last_module` dan `last_path`.
   Jalurnya divalidasi ulang tiap tampil (lokal, masih cocok dengan rute, sesuai modul); bila tidak valid
   tombol disembunyikan. Label halaman diambil dari hierarki di `app/navigation.py`.

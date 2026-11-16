@@ -251,15 +251,15 @@ class StatsAllModulesTest(IntegrationCase):
         self.sql("INSERT INTO cart_items (user_id, product_id, qty) VALUES (1,1,3)")
         self.sql("INSERT INTO tutorials (id, category_id, title, slug) VALUES (1,2,'Tutorial Git','git')")
         self.sql("INSERT INTO tutorial_bookmarks (user_id, tutorial_id) VALUES (1,1)")
-        self.sql("INSERT INTO articles (id, category_id, title, slug, body, published_at) VALUES (1,1,'Artikel Terbaru Saya','terbaru','x','2026-11-14T03:00:00+00:00')")
+        self.sql("INSERT INTO articles (id, category_id, title, slug, body, published_at) VALUES (1,1,'Artikel Terbaru Saya','terbaru','x',datetime('now'))")
         self.sql("INSERT INTO threads (id, category_id, user_id, title, body) VALUES (1,3,2,'Thread Terbaru Saya','x')")
         self.sql("INSERT INTO activity_logs (user_id, module_key, action) VALUES (1,'forum','reply'),(1,'infosys','login')")
         self.login(1)
         html = self.html("/")
         for m in MODULES:
             self.assertIn(f'data-module="{m["key"]}"', html)
-        for text in ("2 aktivitas hari ini", "3 item di keranjang", "1 tutorial tersimpan",
-                     "Artikel Terbaru Saya", "Thread terbaru: Thread Terbaru Saya"):
+        for text in ("2 aktivitas hari ini", "3 di keranjang", "1 tersimpan",
+                     "1 artikel baru minggu ini"):
             self.assertIn(text, html)
 
 
