@@ -6,13 +6,13 @@
 {% block guest %}
   <h1 class="text-3xl font-bold tracking-tight">Information System</h1>
   <p class="mt-1 text-muted">{{ current_module.desc }}</p>
-  {{ empty_state('Masuk untuk membuka Control Panel', 'Profil, log aktivitas, statistik lintas modul, dan pengaturan keamanan hanya tersedia setelah Anda masuk.', 'Masuk', login_url()) }}
+  {{ empty_state('Masuk untuk membuka Control Panel', 'Profil, log aktivitas, statistik dari semua aplikasi, dan pengaturan keamanan hanya tersedia setelah Anda masuk.', 'Masuk', login_url()) }}
   <p class="text-center text-sm text-muted">Belum punya akun? <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('infosys.register') }}">Daftar gratis</a></p>
 {% endblock %}
 
 {% block panel %}
   <h1 class="text-3xl font-bold tracking-tight">Ringkasan</h1>
-  <p class="mt-1 text-muted">Gambaran singkat akun dan aktivitas Anda di seluruh modul DKE.</p>
+  <p class="mt-1 text-muted">Gambaran singkat akun dan aktivitas Anda di seluruh aplikasi DKE.</p>
 
   <section class="mt-5 flex items-center gap-4 rounded-xl border border-line bg-surface p-5 shadow-sm stack-mobile" aria-label="Akun">
     {{ avatar(current_user['full_name'], current_user['avatar_url'], 'h-16 w-16', 'text-xl') }}
@@ -36,7 +36,7 @@
     </div>
     {% if stats.is_empty %}
       <p class="mt-2 rounded-xl border border-dashed border-line bg-surface p-5 text-center text-muted" data-empty="stats">
-        Belum ada data lintas modul. Mulailah dengan <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('elearning.index') }}">mengikuti kelas</a>,
+        Belum ada data dari semua aplikasi. Mulailah dengan <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('elearning.index') }}">mengikuti kelas</a>,
         <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('etutorial.index') }}">menyimpan tutorial</a>, atau
         <a class="font-semibold text-primary underline underline-offset-2" href="{{ url_for('forum.index') }}">bertanya di forum</a>.
       </p>
@@ -67,7 +67,7 @@
         {% endfor %}
       </ul>
     {% else %}
-      <p class="mt-2 rounded-xl border border-dashed border-line bg-surface p-5 text-center text-muted" data-empty="recent">Belum ada aktivitas tercatat. Aktivitas Anda di semua modul akan muncul di sini.</p>
+      <p class="mt-2 rounded-xl border border-dashed border-line bg-surface p-5 text-center text-muted" data-empty="recent">Belum ada aktivitas tercatat. Aktivitas Anda di semua aplikasi akan muncul di sini.</p>
     {% endif %}
   </section>
 {% endblock %}

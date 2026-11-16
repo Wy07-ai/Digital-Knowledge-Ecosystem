@@ -147,7 +147,7 @@ USERS = [
     (ADMIN_EMAIL, "Admin DKE", "admin",
      "Pengelola konten dan moderator Digital Knowledge Ecosystem.", 60, "admin"),
     (DEMO_EMAIL, "Pengguna Demo", "member",
-     "Akun contoh untuk mencoba seluruh modul DKE. Mahasiswa Teknik Informatika semester 3.", 14, "demo"),
+     "Akun contoh untuk mencoba seluruh aplikasi DKE. Mahasiswa Teknik Informatika semester 3.", 14, "demo"),
     ("budi@dke.test", "Budi Santoso", "member",
      "Mahasiswa semester 5, sedang belajar Flask dan basis data.", 45, None),
     ("citra@dke.test", "Citra Lestari", "member",
@@ -1208,7 +1208,7 @@ def seed_activity(conn, users, courses, products, tutorials):
 
     # --- notifikasi non-forum (akun demo) ---
     for module_key, msg, link, read, days_ago in (
-        ("infosys", "Selamat datang di Digital Knowledge Ecosystem! Jelajahi enam modul dari Beranda.", "/", 1, 14),
+        ("infosys", "Selamat datang di Digital Knowledge Ecosystem! Jelajahi enam aplikasi dari Beranda.", "/", 1, 14),
         ("elearning", "Anda terdaftar di kursus Prinsip Desain Antarmuka untuk Pemula. Selamat belajar!", "/elearning/", 1, 9),
         ("ecommerce", "Pesanan DKE-20261105-0001 berhasil dibuat.", "/ecommerce/", 1, 8),
     ):

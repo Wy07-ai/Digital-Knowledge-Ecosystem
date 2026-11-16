@@ -48,7 +48,7 @@
     }).then(function (res) {
       if (!res.ok) { var err = new Error('HTTP ' + res.status); err.status = res.status; throw err; }
       notify(next === 'last_module'
-        ? 'Berikutnya DKE akan membuka modul terakhir Anda.'
+        ? 'Berikutnya DKE akan membuka aplikasi terakhir Anda.'
         : 'Smart Landing dimatikan. Berikutnya DKE akan membuka Beranda.', 'success');
     }).catch(function (err) {
       show(previous);

@@ -5,30 +5,30 @@
 {% block title %}Log Aktivitas{% endblock %}
 {% block panel %}
   <h1 class="text-3xl font-bold tracking-tight">Log Aktivitas</h1>
-  <p class="mt-1 text-muted">Jejak aktivitas akun Anda di semua modul, dari yang terbaru. Hanya Anda yang dapat melihatnya.</p>
+  <p class="mt-1 text-muted">Jejak aktivitas akun Anda di semua aplikasi, dari yang terbaru. Hanya Anda yang dapat melihatnya.</p>
 
   {% if all_total == 0 %}
-    {{ empty_state('Belum ada aktivitas', 'Login, belanja, belajar, dan diskusi Anda akan tercatat di sini secara otomatis.', 'Jelajahi modul', url_for('main.index'), 'list') }}
+    {{ empty_state('Belum ada aktivitas', 'Login, belanja, belajar, dan diskusi Anda akan tercatat di sini secara otomatis.', 'Jelajahi aplikasi', url_for('main.index'), 'list') }}
   {% else %}
     <form method="get" action="{{ url_for('infosys.activity') }}" class="mt-5 flex flex-wrap items-end gap-3" data-filter-form>
       <div>
-        <label for="f-modul" class="block text-sm font-semibold">Filter modul</label>
+        <label for="f-modul" class="block text-sm font-semibold">Filter aplikasi</label>
         <select id="f-modul" name="modul" data-autosubmit class="mt-1 block min-h-[44px] rounded-lg border border-line bg-surface px-3 py-2 text-ink">
-          <option value="">Semua modul ({{ all_total }})</option>
+          <option value="">Semua aplikasi ({{ all_total }})</option>
           {% for m in MODULES %}<option value="{{ m.key }}" {% if module == m.key %}selected{% endif %}>{{ m.name }} ({{ counts.get(m.key, 0) }})</option>{% endfor %}
         </select>
       </div>
       <button type="submit" class="btn btn-secondary">{{ icon('filter', 'h-4 w-4') }}<span class="ml-1.5">Terapkan</span></button>
       {% if module %}<a href="{{ url_for('infosys.activity') }}" class="btn btn-secondary">Hapus filter</a>{% endif %}
     </form>
-    {% if invalid_filter %}<p class="mt-3 text-sm text-muted" data-note="filter">Filter modul tidak dikenal, jadi semua modul ditampilkan.</p>{% endif %}
+    {% if invalid_filter %}<p class="mt-3 text-sm text-muted" data-note="filter">Filter aplikasi tidak dikenal, jadi semua aplikasi ditampilkan.</p>{% endif %}
 
     {% if rows %}
       <div class="mt-4 overflow-x-auto rounded-xl border border-line bg-surface" data-log-table>
         <table class="w-full min-w-[40rem] text-left text-sm">
-          <caption class="sr-only">Log aktivitas{% if module %} modul {{ module }}{% endif %}, halaman {{ pager.page }} dari {{ pager.pages }}</caption>
+          <caption class="sr-only">Log aktivitas{% if module %} aplikasi {{ module }}{% endif %}, halaman {{ pager.page }} dari {{ pager.pages }}</caption>
           <thead class="border-b border-line bg-page text-muted">
-            <tr><th scope="col" class="px-4 py-3 font-semibold">Waktu</th><th scope="col" class="px-4 py-3 font-semibold">Modul</th>
+            <tr><th scope="col" class="px-4 py-3 font-semibold">Waktu</th><th scope="col" class="px-4 py-3 font-semibold">Aplikasi</th>
                 <th scope="col" class="px-4 py-3 font-semibold">Aktivitas</th><th scope="col" class="px-4 py-3 font-semibold">Detail</th>
                 <th scope="col" class="px-4 py-3 font-semibold">IP</th></tr>
           </thead>
@@ -47,7 +47,7 @@
       </div>
       {{ pagination(pager, 'aktivitas') }}
     {% else %}
-      {{ empty_state('Belum ada aktivitas di modul ini', 'Coba pilih modul lain atau tampilkan semua aktivitas.', 'Tampilkan semua', url_for('infosys.activity'), 'filter') }}
+      {{ empty_state('Belum ada aktivitas di aplikasi ini', 'Coba pilih aplikasi lain atau tampilkan semua aktivitas.', 'Tampilkan semua', url_for('infosys.activity'), 'filter') }}
     {% endif %}
   {% endif %}
 {% endblock %}

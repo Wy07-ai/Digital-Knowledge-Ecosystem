@@ -9,8 +9,8 @@
     <div>
       <h1 class="text-3xl font-bold tracking-tight">{% if first_name %}Halo, {{ first_name }}{% else %}Beranda{% endif %}</h1>
       <p class="mt-1 text-muted">
-        {% if current_user %}Pilih modul untuk mulai, atau lanjutkan yang terakhir.
-        {% else %}Enam modul dalam satu akun. <a href="{{ login_url() }}" class="font-semibold text-primary underline">Masuk</a> untuk melihat ringkasan pribadi Anda.{% endif %}
+        {% if current_user %}Pilih aplikasi untuk mulai, atau lanjutkan yang terakhir.
+        {% else %}Enam aplikasi dalam satu akun. <a href="{{ login_url() }}" class="font-semibold text-primary underline">Masuk</a> untuk melihat ringkasan pribadi Anda.{% endif %}
       </p>
     </div>
 
@@ -46,7 +46,7 @@
         <button type="button" class="btn btn-secondary text-sm" data-landing-option="launcher"
                 aria-pressed="{{ 'true' if settings.landing_mode != 'last_module' else 'false' }}">Tampilkan Beranda (matikan Smart Landing)</button>
         <button type="button" class="btn btn-secondary text-sm" data-landing-option="last_module"
-                aria-pressed="{{ 'true' if settings.landing_mode == 'last_module' else 'false' }}">Lanjutkan modul terakhir (nyalakan)</button>
+                aria-pressed="{{ 'true' if settings.landing_mode == 'last_module' else 'false' }}">Lanjutkan aplikasi terakhir (nyalakan)</button>
       </div>
       <p class="mt-2 text-sm text-muted">Berlaku saat Anda masuk atau membuka DKE kembali. Tombol DKE di Top-Bar selalu menuju Beranda.</p>
     </section>

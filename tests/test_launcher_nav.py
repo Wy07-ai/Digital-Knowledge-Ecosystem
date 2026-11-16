@@ -312,7 +312,7 @@ class NavigasiTests(LauncherTestCase):
         panel = re.search(r'id="app-switcher-panel".*?</div>\s*<a href="/"', html, re.S).group(0)
         self.assertEqual(len(re.findall(r'data-popover-item', panel)), 6)
         self.assertEqual(len(re.findall(r'aria-current="page"', panel)), 1)
-        self.assertIn("Semua modul (Beranda)", html)
+        self.assertIn("Semua aplikasi (Beranda)", html)
 
     def test_halaman_uji_nonaktif_memberi_404(self):
         app = create_app({"TESTING": True, "DATABASE": self.db_path, "SECRET_KEY": "x", "UI_TEST_PAGE": False})

@@ -81,7 +81,7 @@ def _scalar(db, sql, params=()):
 
 def _infosys(db, uid):
     if uid is None:
-        return _w("Masuk untuk melihat aktivitas Anda", "Profil, log, dan statistik lintas modul.", empty=True)
+        return _w("Masuk untuk melihat aktivitas Anda", "Profil, log, dan statistik dari semua aplikasi.", empty=True)
     total = _scalar(
         db,
         "SELECT COUNT(*) FROM activity_logs WHERE user_id = ? AND datetime(created_at) >= datetime(?)",
@@ -208,7 +208,7 @@ def build_widgets():
             widgets[module["key"]] = _BUILDERS[module["key"]](get_db(), uid)
         except sqlite3.Error:
             current_app.logger.warning("Widget %s gagal dimuat", module["key"], exc_info=True)
-            widgets[module["key"]] = _w("Ringkasan belum tersedia", "Buka modul untuk melihat isinya.", empty=True, error=True)
+            widgets[module["key"]] = _w("Ringkasan belum tersedia", "Buka aplikasi untuk melihat isinya.", empty=True, error=True)
     return widgets
 
 

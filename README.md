@@ -2,10 +2,12 @@
 
 Tugas Besar IMK · Teknik Informatika, Universitas Bale Bandung.
 
-Platform web dengan 6 modul independen yang memakai satu database SQLite dan satu sistem
+Platform web dengan 6 aplikasi independen yang memakai satu database SQLite dan satu sistem
 autentikasi: **Information System, E-Commerce, E-Learning, E-Tutorial, Portal, Forum**.
 
 **Stack:** Python 3.10+, Flask (Blueprint), sqlite3, Jinja2, HTML5, Tailwind CSS (hasil build statis, tanpa CDN), JavaScript biasa.
+
+**Istilah antarmuka:** untuk pengguna, tiap bagian DKE disebut **aplikasi** (bukan "modul"). Di kode tetap `module_key`, `MODULES`, dan sejenisnya. Daftar istilah baku, keputusan, dan istilah Inggris yang dihindari ada di [`docs/GLOSARIUM_TEKS.md`](docs/GLOSARIUM_TEKS.md).
 
 ## Menjalankan
 
@@ -379,13 +381,13 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 
 **Beranda** (`/`, `app/main/routes.py` + `app/main/launcher.py`)
 
-- Grid kartu modul: 3 kolom (3x2) di desktop (`lg`), 2 kolom di tablet, 1 kolom di mobile dan Mobile View.
-  Setiap kartu memuat aksen warna, ikon, nama modul, dan widget ringkas; hover lift 4 px + glow 200 ms
+- Grid kartu aplikasi: 3 kolom (3x2) di desktop (`lg`), 2 kolom di tablet, 1 kolom di mobile dan Mobile View.
+  Setiap kartu memuat aksen warna, ikon, nama aplikasi, dan widget ringkas; hover lift 4 px + glow 200 ms
   (`.launcher-card` di `custom.css`, nonaktif di layar sentuh dan saat reduced-motion).
 - Widget dibaca dari database, satu fungsi per modul di `launcher.py`. Data kosong tampil sebagai pesan
   ramah berwarna redup ("Keranjang masih kosong"), dan kegagalan satu widget tidak merusak halaman.
   Guest melihat konten publik (produk, tutorial, artikel, thread terbaru).
-- Tombol **Lanjutkan: modul > halaman terakhir** dibangun dari `user_settings.last_module` dan `last_path`.
+- Tombol **Lanjutkan: aplikasi > halaman terakhir** dibangun dari `user_settings.last_module` dan `last_path`.
   Jalurnya divalidasi ulang tiap tampil (lokal, masih cocok dengan rute, sesuai modul); bila tidak valid
   tombol disembunyikan. Label halaman diambil dari hierarki di `app/navigation.py`.
 - **landing_mode**: `launcher` menampilkan Beranda; `last_module` mengalihkan ke halaman terakhir, tetapi
@@ -400,7 +402,7 @@ karena Blueprint hanya mendefinisikan kolom `message`.
 |-------|----------|--------|
 | 1 | Tombol Kembali: menuju induk langsung di hierarki halaman, bukan riwayat browser | `app/navigation.py` |
 | 2 | Breadcrumb: tiap jenjang bisa diklik; di mobile menjadi `... > Halaman`, tombol `...` membuka jenjang tersembunyi | `_components/breadcrumb.html` |
-| 3 | App Switcher (9 titik) + tombol DKE di Top-Bar, modul aktif ditandai | `_components/app_switcher.html` |
+| 3 | App Switcher (9 titik) + tombol DKE di Top-Bar, aplikasi aktif ditandai | `_components/app_switcher.html` |
 
 Breadcrumb dan Kembali tampil **otomatis** di atas konten (`{% block page_nav %}` di `base.html`) untuk
 setiap halaman yang terdaftar di `app/navigation.py`. Contoh menambah halaman bersarang:
@@ -422,8 +424,8 @@ paksa, sidebar menjadi deretan tab horizontal yang bisa digeser (`custom.css` ba
 |-----|-----|-----|
 | Ringkasan | `/infosys/` | Kartu akun, 4 statistik singkat, 5 aktivitas terbaru. Guest melihat ajakan masuk |
 | Profil | `/infosys/profil` | Ubah nama, bio (maks. 300), `avatar_url` (https, maks. 500) dengan pratinjau; form terpisah **Ganti kata sandi** (`POST /infosys/profil/sandi`) |
-| Log Aktivitas | `/infosys/log?modul=&halaman=` | Tabel dengan filter modul dan paginasi 10 baris per halaman |
-| Statistik Lintas Modul | `/infosys/statistik` | 6 kartu: pesanan, kelas diikuti, rata-rata progres, tutorial tersimpan, thread, balasan; progres per kelas |
+| Log Aktivitas | `/infosys/log?modul=&halaman=` | Tabel dengan filter aplikasi dan paginasi 10 baris per halaman |
+| Statistik Semua Aplikasi | `/infosys/statistik` | 6 kartu: pesanan, kelas diikuti, rata-rata progres, tutorial tersimpan, thread, balasan; progres per kelas |
 | Pengaturan Keamanan | `/infosys/keamanan?halaman=` | Riwayat login (waktu + IP) dengan paginasi, peringatan bila ada lebih dari satu IP, tautan ganti kata sandi |
 
 **Aturan penting**
@@ -450,9 +452,9 @@ Skenario uji manual: `docs/UJI_MANUAL_PANEL.md`.
 
 ## Integrasi lintas modul (notifikasi, Smart Landing, statistik, pengaturan)
 
-- **Notifikasi Top-Bar.** Lonceng menampilkan jumlah belum dibaca (lencana, `9+` bila lebih), panel berisi notifikasi terbaru beserta modul dan waktunya, dan tautan ke halaman asal. Klik notifikasi bertautan menandainya dibaca sambil membuka halaman asal; notifikasi tanpa tautan berupa tombol yang hanya menandai dibaca. Tombol "Tandai semua dibaca" membersihkan seluruhnya. Endpoint: `POST /api/notifications/read` (`{"id": N}` atau `{"all": true}`, JSON same-origin, hanya milik akun sendiri), klien: `static/js/notif.js`, logika: `utils.mark_notifications_read`.
-- **Smart Landing.** Kontrol di Beranda menampilkan statusnya (aktif/nonaktif). "Tampilkan Beranda" mematikannya; "Lanjutkan modul terakhir" menyalakannya. Tersimpan di `user_settings.landing_mode`.
-- **Statistik Information System** (`/infosys/statistik`) memuat data keenam modul: pesanan, kelas, kemajuan, bookmark, thread, balasan, kuis lulus, artikel Portal (umum), kategori favorit, aktivitas tercatat, dan rincian aktivitas per modul.
+- **Notifikasi Top-Bar.** Lonceng menampilkan jumlah belum dibaca (lencana, `9+` bila lebih), panel berisi notifikasi terbaru beserta aplikasi dan waktunya, dan tautan ke halaman asal. Klik notifikasi bertautan menandainya dibaca sambil membuka halaman asal; notifikasi tanpa tautan berupa tombol yang hanya menandai dibaca. Tombol "Tandai semua dibaca" membersihkan seluruhnya. Endpoint: `POST /api/notifications/read` (`{"id": N}` atau `{"all": true}`, JSON same-origin, hanya milik akun sendiri), klien: `static/js/notif.js`, logika: `utils.mark_notifications_read`.
+- **Smart Landing.** Kontrol di Beranda menampilkan statusnya (aktif/nonaktif). "Tampilkan Beranda" mematikannya; "Lanjutkan aplikasi terakhir" menyalakannya. Tersimpan di `user_settings.landing_mode`.
+- **Statistik Information System** (`/infosys/statistik`) memuat data keenam aplikasi: pesanan, kelas, kemajuan, bookmark, thread, balasan, kuis lulus, artikel Portal (umum), kategori favorit, aktivitas tercatat, dan rincian aktivitas per aplikasi.
 - **Pengaturan per modul** memakai satu pola: `app/module_settings.py` (`get_setting`, `set_setting`, `MSG_SAVE_FAILED`, `msg_saved`). Modul tidak boleh menulis SQL `module_settings` sendiri (dijaga tes). `set_setting(..., None)` menghapus; `commit=False` untuk transaksi gabungan. Setiap simpan tercatat di log aktivitas.
 - **Navigasi.** Setiap halaman GET modul harus punya node di `app/navigation.py` (dijaga `NavigationCoverageTest`); E-Commerce kini ikut.
 - Uji: `python -m unittest tests.test_integration`; panduan manual: `docs/UJI_MANUAL_INTEGRASI.md`; rincian perubahan: `docs/PERUBAHAN_INTEGRASI.md`.

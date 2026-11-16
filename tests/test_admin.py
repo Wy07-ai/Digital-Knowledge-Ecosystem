@@ -22,7 +22,7 @@ from werkzeug.security import generate_password_hash
 from app import create_app
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PASSWORDS = {"admin@dke.test": "Admin12345", "rina@dke.test": "Rina12345", "budi@dke.test": "Budi12345"}
+PASSWORDS = {"admin@dke.test": "Pengelola-Uji-2026", "rina@dke.test": "Rina12345", "budi@dke.test": "Budi12345"}
 
 
 class AdminTestCase(unittest.TestCase):

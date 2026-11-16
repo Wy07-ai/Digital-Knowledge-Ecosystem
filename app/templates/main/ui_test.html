@@ -64,8 +64,8 @@
   </section>
 
   <section class="mt-10" aria-labelledby="h-card">
-    <h2 id="h-card" class="text-xl font-semibold">5. Kartu modul dan penanda modul aktif</h2>
-    <p class="mt-1 text-sm text-muted">Klik kartu untuk membuka modul; di sana App Switcher (ikon 9 titik) menandai modul aktif.</p>
+    <h2 id="h-card" class="text-xl font-semibold">5. Kartu aplikasi dan penanda aplikasi aktif</h2>
+    <p class="mt-1 text-sm text-muted">Klik kartu untuk membuka aplikasi; di sana App Switcher (ikon 9 titik) menandai aplikasi aktif.</p>
     <div class="launcher-grid mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {% for m in modules %}
         {{ module_card(m, summary=('Python Dasar' if m.key == 'elearning' else None), progress=(45 if m.key == 'elearning' else None)) }}

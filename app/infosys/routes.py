@@ -74,7 +74,7 @@ PANEL_TABS = (
     ("ringkasan", "infosys.index", "Ringkasan", "infosys"),
     ("profil", "infosys.profile", "Profil", "user"),
     ("log", "infosys.activity", "Log Aktivitas", "list"),
-    ("statistik", "infosys.stats", "Statistik Lintas Modul", "chart"),
+    ("statistik", "infosys.stats", "Statistik Semua Aplikasi", "chart"),
     ("keamanan", "infosys.security", "Pengaturan Keamanan", "shield"),
 )
 
@@ -260,7 +260,7 @@ def activity():
 def stats():
     db = get_db()
     stats_, courses = panel.user_stats(db, _uid())
-    return _panel("infosys/stats.html", "statistik", "Statistik Lintas Modul",
+    return _panel("infosys/stats.html", "statistik", "Statistik Semua Aplikasi",
                   stats=stats_, courses=courses, activity=panel.module_activity(db, _uid()))
 
 
