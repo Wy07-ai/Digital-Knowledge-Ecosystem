@@ -200,6 +200,34 @@ def build_widgets():
 
 
 # --------------------------------------------------------------------------
+# Hero Beranda (carousel)
+# --------------------------------------------------------------------------
+# Lima slide promosi; Information System sengaja tidak ikut. Urutan tetap: E-Learning, E-Commerce, E-Tutorial,
+# Portal, Forum. Teks mengikuti docs/GLOSARIUM_TEKS.md: satu kalimat maks. 15 kata, menyapa dengan "Anda", dan
+# memakai kata "aplikasi" (bukan istilah internal). Tautan dibuat di templat lewat url_for(key ~ '.index');
+# aksen berasal dari MODULE_BY_KEY (hanya untuk cahaya dekoratif, bukan warna teks).
+HERO_INTERVAL_MS = 10000  # jeda geser otomatis, dikirim ke data-interval; dibaca carousel.js
+
+HERO_SLIDES = (
+    {"key": "elearning", "title": "Belajar dari kelas pilihan",
+     "text": "Ikuti kelas, kerjakan kuis, dan pantau kemajuan belajar Anda.", "cta": "Jelajahi kelas"},
+    {"key": "ecommerce", "title": "Belanja kebutuhan belajar",
+     "text": "Pilih produk, isi keranjang, lalu bayar dengan mudah sesuai kebutuhan Anda.", "cta": "Lihat produk"},
+    {"key": "etutorial", "title": "Praktik langkah demi langkah",
+     "text": "Ikuti contoh kode dan simpan tutorial favorit Anda.", "cta": "Buka tutorial"},
+    {"key": "portal", "title": "Baca artikel dan berita pilihan",
+     "text": "Ikuti kabar terbaru dari kategori yang Anda minati.", "cta": "Baca artikel"},
+    {"key": "forum", "title": "Bertanya dan berdiskusi bersama",
+     "text": "Anda bisa bertanya, menjawab, dan bertukar pikiran dengan komunitas.", "cta": "Ikut diskusi"},
+)
+
+
+def hero_slides():
+    """HERO_SLIDES beserta dict aplikasinya (nama dan aksen) dari MODULE_BY_KEY, siap dipakai templat."""
+    return [{**slide, "module": MODULE_BY_KEY[slide["key"]]} for slide in HERO_SLIDES]
+
+
+# --------------------------------------------------------------------------
 # Lanjutkan (Smart Landing)
 # --------------------------------------------------------------------------
 def resume_target():

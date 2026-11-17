@@ -1,52 +1,45 @@
 {% extends "base.html" %}
 {% from "_components/module_card.html" import module_card %}
 {% from "_components/_icons.html" import icon %}
+{% from "_components/hero_carousel.html" import hero_carousel %}
 {% block title %}Beranda{% endblock %}
-{% block scripts_extra %}<script defer src="{{ url_for('static', filename='js/launcher.js') }}"></script>{% endblock %}
+{% block scripts_extra %}
+  <script defer src="{{ url_for('static', filename='js/launcher.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/carousel.js') }}"></script>
+{% endblock %}
 {% block content %}
-  <section class="home-hero" aria-labelledby="home-hero-title">
-    <div class="home-hero-copy">
+  {{ hero_carousel(hero_slides, hero_interval) }}
+
+  {# Strip tipis di bawah carousel: sapaan personal dan tombol "Lanjutkan" (data-resume) tetap seperti sebelumnya. #}
+  <section class="home-strip" aria-labelledby="home-hero-title">
+    <div class="home-strip-copy">
       {% if first_name %}
-        <p class="home-eyebrow">SELAMAT DATANG KEMBALI</p>
         <h1 id="home-hero-title">Halo, {{ first_name }}.</h1>
         <p>Pilih aplikasi, atau lanjutkan aktivitas terakhir.</p>
       {% else %}
-        <p class="home-eyebrow">EKOSISTEM BELAJAR DIGITAL</p>
         <h1 id="home-hero-title">Belajar lebih mudah, saat semuanya terhubung.</h1>
         <p>Satu akun untuk enam aplikasi belajar dan berkarya.</p>
       {% endif %}
-
-      {% if resume %}
-        <a href="{{ resume.url }}" class="home-hero-cta" data-resume
-           aria-label="Lanjutkan: {{ resume.labels|join(' ke ') }}">
-          {{ icon(resume.module.key, 'h-5 w-5 flex-none') }}
-          <span class="min-w-0 truncate">
-            <span class="font-bold">Lanjutkan:</span>
-            {% for label in resume.labels %}
-              {% if not loop.first %}<span aria-hidden="true"> &rsaquo; </span>{% endif %}
-              <span class="{{ 'dke-hide-mobile' if (not loop.first and not loop.last) }}">{{ label }}</span>
-            {% endfor %}
-          </span>
-          {{ icon('arrow-right', 'h-4 w-4 flex-none') }}
-        </a>
-      {% elif current_user %}
-        <a href="{{ url_for('elearning.index') }}" class="home-hero-cta">
-          {{ icon('elearning', 'h-5 w-5') }}Jelajahi kelas{{ icon('arrow-right', 'h-4 w-4') }}
-        </a>
-      {% else %}
-        <a href="{{ url_for('elearning.index') }}" class="home-hero-cta">
-          {{ icon('arrow-right', 'h-5 w-5') }}Mulai belajar
-        </a>
-      {% endif %}
     </div>
 
-    <div class="home-orbit" aria-hidden="true">
-      <span class="home-orbit-ring"></span>
-      <span class="home-orbit-core">DKE</span>
-      <span class="home-orbit-node home-orbit-node-one">{{ icon('elearning', 'h-6 w-6') }}</span>
-      <span class="home-orbit-node home-orbit-node-two">{{ icon('portal', 'h-6 w-6') }}</span>
-      <span class="home-orbit-node home-orbit-node-three">{{ icon('forum', 'h-6 w-6') }}</span>
-    </div>
+    {% if resume %}
+      <a href="{{ resume.url }}" class="home-strip-cta" data-resume
+         aria-label="Lanjutkan: {{ resume.labels|join(' ke ') }}">
+        {{ icon(resume.module.key, 'h-5 w-5 flex-none') }}
+        <span class="min-w-0 truncate">
+          <span class="font-bold">Lanjutkan:</span>
+          {% for label in resume.labels %}
+            {% if not loop.first %}<span aria-hidden="true"> &rsaquo; </span>{% endif %}
+            <span class="{{ 'dke-hide-mobile' if (not loop.first and not loop.last) }}">{{ label }}</span>
+          {% endfor %}
+        </span>
+        {{ icon('arrow-right', 'h-4 w-4 flex-none') }}
+      </a>
+    {% elif current_user %}
+      <a href="{{ url_for('elearning.index') }}" class="home-strip-cta">
+        {{ icon('elearning', 'h-5 w-5') }}Jelajahi kelas{{ icon('arrow-right', 'h-4 w-4') }}
+      </a>
+    {% endif %}
   </section>
 
   <section class="home-apps" aria-labelledby="home-apps-title">

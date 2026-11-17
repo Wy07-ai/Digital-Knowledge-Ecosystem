@@ -2,7 +2,7 @@ from flask import abort, current_app, flash, g, redirect, render_template, sessi
 
 from .. import LANDED_KEY, MODULES
 from . import bp
-from .launcher import build_widgets, resume_target
+from .launcher import HERO_INTERVAL_MS, build_widgets, hero_slides, resume_target
 
 
 @bp.route("/")
@@ -34,6 +34,8 @@ def index():
         "main/index.html",
         page_title="Beranda",
         widgets=build_widgets(),
+        hero_slides=hero_slides(),
+        hero_interval=HERO_INTERVAL_MS,
         resume=resume,
         first_name=user["full_name"].split()[0] if user else None,
     )

@@ -36,7 +36,7 @@ Modul tetap boleh memakai kelas khusus untuk fungsi yang tidak sama dengan kompo
 
 ## Polesan halaman
 
-- Hero Beranda memberi sambutan sesuai status Guest/Member, satu CTA utama, dan motif aplikasi dekoratif.
+- Hero Beranda berupa carousel lima aplikasi (E-Learning, E-Commerce, E-Tutorial, Portal, Forum) dengan satu tombol per slide dan ikon aplikasi dekoratif. Sapaan sesuai status Guest/Member dan tombol Lanjutkan berada di strip tipis tepat di bawahnya.
 - Ikon kartu Beranda memakai latar gradien warna aksen yang lembut; deskripsi aplikasi tampil dua baris.
 - Top-Bar menampilkan ikon Beranda dan ikon aplikasi aktif, serta menyamakan ukuran aksi Masuk/Daftar dengan gaya sekunder/primer.
 - Empty state memakai bidang ilustrasi berbasis SVG inline dan aksen modul dengan tetap mempertahankan judul, pesan, serta aksi yang jelas.
