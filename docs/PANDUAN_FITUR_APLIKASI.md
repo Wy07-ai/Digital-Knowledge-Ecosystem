@@ -285,6 +285,28 @@ dan cocok untuk mobile. Modal pencarian cepat bisa menjadi issue lanjutan.
 | 1 | Tombol Kembali: menuju induk langsung di hierarki halaman, bukan riwayat browser | `app/navigation.py` |
 | 2 | Breadcrumb: tiap jenjang bisa diklik; di mobile menjadi `... > Halaman`, tombol `...` membuka jenjang tersembunyi | `_components/breadcrumb.html` |
 | 3 | App Switcher (9 titik) + tombol DKE di Top-Bar, aplikasi aktif ditandai | `_components/app_switcher.html` |
+| 3 (mobile) | Bilah navigasi bawah: Beranda, Aplikasi, Cari, Akun; hanya di layar < 768 px dan Mobile View | `_components/bottom_nav.html` |
+
+**Bilah navigasi bawah (mobile)**: di layar sempit (< 768 px) dan Mobile View, navigasi level 3 juga tersedia sebagai bilah tetap di dasar layar
+dengan empat menu (ikon dan label terlihat, tiap target minimal 44 x 44 px). Komponen `_components/bottom_nav.html` di-include satu kali dari
+`base.html` di dalam `{% block bottom_nav %}`, jadi halaman tertentu bisa menyembunyikannya dengan mengosongkan blok itu. Bilah ini tidak tampil di desktop biasa.
+
+| Menu | Tujuan | Aktif (`aria-current="page"`) bila |
+|------|--------|------------------------------------|
+| Beranda | `main.index` | `request.endpoint == 'main.index'` |
+| Aplikasi | tombol yang membuka panel App Switcher yang sama dengan bilah atas (daftar enam aplikasi tidak digandakan; `aria-expanded` mengikuti panel) | `current_module` ada dan bukan `infosys` |
+| Cari | `main.search` | `request.endpoint == 'main.search'` |
+| Akun | `infosys.index` untuk Member, `infosys.login` (dengan `?next=`) untuk Guest | `request.blueprint == 'infosys'` |
+
+- **Penanda aktif** bukan hanya warna: garis tebal di tepi atas item, ikon berisi lembut, dan teks lebih tebal.
+- **Menu Aplikasi** memakai atribut `data-popover-open` + `aria-controls="app-switcher-panel"` yang ditangani `static/js/switcher.js`: satu panel,
+  satu panel terbuka pada satu waktu, `aria-expanded` pemicu bilah atas dan bilah bawah selalu sama, dan Esc mengembalikan fokus ke pemicu yang dipakai.
+- **CSS** (`custom.css` bagian 16): tersembunyi secara bawaan; tampil pada `@media (max-width: 767px)` dan `html[data-view='mobile']`; `position: fixed`,
+  `z-index: 30` (di bawah bilah atas, panel, toast, dan dialog), `padding-bottom: env(safe-area-inset-bottom, 0)`. Di Mobile View pada desktop lebarnya
+  `min(430px, 100%)` dan dipusatkan, sama dengan body. Hanya bila bilah ada, `body` diberi `padding-bottom` setinggi bilah plus area aman, `html` diberi
+  `scroll-padding-bottom`, dan `#toast-root` dipindah ke atas bilah. Tersembunyi saat cetak; warna hanya dari token tema (Terang dan Gelap).
+- **Halaman galat** mewarisi `base.html`, jadi bilah ikut tampil (tanpa menu aktif).
+- Uji: `python -m unittest tests.test_bottom_nav`; uji manual: [`UJI_MANUAL_NAV_MOBILE.md`](UJI_MANUAL_NAV_MOBILE.md).
 
 Breadcrumb dan Kembali tampil **otomatis** di atas konten (`{% block page_nav %}` di `base.html`) untuk
 setiap halaman yang terdaftar di `app/navigation.py`. Contoh menambah halaman bersarang:

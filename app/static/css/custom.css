@@ -13,6 +13,7 @@
    7. prefers-reduced-motion
    8. Kartu aplikasi Beranda (kartu fitur, hover lift); 8b/8d: hero dan kartu di layar sempit dan Mobile View
    8c. Carousel hero Beranda dan strip sapaan
+   16. Bilah navigasi bawah (hanya layar sempit dan Mobile View)
    ===================================================================== */
 
 /* ---------- 1. Design token ---------- */
@@ -1384,3 +1385,68 @@ html[data-view='mobile'] .fm-post[data-level='3'] { margin-left: .75rem; }
 html[data-view='mobile'] .fm-post[data-level='2'], html[data-view='mobile'] .fm-post[data-level='3'] { padding-left: .75rem; }
 html[data-view='mobile'] .fm-count { min-width: 3.25rem; }
 html[data-view='mobile'] .fm-choices { grid-template-columns: 1fr; }
+
+/* ---------- 16. Bilah navigasi bawah (layar sempit dan Mobile View) ----------
+   Markup: _components/bottom_nav.html (di-include satu kali dari base.html, dalam {% block bottom_nav %}).
+   Perilaku menu Aplikasi: static/js/switcher.js (data-popover-open). Pola ganda seperti bagian 6: media query
+   untuk layar sempit sungguhan, html[data-view='mobile'] untuk Mobile View di desktop (lebar viewport tetap besar).
+   Warna hanya dari token (--c-surface, --c-border, --c-muted, --c-primary), jadi Terang dan Gelap otomatis.
+   z-index 30: di bawah Top-Bar (40), panel popover (50), toast (60), dan <dialog> (lapisan atas peramban).
+   Tidak ada elemen lain yang menempel di dasar layar (Sebelumnya/Berikutnya E-Tutorial, navigasi kuis, form balas
+   Forum, dan ringkasan keranjang berada di alur halaman), jadi cukup padding-bottom pada body dan scroll-padding-bottom
+   pada html supaya fokus dan scrollIntoView() tidak berhenti di balik bilah. */
+:root {
+  --bottom-nav-h: 3.5rem;
+  --bottom-nav-space: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+.bottom-nav {
+  display: none;                                           /* bawaan: tersembunyi di desktop */
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  border-top: 1px solid rgb(var(--c-border)); background: rgb(var(--c-surface));
+  box-shadow: 0 -6px 18px -14px rgb(15 23 42 / .45);
+}
+.bottom-nav-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.bottom-nav-list > li { display: flex; min-width: 0; }
+.bottom-nav-item {
+  position: relative; display: flex; flex: 1; min-width: 44px; min-height: 44px; height: var(--bottom-nav-h);
+  flex-direction: column; align-items: center; justify-content: center; gap: .125rem; padding: .25rem .125rem;
+  border: 0; background: transparent; font: inherit; font-size: .75rem; font-weight: 600; line-height: 1.2;
+  color: rgb(var(--c-muted)); text-decoration: none; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.bottom-nav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bottom-nav-item:hover { background: rgb(var(--c-border) / .5); color: rgb(var(--c-ink)); }
+.bottom-nav-item:active { transform: scale(.95); }
+.bottom-nav-item:focus-visible { outline: 2px solid rgb(var(--c-primary)); outline-offset: -4px; border-radius: .75rem; }
+.bottom-nav-item[aria-expanded='true'] { background: rgb(var(--c-border) / .6); color: rgb(var(--c-ink)); }
+/* Penanda aktif bukan hanya warna: garis tebal di tepi atas, ikon berisi lembut, dan teks lebih tebal. */
+.bottom-nav-item::before {
+  content: ""; position: absolute; top: -1px; left: 22%; right: 22%; height: 3px; border-radius: 0 0 3px 3px;
+  background: currentColor; transform: scaleX(0); transition: transform var(--dur-fast) var(--ease-out);
+}
+.bottom-nav-item[aria-current='page'] { color: rgb(var(--c-primary)); font-weight: 800; }
+.bottom-nav-item[aria-current='page']::before { transform: scaleX(1); }
+.bottom-nav-item[aria-current='page'] svg { fill: currentColor; fill-opacity: .18; }
+
+@media (max-width: 767px) {
+  .bottom-nav { display: block; }
+  /* Ruang di dasar halaman setinggi bilah plus area aman, hanya bila bilah ada (blok bottom_nav tidak dikosongkan). */
+  body:has(> .bottom-nav) { padding-bottom: var(--bottom-nav-space); }
+  html:has(.bottom-nav) { scroll-padding-bottom: var(--bottom-nav-space); }
+  /* Toast pindah ke atas bilah. */
+  body:has(> .bottom-nav) #toast-root { top: auto; bottom: calc(var(--bottom-nav-space) + .75rem); }
+}
+html[data-view='mobile'] .bottom-nav { display: block; width: min(430px, 100%); margin-inline: auto; }   /* selebar body, dipusatkan */
+html[data-view='mobile'] body:has(> .bottom-nav) { padding-bottom: var(--bottom-nav-space); }
+html[data-view='mobile']:has(.bottom-nav) { scroll-padding-bottom: var(--bottom-nav-space); }
+html[data-view='mobile'] body:has(> .bottom-nav) #toast-root { top: auto; bottom: calc(var(--bottom-nav-space) + .75rem); }
+
+@media print {
+  .bottom-nav { display: none !important; }
+  body:has(> .bottom-nav) { padding-bottom: 0 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav-item, .bottom-nav-item::before { transition: none; }
+  .bottom-nav-item:active { transform: none; }
+}

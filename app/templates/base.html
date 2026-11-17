@@ -2,7 +2,7 @@
 {#
   base.html - kerangka dasar DKE (Blueprint 6.1 dan 6.2).
   Blok yang bisa diisi turunan:
-    title, head_extra, main_class, content, scripts_extra
+    title, head_extra, main_class, content, scripts_extra, bottom_nav
   Atribut <html>:
     data-theme / data-view : nilai tersimpan (Member: dari database; Guest: bawaan,
                              lalu ditimpa localStorage oleh skrip anti-kedip)
@@ -72,6 +72,9 @@
     {% block page_nav %}{{ page_nav(nav) }}{% endblock %}
     {% block content %}{% endblock %}
   </main>
+
+  {# Bilah navigasi bawah (hanya layar sempit dan Mobile View). Kosongkan blok ini untuk menyembunyikannya di halaman tertentu. #}
+  {% block bottom_nav %}{% include '_components/bottom_nav.html' %}{% endblock %}
 
   {# Wadah toast. Pesan flash() Flask dikirim sebagai JSON aman dan ditampilkan oleh app.js. #}
   <div id="toast-root"></div>
