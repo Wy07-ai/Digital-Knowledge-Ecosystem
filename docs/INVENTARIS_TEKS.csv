@@ -10,6 +10,12 @@ app/templates/_components/breadcrumb.html,24,html-atribut,Tampilkan jenjang sebe
 app/templates/_components/breadcrumb.html,52,html-atribut,Kembali
 app/templates/_components/breadcrumb.html,53,html-teks,Kembali
 app/templates/_components/breadcrumb.html,53,html-teks,ke
+app/templates/_components/hero_carousel.html,14,html-atribut,Sorotan aplikasi
+app/templates/_components/hero_carousel.html,37,html-atribut,Pilih slide
+app/templates/_components/hero_carousel.html,39,html-atribut,Slide :
+app/templates/_components/hero_carousel.html,45,html-atribut,Jeda geser otomatis
+app/templates/_components/hero_carousel.html,50,html-atribut,Sebelumnya
+app/templates/_components/hero_carousel.html,52,html-atribut,Berikutnya
 app/templates/_components/module_card.html,41,html-atribut,Progres
 app/templates/_components/topbar.html,5,jinja,Beranda
 app/templates/_components/topbar.html,11,html-atribut,Beranda DKE
@@ -698,25 +704,21 @@ app/templates/infosys/stats.html,55,html-teks,Belum ada kelas yang diikuti.
 app/templates/infosys/stats.html,56,html-teks,Lihat daftar kelas
 app/templates/main/error.html,1,html-teks,max-w-2xl
 app/templates/main/error.html,21,html-teks,Kembali ke Beranda
-app/templates/main/index.html,72,jinja,Beranda
+app/templates/main/index.html,65,jinja,Beranda
 app/templates/main/index.html,1,html-teks,Beranda
-app/templates/main/index.html,10,html-teks,SELAMAT DATANG KEMBALI
-app/templates/main/index.html,11,html-teks,"Halo, ."
-app/templates/main/index.html,12,html-teks,"Pilih aplikasi, atau lanjutkan aktivitas terakhir."
-app/templates/main/index.html,14,html-teks,EKOSISTEM BELAJAR DIGITAL
-app/templates/main/index.html,15,html-teks,"Belajar lebih mudah, saat semuanya terhubung."
-app/templates/main/index.html,16,html-teks,Satu akun untuk enam aplikasi belajar dan berkarya.
-app/templates/main/index.html,24,html-teks,Lanjutkan:
-app/templates/main/index.html,33,html-teks,Jelajahi kelas
-app/templates/main/index.html,37,html-teks,Mulai belajar
-app/templates/main/index.html,45,html-teks,DKE
-app/templates/main/index.html,55,html-teks,"SATU PINTU, ENAM APLIKASI"
-app/templates/main/index.html,56,html-teks,Pilih aplikasi Anda
-app/templates/main/index.html,58,html-teks,Mulai dari yang Anda butuhkan hari ini.
-app/templates/main/index.html,71,html-teks,Saat membuka DKE
-app/templates/main/index.html,75,html-teks,Selalu tampilkan Beranda
-app/templates/main/index.html,77,html-teks,Lanjutkan aplikasi terakhir
-app/templates/main/index.html,79,html-teks,Berlaku saat Anda masuk atau membuka DKE lagi. Tombol DKE di bilah atas selalu ke Beranda.
+app/templates/main/index.html,17,html-teks,"Halo, ."
+app/templates/main/index.html,18,html-teks,"Pilih aplikasi, atau lanjutkan aktivitas terakhir."
+app/templates/main/index.html,20,html-teks,"Belajar lebih mudah, saat semuanya terhubung."
+app/templates/main/index.html,21,html-teks,Satu akun untuk enam aplikasi belajar dan berkarya.
+app/templates/main/index.html,30,html-teks,Lanjutkan:
+app/templates/main/index.html,39,html-teks,Jelajahi kelas
+app/templates/main/index.html,48,html-teks,"SATU PINTU, ENAM APLIKASI"
+app/templates/main/index.html,49,html-teks,Pilih aplikasi Anda
+app/templates/main/index.html,51,html-teks,Mulai dari yang Anda butuhkan hari ini.
+app/templates/main/index.html,64,html-teks,Saat membuka DKE
+app/templates/main/index.html,68,html-teks,Selalu tampilkan Beranda
+app/templates/main/index.html,70,html-teks,Lanjutkan aplikasi terakhir
+app/templates/main/index.html,72,html-teks,Berlaku saat Anda masuk atau membuka DKE lagi. Tombol DKE di bilah atas selalu ke Beranda.
 app/templates/main/nav_demo.html,1,html-teks,Contoh Navigasi
 app/templates/main/nav_demo.html,6,html-teks,Contoh halaman jenjang 3: Materi Contoh halaman jenjang 2: Kelas
 app/templates/main/nav_demo.html,9,html-teks,Perhatikan baris di atas judul: tombol
@@ -1239,12 +1241,27 @@ app/main/launcher.py,111,py,Keranjang masih kosong
 app/main/launcher.py,150,py,Belum ada tutorial tersimpan
 app/main/launcher.py,162,py,Belum ada artikel baru
 app/main/launcher.py,176,py,Tidak ada balasan baru
+app/main/launcher.py,212,py,Belajar dari kelas pilihan
+app/main/launcher.py,213,py,"Ikuti kelas, kerjakan kuis, dan pantau kemajuan belajar Anda."
+app/main/launcher.py,213,py,Jelajahi kelas
+app/main/launcher.py,214,py,Belanja kebutuhan belajar
+app/main/launcher.py,215,py,"Pilih produk, isi keranjang, lalu bayar dengan mudah sesuai kebutuhan Anda."
+app/main/launcher.py,215,py,Lihat produk
+app/main/launcher.py,216,py,Praktik langkah demi langkah
+app/main/launcher.py,217,py,Ikuti contoh kode dan simpan tutorial favorit Anda.
+app/main/launcher.py,217,py,Buka tutorial
+app/main/launcher.py,218,py,Baca artikel dan berita pilihan
+app/main/launcher.py,219,py,Ikuti kabar terbaru dari kategori yang Anda minati.
+app/main/launcher.py,219,py,Baca artikel
+app/main/launcher.py,220,py,Bertanya dan berdiskusi bersama
+app/main/launcher.py,221,py,"Anda bisa bertanya, menjawab, dan bertukar pikiran dengan komunitas."
+app/main/launcher.py,221,py,Ikut diskusi
 app/main/launcher.py,93,py,Masuk ke akun
 app/main/launcher.py,100,py,Belum ada aktivitas hari ini
 app/main/launcher.py,136,py,Belum mengikuti kelas
 app/main/launcher.py,156,py,Belum ada artikel
 app/main/launcher.py,158,py,Baca artikel
-app/main/launcher.py,231,py,Halaman terakhir
+app/main/launcher.py,259,py,Halaman terakhir
 app/main/launcher.py,107,py,Lihat produk
 app/main/launcher.py,107,py,Belum ada produk
 app/main/launcher.py,117,py,Lihat kelas
@@ -1254,11 +1271,11 @@ app/main/launcher.py,146,py,Belum ada tutorial
 app/main/launcher.py,168,py,Lihat diskusi
 app/main/launcher.py,168,py,Belum ada diskusi
 app/main/launcher.py,198,py,Ringkasan belum tersedia
-app/main/routes.py,64,py,Pesan tanpa kategori (bawaan Flask) tampil sebagai toast info.
+app/main/routes.py,66,py,Pesan tanpa kategori (bawaan Flask) tampil sebagai toast info.
 app/main/routes.py,35,py,Beranda
-app/main/routes.py,53,py,Uji Komponen
-app/main/routes.py,75,py,Contoh Navigasi
-app/main/routes.py,81,py,Contoh Navigasi
+app/main/routes.py,55,py,Uji Komponen
+app/main/routes.py,77,py,Contoh Navigasi
+app/main/routes.py,83,py,Contoh Navigasi
 app/portal/routes.py,45,py,Redaksi DKE
 app/portal/routes.py,49,py,Jan
 app/portal/routes.py,49,py,Feb
@@ -1298,6 +1315,10 @@ app/static/js/auth.js,23,js,Nama lengkap belum diisi. Tulis nama Anda.
 app/static/js/auth.js,24,js,Nama lengkap terlalu panjang. Maksimal 100 karakter.
 app/static/js/auth.js,155,js,Sembunyikan
 app/static/js/auth.js,155,js,Tampilkan
+app/static/js/carousel.js,31,js,Jeda geser otomatis
+app/static/js/carousel.js,32,js,Putar geser otomatis
+app/static/js/carousel.js,122,js,Home
+app/static/js/carousel.js,123,js,End
 app/static/js/cart.js,11,js,Rp
 app/static/js/cart.js,26,js,"Keranjang belanja,"
 app/static/js/cart.js,66,js,Keranjang belum bisa diperbarui.

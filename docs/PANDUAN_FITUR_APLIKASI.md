@@ -202,6 +202,24 @@ Uji: `python -m unittest tests.test_forum`; panduan manual: [`UJI_MANUAL_FORUM.m
 
 **Beranda** (`/`, `app/main/routes.py` + `app/main/launcher.py`)
 
+- **Hero carousel** (`_components/hero_carousel.html`, `static/js/carousel.js`, `custom.css` bagian 8c): lima slide
+  berurutan E-Learning, E-Commerce, E-Tutorial, Portal, dan Forum (Information System tidak ikut). Data slide ada di
+  `HERO_SLIDES` (`app/main/launcher.py`): `key`, judul, satu kalimat maks. 15 kata yang menyapa dengan "Anda", dan label
+  tombol. Tombol slide menuju `url_for(key ~ '.index')`; aksen aplikasi dari `MODULE_BY_KEY` hanya menjadi cahaya
+  dekoratif di belakang ikon besar (teks selalu putih di atas dasar navy, kontras >= 4,5:1 di Terang dan Gelap).
+  - **Geser otomatis** tiap 10 detik (nilai dari `data-interval`, bukan di JavaScript). Berhenti saat hover dan fokus
+    (lanjut bila kursor dan fokus sudah keluar), saat tab tersembunyi, dan tidak berjalan sama sekali bila
+    `prefers-reduced-motion: reduce` aktif (perubahan pengaturan dipantau langsung). Tombol Jeda/Putar adalah pilihan
+    tetap pengguna (WCAG 2.2.2).
+  - **Kontrol**: Jeda/Putar, Sebelumnya, Berikutnya, dan titik indikator (area sentuh 44 x 44 px, titik aktif berbentuk
+    pil dan ber-`aria-current`). ArrowLeft/ArrowRight (juga Home/End) pada kontrol, geser sentuh dengan ambang 40 px.
+  - **Aksesibilitas**: pembungkus `aria-roledescription="carousel"`, tiap slide grup "n dari 5", slide tak aktif memakai
+    `visibility: hidden` (tidak bisa difokus), `aria-live` "off" saat otomatis dan "polite" saat dijeda atau dipindah manual.
+  - **Tanpa JavaScript**: slide pertama tampil, tombol slide tetap tautan, kontrol tersembunyi (kelas `.carousel-js`
+    dipasang oleh `carousel.js`). Tanpa skrip inline dan atribut event, jadi CSP tidak dilonggarkan.
+  - **Mobile View dan layar sempit**: tanpa ilustrasi besar, judul kecil, tombol slide selebar penuh (aturan Issue A).
+  - Strip tipis di bawah carousel berisi sapaan dan tombol **Lanjutkan** (`data-resume`); lihat bagian di bawah.
+  - Uji: `python -m unittest tests.test_home_hero`; uji manual: [`UJI_MANUAL_BERANDA.md`](UJI_MANUAL_BERANDA.md) baris 15-33.
 - Grid kartu aplikasi: 3 kolom (3x2) di desktop (`lg`), 2 kolom di tablet, 1 kolom di mobile dan Mobile View.
   Setiap kartu hanya memuat aksen warna, ikon, nama aplikasi, dan satu baris metrik (maks. ~40 karakter, angka ditonjolkan);
   deskripsi aplikasi ada di `title` dan `aria-describedby`, bukan di kartu. Zona metrik menempel di dasar kartu dengan tinggi tetap; hover lift 4 px + glow 200 ms
@@ -209,7 +227,7 @@ Uji: `python -m unittest tests.test_forum`; panduan manual: [`UJI_MANUAL_FORUM.m
 - Widget dibaca dari database, satu fungsi per modul di `launcher.py`. Data kosong tampil sebagai pesan
   ramah berwarna redup ("Keranjang masih kosong"), dan kegagalan satu widget tidak merusak halaman.
   Guest melihat satu ajakan pendek per kartu ("Lihat produk", "Lihat kelas", "Baca artikel", "Lihat diskusi").
-- Tombol **Lanjutkan: aplikasi > halaman terakhir** dibangun dari `user_settings.last_module` dan `last_path`.
+- Tombol **Lanjutkan: aplikasi > halaman terakhir** (di strip di bawah carousel) dibangun dari `user_settings.last_module` dan `last_path`.
   Jalurnya divalidasi ulang tiap tampil (lokal, masih cocok dengan rute, sesuai modul); bila tidak valid
   tombol disembunyikan. Label halaman diambil dari hierarki di `app/navigation.py`.
 - **landing_mode**: `launcher` menampilkan Beranda; `last_module` mengalihkan ke halaman terakhir, tetapi

@@ -12,6 +12,7 @@
    6. Mobile View (paksa di desktop + layar sempit sungguhan)
    7. prefers-reduced-motion
    8. Kartu modul Beranda (hover lift)
+   8c. Carousel hero Beranda dan strip sapaan
    ===================================================================== */
 
 /* ---------- 1. Design token ---------- */
@@ -577,6 +578,134 @@ html[data-view='mobile'] .home-apps { margin-top: 1.5rem; }
   .home-hero-cta { display: flex; width: 100%; min-height: 44px; margin-top: .875rem; }
   .home-hero-cta > .truncate { flex: 0 1 auto; }
   .home-apps { margin-top: 1.5rem; }
+}
+
+/* ---------- 8c. Carousel hero Beranda ----------
+   Markup: _components/hero_carousel.html; perilaku: static/js/carousel.js. Ditaruh DI LUAR blok
+   @media (hover: hover) di atas supaya juga berlaku di layar sentuh. Aturan .home-hero/.home-orbit di atas
+   tinggal sebagai warisan (hero lama), tetap dipertahankan karena dijaga HeroMobileCssTests.
+   Kontras: teks selalu putih di atas dasar navy yang sama di Terang dan Gelap. Aksen aplikasi
+   (--slide-accent) hanya cahaya dekoratif sebesar --slide-glow; tes menghitung kasus terburuknya (>= 4,5:1).
+   Tanpa JavaScript: slide pertama (.is-active dari server) tampil dan kontrol tersembunyi. */
+.hero-carousel {
+  --slide-glow: 30%;
+  position: relative; isolation: isolate; overflow: hidden;
+  border: 1px solid rgb(255 255 255 / .15); border-radius: var(--radius-card);
+  background:
+    radial-gradient(ellipse at 12% 0%, rgb(255 255 255 / .12), transparent 34%),
+    linear-gradient(118deg, rgb(var(--c-header-deep)) 0%, rgb(var(--c-header)) 62%, #294eaa 100%);
+  color: #fff;
+  box-shadow: 0 22px 48px -36px rgb(15 23 42 / .72), 0 8px 20px -16px rgb(var(--c-header) / .42);
+}
+.hero-carousel :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.hero-carousel-track { display: grid; touch-action: pan-y; }
+.hero-slide {
+  grid-area: 1 / 1; position: relative; isolation: isolate;
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(10rem, .65fr); align-items: center; gap: 2rem;
+  min-height: 17rem; padding: clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem) 1rem;
+  opacity: 0; visibility: hidden; transform: translateX(1rem);
+  /* visibility ikut ditunda 400 ms agar slide yang keluar sempat memudar; slide tak aktif keluar dari urutan Tab */
+  transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), visibility 0s linear 400ms;
+}
+.hero-slide.is-active { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.hero-slide::before {
+  content: ""; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+  background: radial-gradient(circle 18rem at 82% 45%, color-mix(in srgb, var(--slide-accent, #4F46E5) var(--slide-glow), transparent), transparent 100%);
+}
+.hero-slide-copy { position: relative; min-width: 0; max-width: 42rem; }
+.hero-slide .home-eyebrow { color: #fff; }   /* putih (bukan #c7d2fe): lolos 4,5:1 di atas cahaya aksen terkuat */
+.hero-slide-title {
+  max-width: 20ch; margin: .65rem 0 0; color: #fff;
+  font-size: var(--text-hero); font-weight: 750; line-height: 1.08; letter-spacing: -.035em;
+}
+.hero-slide-text { max-width: 54ch; margin: .875rem 0 0; color: rgb(255 255 255 / .9); font-size: 1rem; line-height: 1.65; }
+.hero-slide-cta {
+  display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: .625rem;
+  margin-top: 1.375rem; padding: .625rem 1rem; border: 1px solid rgb(255 255 255 / .6); border-radius: var(--radius-control);
+  background: #fff; color: #172e68; font-weight: 700; line-height: 1.25; text-decoration: none;
+  box-shadow: 0 8px 18px -14px rgb(2 6 23 / .7);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.hero-slide-cta:hover { transform: translateY(-2px); }
+.hero-slide-cta:active { transform: scale(.97); }
+.hero-slide-art { display: flex; align-items: center; justify-content: center; }
+.hero-slide-tile {
+  display: flex; width: 11rem; height: 11rem; align-items: center; justify-content: center;
+  border: 1px solid rgb(255 255 255 / .34); border-radius: 2.5rem; background: rgb(255 255 255 / .12); color: #fff;
+  box-shadow: 0 0 0 .75rem color-mix(in srgb, var(--slide-accent, #4F46E5) 22%, transparent), 0 24px 40px -26px rgb(2 6 23 / .85);
+}
+.hero-slide-icon { width: 6rem; height: 6rem; }
+
+/* Kontrol: tersembunyi sampai carousel.js memasang .carousel-js */
+.hero-carousel:not(.carousel-js) .hero-carousel-controls { display: none; }
+.hero-carousel-controls {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .25rem 1rem;
+  padding: 0 clamp(1rem, 3vw, 2.25rem) .75rem;
+}
+.hero-carousel-dots, .hero-carousel-buttons { display: flex; align-items: center; }
+.hero-carousel-dot {
+  display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center;
+  padding: 0; border: 0; background: none; cursor: pointer;      /* area sentuh 44 x 44, bulatan visual kecil */
+}
+.hero-carousel-dot::before {
+  content: ""; width: .625rem; height: .625rem; border: 2px solid rgb(255 255 255 / .75); border-radius: 999px;
+  box-sizing: content-box; transition: width var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
+}
+.hero-carousel-dot[aria-current='true']::before { width: 1.5rem; background: #fff; border-color: #fff; }   /* bentuk, bukan hanya warna */
+.hero-carousel-btn {
+  display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center;
+  border: 1px solid rgb(255 255 255 / .45); border-radius: var(--radius-control); background: rgb(255 255 255 / .14);
+  color: #fff; cursor: pointer; margin-left: .5rem;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.hero-carousel-btn:first-child { margin-left: 0; }
+.hero-carousel-btn:hover { background: rgb(255 255 255 / .26); }
+.hero-carousel-btn[hidden] { display: none; }
+.hero-carousel-icon-play, .hero-carousel[data-paused='true'] .hero-carousel-icon-pause { display: none; }
+.hero-carousel[data-paused='true'] .hero-carousel-icon-play { display: inline-flex; }
+
+/* Strip sapaan dan "Lanjutkan" tepat di bawah carousel */
+.home-strip {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem;
+  margin-top: .75rem; padding: .75rem 1rem;
+  border: 1px solid rgb(var(--c-border)); border-radius: var(--radius-control); background: rgb(var(--c-surface));
+}
+.home-strip-copy { min-width: 0; }
+.home-strip h1 { margin: 0; color: rgb(var(--c-ink)); font-size: 1.125rem; font-weight: 750; line-height: 1.3; letter-spacing: -.02em; }
+.home-strip p { margin: .125rem 0 0; color: rgb(var(--c-muted)); font-size: .9375rem; line-height: 1.5; }
+.home-strip-cta {
+  display: inline-flex; min-height: 44px; max-width: 100%; align-items: center; justify-content: center; gap: .625rem;
+  padding: .5rem 1rem; border-radius: var(--radius-control); text-decoration: none; font-weight: 700; line-height: 1.25;
+  background: rgb(var(--c-primary)); color: rgb(var(--c-on-primary));
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.home-strip-cta:hover { transform: translateY(-1px); }
+.home-strip-cta:active { transform: scale(.97); }
+
+/* Mobile View dan layar sempit: mengikuti hasil Issue A (tanpa ilustrasi besar, judul kecil, tombol 44 px) */
+html[data-view='mobile'] .hero-slide { display: block; min-height: 0; padding: 1.25rem 1.25rem .5rem; }
+html[data-view='mobile'] .hero-slide-art { display: none; }
+html[data-view='mobile'] .hero-slide-title { max-width: none; margin-top: .4rem; font-size: 1.625rem; line-height: 1.2; letter-spacing: -.025em; }
+html[data-view='mobile'] .hero-slide-text { max-width: none; margin-top: .5rem; font-size: .9375rem; line-height: 1.5; }
+html[data-view='mobile'] .hero-slide-cta { display: flex; width: 100%; min-height: 44px; margin-top: .875rem; }
+html[data-view='mobile'] .hero-carousel-controls { justify-content: center; padding-inline: .75rem; }
+html[data-view='mobile'] .home-strip-cta { display: flex; width: 100%; }
+html[data-view='mobile'] .home-strip-cta > .truncate { flex: 0 1 auto; }
+@media (max-width: 767px) {
+  .hero-slide { display: block; min-height: 0; padding: 1.25rem 1.25rem .5rem; }
+  .hero-slide-art { display: none; }
+  .hero-slide-title { max-width: none; margin-top: .4rem; font-size: 1.625rem; line-height: 1.2; letter-spacing: -.025em; }
+  .hero-slide-text { max-width: none; margin-top: .5rem; font-size: .9375rem; line-height: 1.5; }
+  .hero-slide-cta { display: flex; width: 100%; min-height: 44px; margin-top: .875rem; }
+  .hero-carousel-controls { justify-content: center; padding-inline: .75rem; }
+  .home-strip-cta { display: flex; width: 100%; }
+  .home-strip-cta > .truncate { flex: 0 1 auto; }
+}
+
+/* Reduced motion: tanpa transisi (aturan global bagian 7 juga berlaku; ini dibuat eksplisit untuk carousel) */
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide, .hero-slide-cta, .hero-carousel-dot::before, .hero-carousel-btn, .home-strip-cta { transition: none; }
+  .hero-slide { transform: none; }
 }
 
 /* ---------- 9. Control Panel Information System ----------

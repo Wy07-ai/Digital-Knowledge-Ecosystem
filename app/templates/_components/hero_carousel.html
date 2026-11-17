@@ -1,0 +1,57 @@
+{# Hero Beranda berupa carousel lima aplikasi (E-Learning, E-Commerce, E-Tutorial, Portal, Forum).
+
+   hero_carousel(slides, interval=10000)
+     slides   : hasil hero_slides() di app/main/launcher.py; tiap elemen berisi key, title, text, cta, module
+     interval : jeda geser otomatis dalam milidetik; dibaca carousel.js dari data-interval (tidak tertanam di JS)
+
+   Tanpa JavaScript: slide pertama tampil (kelas is-active dari server), tombol slide tetap tautan biasa, dan
+   kontrol (Jeda, Sebelumnya, Berikutnya, titik) disembunyikan sampai carousel.js memasang .carousel-js.
+   Slide tak aktif memakai visibility: hidden, sehingga keluar dari pohon aksesibilitas dan urutan Tab.
+   Ilustrasi hanya dekoratif (aria-hidden). Aksen --slide-accent hanya cahaya dekoratif; teks selalu putih di
+   atas dasar navy (kontras dijaga tes). Gaya ada di custom.css bagian 8c. #}
+{% from '_components/_icons.html' import icon %}
+{% macro hero_carousel(slides, interval=10000) -%}
+<section class="hero-carousel" data-carousel data-interval="{{ interval }}"
+         aria-roledescription="carousel" aria-label="Sorotan aplikasi">
+  <div class="hero-carousel-track" id="hero-slides" data-carousel-track aria-live="off">
+    {% for s in slides %}
+    <div class="hero-slide{{ ' is-active' if loop.first }}" data-carousel-slide
+         role="group" aria-roledescription="slide" aria-label="{{ loop.index }} dari {{ slides|length }}"
+         style="--slide-accent: {{ s.module.accent }}">
+      <div class="hero-slide-copy">
+        <p class="home-eyebrow">{{ s.module.name|upper }}</p>
+        <h2 class="hero-slide-title">{{ s.title }}</h2>
+        <p class="hero-slide-text">{{ s.text }}</p>
+        <a href="{{ url_for(s.key ~ '.index') }}" class="hero-slide-cta">
+          {{ s.cta }}{{ icon('arrow-right', 'h-4 w-4 flex-none') }}
+        </a>
+      </div>
+      <div class="hero-slide-art" aria-hidden="true">
+        <span class="hero-slide-tile">{{ icon(s.key, 'hero-slide-icon') }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="hero-carousel-controls" data-carousel-controls>
+    <div class="hero-carousel-dots" role="group" aria-label="Pilih slide">
+      {% for s in slides %}
+      <button type="button" class="hero-carousel-dot" data-carousel-dot="{{ loop.index0 }}"
+              aria-controls="hero-slides" aria-label="Slide {{ loop.index }}: {{ s.module.name }}"
+              {% if loop.first %}aria-current="true"{% else %}tabindex="-1"{% endif %}></button>
+      {% endfor %}
+    </div>
+    <div class="hero-carousel-buttons">
+      <button type="button" class="hero-carousel-btn" data-carousel-toggle aria-controls="hero-slides"
+              aria-label="Jeda geser otomatis">
+        <span class="hero-carousel-icon-pause">{{ icon('pause', 'h-5 w-5') }}</span>
+        <span class="hero-carousel-icon-play">{{ icon('play', 'h-5 w-5') }}</span>
+      </button>
+      <button type="button" class="hero-carousel-btn" data-carousel-prev aria-controls="hero-slides"
+              aria-label="Sebelumnya">{{ icon('chevron-left', 'h-5 w-5') }}</button>
+      <button type="button" class="hero-carousel-btn" data-carousel-next aria-controls="hero-slides"
+              aria-label="Berikutnya">{{ icon('chevron-right', 'h-5 w-5') }}</button>
+    </div>
+  </div>
+</section>
+{%- endmacro %}
