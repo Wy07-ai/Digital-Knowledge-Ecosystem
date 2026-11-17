@@ -11,7 +11,7 @@
    5. Toast root, breadcrumb mobile
    6. Mobile View (paksa di desktop + layar sempit sungguhan)
    7. prefers-reduced-motion
-   8. Kartu modul Beranda (hover lift)
+   8. Kartu aplikasi Beranda (kartu fitur, hover lift); 8b/8d: hero dan kartu di layar sempit dan Mobile View
    8c. Carousel hero Beranda dan strip sapaan
    ===================================================================== */
 
@@ -343,7 +343,7 @@ html[data-theme-animating] [data-theme-option] { pointer-events: none; }
 /* ---------- 6. Mobile View ----------
    Breakpoint Tailwind mengikuti lebar jendela sungguhan, jadi Mobile View
    di desktop membutuhkan aturan eksplisit. Beri kelas penanda pada setiap
-   grid (launcher-grid, product-grid, card-grid) dan tumpukan flex (stack-mobile).
+   grid (launcher-grid: 2 kolom; product-grid, card-grid: 1 kolom) dan tumpukan flex (stack-mobile).
    Kelas .dke-hide-mobile menyembunyikan elemen di Mobile View dan layar sempit. */
 html[data-view='mobile'] { background-color: rgb(var(--c-outer)); }
 html[data-view='mobile'] body {
@@ -351,7 +351,7 @@ html[data-view='mobile'] body {
   border-inline: 1px solid rgb(var(--c-border));
   box-shadow: 0 0 48px rgb(0 0 0 / .12);
 }
-html[data-view='mobile'] .launcher-grid,
+html[data-view='mobile'] .launcher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
 html[data-view='mobile'] .product-grid,
 html[data-view='mobile'] .card-grid { grid-template-columns: 1fr; }
 html[data-view='mobile'] .stack-mobile { flex-direction: column; }
@@ -365,7 +365,8 @@ html[data-view='mobile'] #toast-root {
 
 /* Layar sempit sungguhan (di bawah breakpoint md Tailwind) */
 @media (max-width: 767px) {
-  .launcher-grid, .product-grid, .card-grid { grid-template-columns: 1fr; }
+  .launcher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+  .product-grid, .card-grid { grid-template-columns: 1fr; }
   .stack-mobile { flex-direction: column; }
   .dke-hide-mobile { display: none !important; }
   .bc-mid { display: none; }
@@ -387,50 +388,62 @@ html[data-view='mobile'] #toast-root {
   }
 }
 
-/* ---------- 8. Kartu modul Beranda ----------
-   Hover lift + glow aksen modul. Hanya perangkat dengan hover
-   sungguhan, supaya kartu tidak "menempel" naik setelah disentuh di ponsel. Aksen kartu
-   dikirim lewat variabel --card-accent (lihat _components/module_card.html). */
+/* ---------- 8. Kartu aplikasi Beranda (kartu fitur) ----------
+   Susunan: area visual berwarna aksen dengan ikon besar di tengah, judul tegas, lalu satu baris metrik
+   (lihat _components/module_card.html). Aksen dikirim lewat --card-accent (atribut style pada kartu).
+   Semua warna dicampur dari token (--c-surface, --c-ink, --c-border), bukan warna tetap, sehingga
+   Terang dan Gelap sama-sama kontras. Ukuran untuk layar sempit dan Mobile View ada di bagian 8d.
+   Catatan kaskade: tailwind.css dimuat terakhir, jadi override atas utilitas Tailwind memakai
+   selektor dua kelas (mis. .launcher-card .module-card-metric). */
 .launcher-card {
   position: relative; isolation: isolate; overflow: hidden;
-  gap: .75rem; min-height: 13rem; border-radius: var(--radius-card);
+  border-radius: var(--radius-card);
   background: linear-gradient(145deg, rgb(var(--c-surface)) 0%, rgb(var(--c-page)) 100%);
   box-shadow: var(--shadow-card);
   transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
 }
-.launcher-card::before {
-  content: ""; position: absolute; z-index: 0; top: -4.25rem; right: -3.25rem;
-  width: 11rem; height: 11rem; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, color-mix(in srgb, var(--card-accent) 18%, transparent), transparent 70%);
+.launcher-card:focus-visible { outline-width: 3px; outline-offset: 3px; }
+.module-card-visual {
+  position: relative; display: flex; height: 7.5rem; align-items: center; justify-content: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--card-accent) 18%, rgb(var(--c-border)));
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--card-accent) 26%, rgb(var(--c-surface))),
+    color-mix(in srgb, var(--card-accent) 9%, rgb(var(--c-surface))));
 }
-.launcher-card > * { position: relative; z-index: 1; }
-.module-card-heading { display: flex; align-items: center; gap: 1rem; }
+/* Pola titik lembut di tepi area visual; memudar ke arah ikon agar ikon tetap bersih. */
+.module-card-visual::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--card-accent) 34%, transparent) 1.2px, transparent 1.7px) 0 0 / 14px 14px;
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 22%, #000 95%);
+  mask-image: radial-gradient(ellipse at center, transparent 22%, #000 95%);
+}
+/* Ikon: aksen digelapkan di Terang dan diterangkan di Gelap lewat --c-ink (token), agar kontras
+   terhadap latar tinta aksen tetap di atas 3:1 (ikon besar, bukan teks). */
 .module-card-icon {
-  display: inline-flex; width: 3.75rem; height: 3.75rem; flex: none; align-items: center; justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--card-accent) 24%, rgb(var(--c-border)));
-  border-radius: 1.125rem;
-  background: linear-gradient(145deg,
-    color-mix(in srgb, var(--card-accent) 18%, rgb(var(--c-surface))),
-    color-mix(in srgb, var(--card-accent) 7%, rgb(var(--c-surface))));
-  color: rgb(var(--c-ink));
-  box-shadow: inset 0 1px rgb(255 255 255 / .56), 0 7px 15px -12px color-mix(in srgb, var(--card-accent) 70%, transparent);
+  position: relative; display: inline-flex; flex: none;
+  color: color-mix(in srgb, var(--card-accent) 58%, rgb(var(--c-ink)));
 }
-.module-card-heading h3 {
-  margin: 0; color: rgb(var(--c-ink)); font-size: 1.125rem; font-weight: 750; line-height: 1.3; letter-spacing: -.02em;
+.module-card-glyph { width: 3.25rem; height: 3.25rem; flex: none; stroke-width: 1.6; }
+.module-card-body { padding: 1rem 1.25rem 1.25rem; }
+.module-card-title {
+  display: -webkit-box; margin: 0; overflow: hidden; overflow-wrap: break-word;
+  color: rgb(var(--c-ink)); font-size: 1.125rem; font-weight: 750; line-height: 1.3; letter-spacing: -.02em;
+  -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
 }
-.module-card-desc {
-  display: -webkit-box; min-height: 3em; overflow: hidden;
-  color: rgb(var(--c-muted)); font-size: .875rem; line-height: 1.5;
-  -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-}
-@media (hover: hover) {
+.launcher-card .module-card-metric { min-width: 0; }
+/* Hover lift + glow aksen: hanya perangkat dengan hover sungguhan (kartu tidak "menempel" naik setelah
+   disentuh di ponsel) dan hanya bila gerak tidak dikurangi. Umpan tekan (:active) juga dimatikan
+   saat prefers-reduced-motion. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .launcher-card:hover, .launcher-card:focus-within {
     transform: translateY(-4px);
     box-shadow: 0 20px 34px -26px color-mix(in srgb, var(--card-accent) 66%, transparent),
                 0 9px 22px -15px rgb(15 23 42 / .28);
   }
 }
-.launcher-card:active { transform: translateY(-1px) scale(.99); }
+@media (prefers-reduced-motion: no-preference) {
+  .launcher-card:active { transform: translateY(-1px) scale(.99); }
+}
 
 /* Kartu produk: hover lift tidak memakai utility "transition" (yang mencakup semua properti). */
 .product-grid > article {
@@ -546,7 +559,6 @@ html.dark .ecom-product-art { background: linear-gradient(135deg, #422006, #713f
     .home-hero h1 { max-width: 16ch; }
     .home-apps { margin-top: 2rem; }
     .home-section-heading { margin-bottom: .75rem; }
-    .module-card-desc { min-height: 0; }
   }
 
   .card-grid .card {
@@ -578,6 +590,28 @@ html[data-view='mobile'] .home-apps { margin-top: 1.5rem; }
   .home-hero-cta { display: flex; width: 100%; min-height: 44px; margin-top: .875rem; }
   .home-hero-cta > .truncate { flex: 0 1 auto; }
   .home-apps { margin-top: 1.5rem; }
+}
+
+/* ---------- 8d. Kartu aplikasi di layar sempit dan Mobile View ----------
+   Pola ganda seperti bagian 6: media query untuk layar sungguhan, html[data-view='mobile'] untuk
+   Mobile View di desktop (lebar viewport tetap besar). Di 360 px tiap kartu selebar sekitar 158 px:
+   padding dikecilkan, ikon 38 px (rentang 36-40 px), judul maks. 2 baris, metrik satu baris dengan
+   elipsis (teks penuh ada di atribut title pada baris metrik). Ditaruh di luar blok hover di atas. */
+html[data-view='mobile'] .module-card-visual { height: 5.25rem; }
+html[data-view='mobile'] .module-card-glyph { width: 2.375rem; height: 2.375rem; }
+html[data-view='mobile'] .module-card-body { padding: .75rem .75rem .875rem; }
+html[data-view='mobile'] .module-card-body > .mt-auto { padding-top: .5rem; }
+html[data-view='mobile'] .module-card-title { font-size: .9375rem; line-height: 1.3; }
+html[data-view='mobile'] .launcher-card .module-card-value { font-size: 1.125rem; }
+html[data-view='mobile'] .launcher-card .module-card-label { font-size: .8125rem; }
+@media (max-width: 767px) {
+  .module-card-visual { height: 5.25rem; }
+  .module-card-glyph { width: 2.375rem; height: 2.375rem; }
+  .module-card-body { padding: .75rem .75rem .875rem; }
+  .module-card-body > .mt-auto { padding-top: .5rem; }
+  .module-card-title { font-size: .9375rem; line-height: 1.3; }
+  .launcher-card .module-card-value { font-size: 1.125rem; }
+  .launcher-card .module-card-label { font-size: .8125rem; }
 }
 
 /* ---------- 8c. Carousel hero Beranda ----------

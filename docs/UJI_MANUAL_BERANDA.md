@@ -56,3 +56,35 @@ Prasyarat: `python seed.py --reset && python run.py`, buka http://127.0.0.1:5000
 | 31 | Mobile View dan 360 px | Ulangi baris 1, 2, 8, 9 pada 360 px dan pada Mobile View (jendela 1280 px) | Tanpa ilustrasi besar; judul slide sekitar 1,6 rem; tombol slide selebar penuh; kontrol tidak keluar bingkai (titik dan tombol boleh turun ke baris kedua); tidak ada gulir horizontal |
 | 32 | Sapaan dan Lanjutkan (Member) | Login sebagai Member yang sudah membuka satu halaman aplikasi, buka `/` | Strip tipis tepat di bawah carousel berisi "Halo, <nama>." dan tombol "Lanjutkan: ..." yang membuka halaman terakhir. Member tanpa riwayat melihat tombol "Jelajahi kelas". Guest melihat judul dan kalimat umum tanpa tombol Lanjutkan |
 | 33 | Tema | Ganti Terang ke Gelap saat carousel berjalan | Slide tetap terbaca, kontrol tetap terlihat, strip mengikuti tema, tidak ada kedip atau slide yang macet |
+
+## Kartu aplikasi Beranda (kartu fitur)
+
+Berkas terkait: `app/templates/_components/module_card.html`, `app/templates/main/index.html`, `app/static/css/custom.css` (bagian 6, 8, dan 8d). Kartu dipakai juga di halaman uji `/dev/ui-test` (bagian 5).
+
+Prasyarat: `python seed.py --reset && python run.py`, buka http://127.0.0.1:5000/. Uji Guest dan Member (login `demo@dke.test`; kata sandi bawaan ada di `seed.py`). Untuk mengganti tema pakai tombol tema di bilah atas. Tes otomatis: `python -m unittest tests.test_launcher_nav -v` (kelas `BerandaGuestTests`, `LauncherGridCssTests`, `KartuAplikasiTemplatTests`).
+
+Susunan kartu yang diharapkan di semua baris: (1) area visual berlatar gradien dan pola titik lembut berwarna aksen, ikon besar di tengah; (2) judul aplikasi yang tegas; (3) satu baris metrik atau ajakan. Tidak ada kalimat deskripsi yang terlihat.
+
+| # | Lebar | Mode tampilan | Akun | Langkah | Hasil yang diharapkan |
+|---|-------|---------------|------|---------|-----------------------|
+| 34 | 1280 px | Mobile View mati | Guest dan Member | Buka `/` | Grid 3 kolom x 2 baris; kartu berukuran sama; ikon sekitar 52 px; judul satu baris; metrik atau ajakan satu baris; tidak ada kalimat deskripsi |
+| 35 | 768 px | Layar sempit mati (lebar tablet) | Guest | Buka `/` | 2 kolom x 3 baris; ukuran ikon dan judul seperti desktop |
+| 36 | 360 px | Layar sempit | Guest | Buka `/` | 2 kolom x 3 baris; tiap kartu sekitar 158 px; ikon sekitar 38 px; "Information System" memakai 2 baris dan tidak terpotong; judul lain satu baris; ajakan ("Masuk ke akun", "Lihat produk", dst.) utuh; tidak ada gulir horizontal |
+| 37 | 360 px | Layar sempit | Member dengan data | Buka `/` | Metrik pendek utuh ("2 tersimpan", "2 balasan baru"). Metrik panjang (judul kelas, "Keranjang masih kosong", "artikel baru minggu ini") tetap satu baris dan dipotong dengan elipsis, tidak membungkus dan tidak menimpa kartu lain. Progress bar E-Learning dan persennya tampil utuh |
+| 38 | 390 px dan 430 px | Layar sempit | Guest dan Member | Ulangi baris 36-37 | 2 kolom x 3 baris; tidak ada teks menimpa atau keluar kartu; elipsis hanya pada metrik yang kepanjangan |
+| 39 | 1280 px | Mobile View nyala | Guest dan Member | Klik "Mobile" di bilah atas | Bingkai 430 px; 2 kolom x 3 baris; ukuran seluruh isi kartu seperti ponsel (ikon sekitar 38 px, padding kecil); klik "Mobile" lagi mengembalikan 3 kolom x 2 baris |
+| 40 | Semua lebar di atas | Layar sempit dan Mobile View | Guest dan Member | Ganti tema Terang lalu Gelap | Gradien dan ikon tetap berkontras; di Gelap latar menjadi tinta gelap beraksen dan ikon menjadi lebih terang; judul dan metrik terbaca (minimal 4,5:1 di pemeriksa kontras DevTools). Kontras ikon terhadap gradien dihitung oleh `test_ikon_berkontras_di_atas_3_banding_1_pada_terang_dan_gelap` |
+| 41 | 1280 px | Mobile View mati | Guest | Arahkan kursor ke tiap kartu | Tooltip menampilkan deskripsi aplikasi dari atribut `title`; deskripsi tidak pernah tampil sebagai teks di kartu |
+| 42 | 1280 px | Mobile View mati | Guest | DevTools > Elements > Accessibility, pilih salah satu kartu | Role "link"; Name = nama aplikasi + metrik (tanpa deskripsi); Description = deskripsi aplikasi; tautan tidak memiliki `aria-label` |
+| 43 | - | - | Guest dan Member | Nyalakan pembaca layar (NVDA atau VoiceOver) dan pindah ke kartu | Dibaca nama aplikasi dan metrik, lalu deskripsi satu kali (tidak berulang). Metrik tidak hilang dari bacaan; ikon dan area visual tidak dibaca |
+| 44 | 1280 px dan 360 px | Mobile View mati | Guest | Tekan Tab dari awal halaman sampai kartu | Fokus masuk ke tiap kartu berurutan (6 tautan, satu per kartu); cincin fokus tebal (3 px) terlihat jelas di Terang dan Gelap; Enter membuka aplikasi |
+| 45 | 360 px | Layar sempit (mode sentuh DevTools) | Guest | Periksa tiap kartu di DevTools | Seluruh kartu adalah satu tautan; tinggi dan lebar kartu jauh di atas 44 px dan seluruh areanya bisa diketuk |
+| 46 | 1280 px dan 360 px | Mobile View mati | Member baru tanpa data | Buka `/` | Teks metrik kosong tampil redup (abu-abu) dan tanpa angka 0; baris metrik tetap sejajar antar kartu |
+| 47 | 1280 px dan 360 px | Mobile View mati | Guest | Buka `/` | Ajakan tiap kartu tampil sebagai teks berwarna primer tebal dengan tanda "›" (bukan data) |
+| 48 | 1280 px dan 360 px | Mobile View mati | Member yang mengikuti kelas dengan progres | Buka `/` | Kartu E-Learning memuat nama kelas, progress bar berwarna aksen, dan persen (mis. 40%); bar sejajar di dasar kartu |
+| 49 | 1280 px | Mobile View mati | Member | Hentikan server, ubah nama satu tabel di salinan database (mis. `sqlite3 instance/dke.db "ALTER TABLE articles RENAME TO articles_x;"`), jalankan lagi, buka `/`. Pulihkan dengan `python seed.py --reset` | Kartu Portal menampilkan "Ringkasan belum tersedia" redup; lima kartu lain dan grid tetap utuh 3 x 2 |
+| 50 | 1280 px | Mobile View mati | Guest | Kursor di atas sebuah kartu (reduced motion mati) | Kartu naik sekitar 4 px dengan bayangan beraksen; animasi masuk bertahap saat halaman dimuat tidak berubah |
+| 51 | 1280 px dan 360 px | Layar sempit dan desktop | Guest | Aktifkan "Reduce motion" di OS (atau DevTools > Rendering > Emulate prefers-reduced-motion), muat ulang, arahkan kursor dan tekan kartu | Tidak ada animasi masuk; kartu tidak naik, tidak ada glow, dan tidak mengecil saat ditekan |
+| 52 | 360 px | Mode sentuh DevTools | Guest | Ketuk sebuah kartu lalu kembali | Tidak ada kartu yang "menempel" naik atau bergaris bayangan setelah disentuh |
+| 53 | 1280 px dan 360 px | Mobile View mati dan nyala | Guest | Buka `/dev/ui-test`, lihat bagian 5 | Grid kartu sama dengan Beranda: 3 kolom di desktop, 2 kolom di mobile dan Mobile View |
+| 54 | 360 px dan Mobile View | Layar sempit dan Mobile View | Guest | Buka `/ecommerce/` dan `/infosys/` | Grid produk dan kartu di sana tetap satu kolom (tidak ikut berubah menjadi 2 kolom) |

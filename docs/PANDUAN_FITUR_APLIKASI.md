@@ -220,10 +220,16 @@ Uji: `python -m unittest tests.test_forum`; panduan manual: [`UJI_MANUAL_FORUM.m
   - **Mobile View dan layar sempit**: tanpa ilustrasi besar, judul kecil, tombol slide selebar penuh (aturan Issue A).
   - Strip tipis di bawah carousel berisi sapaan dan tombol **Lanjutkan** (`data-resume`); lihat bagian di bawah.
   - Uji: `python -m unittest tests.test_home_hero`; uji manual: [`UJI_MANUAL_BERANDA.md`](UJI_MANUAL_BERANDA.md) baris 15-33.
-- Grid kartu aplikasi: 3 kolom (3x2) di desktop (`lg`), 2 kolom di tablet, 1 kolom di mobile dan Mobile View.
-  Setiap kartu hanya memuat aksen warna, ikon, nama aplikasi, dan satu baris metrik (maks. ~40 karakter, angka ditonjolkan);
-  deskripsi aplikasi ada di `title` dan `aria-describedby`, bukan di kartu. Zona metrik menempel di dasar kartu dengan tinggi tetap; hover lift 4 px + glow 200 ms
-  (`.launcher-card` di `custom.css`, nonaktif di layar sentuh dan saat reduced-motion).
+- Grid kartu aplikasi: 3 kolom x 2 baris di desktop (`lg`), 2 kolom di tablet, dan 2 kolom x 3 baris di layar di bawah 768 px
+  serta di Mobile View (kelas `grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4`; aturan Mobile View dan layar sempit untuk `.launcher-grid`
+  ada di `custom.css` bagian 6). Grid `.product-grid` dan `.card-grid` di halaman lain tetap satu kolom di mobile.
+  Setiap kartu adalah kartu fitur: area visual berlatar gradien aksen dengan ikon besar di tengah (sekitar 52 px di desktop, 38 px di mobile),
+  judul aplikasi yang tegas (maks. 2 baris), lalu satu baris metrik atau ajakan (maks. ~40 karakter, angka ditonjolkan; teks yang kepanjangan
+  dipotong dengan elipsis). Deskripsi aplikasi tidak tampil di kartu; ia ada di `title` (tooltip) dan di elemen `sr-only` yang dirujuk
+  `aria-describedby`, tanpa `aria-label` supaya metrik tetap dibaca pembaca layar. Warna gradien dan ikon dicampur dari token tema
+  (`--card-accent`, `--c-surface`, `--c-ink`), jadi kontras terjaga di Terang dan Gelap. Zona metrik menempel di dasar kartu dengan tinggi
+  tetap; hover lift 4 px + glow 200 ms (`.launcher-card` di `custom.css`) hanya aktif di perangkat dengan hover sungguhan dan saat
+  reduced-motion mati.
 - Widget dibaca dari database, satu fungsi per modul di `launcher.py`. Data kosong tampil sebagai pesan
   ramah berwarna redup ("Keranjang masih kosong"), dan kegagalan satu widget tidak merusak halaman.
   Guest melihat satu ajakan pendek per kartu ("Lihat produk", "Lihat kelas", "Baca artikel", "Lihat diskusi").
