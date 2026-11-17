@@ -16,7 +16,7 @@ app/templates/_components/hero_carousel.html,39,html-atribut,Slide :
 app/templates/_components/hero_carousel.html,45,html-atribut,Jeda geser otomatis
 app/templates/_components/hero_carousel.html,50,html-atribut,Sebelumnya
 app/templates/_components/hero_carousel.html,52,html-atribut,Berikutnya
-app/templates/_components/module_card.html,41,html-atribut,Progres
+app/templates/_components/module_card.html,46,html-atribut,Progres
 app/templates/_components/topbar.html,5,jinja,Beranda
 app/templates/_components/topbar.html,11,html-atribut,Beranda DKE
 app/templates/_components/topbar.html,26,html-atribut,"Keranjang belanja, item"

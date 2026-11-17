@@ -50,7 +50,7 @@
       </div>
       <span class="home-section-note">Mulai dari yang Anda butuhkan hari ini.</span>
     </div>
-    <div class="launcher-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" data-launcher-grid>
+    <div class="launcher-grid grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4" data-launcher-grid>
     {% for m in MODULES %}
       {% set wd = widgets[m.key] %}
       {{ module_card(m, value=wd.value, label=wd.label, progress=wd.progress, empty=wd.empty, cta=wd.cta) }}

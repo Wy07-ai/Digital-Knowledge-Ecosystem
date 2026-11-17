@@ -198,7 +198,7 @@ sekali di `app/messages.py`. Untuk meninjau semua teks tampilan: `python scripts
   uji manual: [`UJI_MANUAL_TEMA.md`](UJI_MANUAL_TEMA.md).
 - **Toast** menggantikan `alert()`: `toast(pesan, 'success|error|info|warning', ms)`.
   Pesan `flash()` Flask otomatis tampil sebagai toast (kategori `danger` -> error, tanpa kategori -> info).
-- **Mobile View paksa**: beri kelas `launcher-grid` / `product-grid` / `card-grid` pada grid,
+- **Mobile View paksa**: beri kelas `launcher-grid` (2 kolom di mobile) / `product-grid` / `card-grid` (1 kolom) pada grid,
   `stack-mobile` pada tumpukan flex, `dke-hide-mobile` pada elemen yang disembunyikan di mobile.
   Kelas responsif Tailwind (`md:`, `lg:`) mengikuti lebar jendela sungguhan, jadi untuk elemen
   baru yang harus patuh pada Mobile View gunakan kelas-kelas tersebut.

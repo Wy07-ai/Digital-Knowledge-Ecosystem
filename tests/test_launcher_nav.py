@@ -85,9 +85,13 @@ class BerandaGuestTests(LauncherTestCase):
         html = self.html("/")
         self.assertEqual(re.findall(r'data-module="(\w+)"', html),
                          ["infosys", "ecommerce", "elearning", "etutorial", "portal", "forum"])
-        grid = re.search(r'<div class="([^"]*launcher-grid[^"]*)"', html).group(1)
-        self.assertIn("grid-cols-1", grid)       # 1 kolom di mobile
+        grid = re.search(r'<div class="([^"]*launcher-grid[^"]*)"', html).group(1).split()
+        self.assertIn("grid-cols-2", grid)       # 2 kolom (2x3) di mobile
         self.assertIn("lg:grid-cols-3", grid)    # 3 kolom (3x2) di desktop
+        self.assertIn("gap-3", grid)
+        self.assertIn("lg:gap-4", grid)
+        self.assertNotIn("grid-cols-1", grid)    # tidak ada lagi satu kolom
+        self.assertNotIn("md:grid-cols-2", grid)
 
     def test_kartu_memuat_nama_dan_aksen_modul(self):
         html = self.html("/")
@@ -132,14 +136,36 @@ class BerandaGuestTests(LauncherTestCase):
         self.assertIn("Satu akun untuk enam aplikasi", html)
         self.assertNotIn("modul", re.sub(r"data-module|module", "", html.lower().split("<main")[1].split("launcher-grid")[0]))
 
-    def test_deskripsi_tampil_di_kartu_dan_direferensikan_oleh_aria(self):
+    def test_deskripsi_ada_di_title_dan_aria_describedby_bukan_teks_tampil(self):
         html = self.html("/")
-        for key, desc in (("infosys", "Profil, log aktivitas, dan statistik dari semua aplikasi."),
-                          ("forum", "Diskusi, tanya jawab, dan balasan komunitas.")):
+        literal = {"infosys": "Profil, log aktivitas, dan statistik dari semua aplikasi.",
+                   "forum": "Diskusi, tanya jawab, dan balasan komunitas."}
+        for m in MODULES:
+            key, desc = m["key"], m["desc"]
+            if key in literal:
+                self.assertEqual(desc, literal[key])
             card = re.search(rf'<a [^>]*data-module="{key}".*?</a>', html, re.S).group(0)
-            self.assertIn(f'title="{desc}"', card)
-            self.assertIn(f'aria-describedby="card-desc-{key}"', card)
-            self.assertIn(f'id="card-desc-{key}" class="module-card-desc">{desc}</span>', card)
+            start_tag = card.split(">", 1)[0]
+            # (1) deskripsi tetap ada di atribut title
+            self.assertIn(f'title="{desc}"', start_tag, key)
+            # (2) aria-describedby menunjuk satu elemen yang ada, sr-only, berisi deskripsi
+            ref = re.search(r'aria-describedby="([^"]+)"', start_tag).group(1)
+            self.assertEqual(ref, f"card-desc-{key}")
+            self.assertEqual(html.count(f'id="{ref}"'), 1, ref)
+            target = re.search(rf'<span id="{ref}" class="([^"]*)" aria-hidden="true">(.*?)</span>', card, re.S)
+            self.assertIsNotNone(target, key)
+            self.assertIn("sr-only", target.group(1).split())
+            self.assertEqual(target.group(2), desc)
+            # (3) tanpa aria-label di tautan: aria-label menggantikan isi tautan dan menyembunyikan metrik
+            self.assertNotIn("aria-label=", start_tag, key)
+            # (4) tidak ada kalimat deskripsi yang terlihat: buang elemen sr-only dan atribut tooltip/label
+            visible = re.sub(r'<span id="card-desc-[^>]*>.*?</span>', "", card, flags=re.S)
+            visible = re.sub(r'(?:title|aria-label)="[^"]*"', "", visible)
+            self.assertNotIn(desc, visible, key)
+            self.assertNotIn("module-card-desc", card, key)
+            # (5) nama aplikasi dan metrik tetap menjadi isi tautan (nama aksesibel tetap lengkap)
+            self.assertIn(m["name"], self.widget_text(html, key))
+            self.assertIn("data-widget", card)
 
     def test_kartu_maksimal_dua_baris_teks_selain_nama_dan_tanpa_pengulangan(self):
         self.seed_content()
@@ -158,7 +184,7 @@ class BerandaGuestTests(LauncherTestCase):
 
     def test_zona_metrik_seragam_dan_menempel_di_dasar(self):
         html = self.html("/")
-        zones = re.findall(r'<div class="mt-auto pt-4">\s*<div class="(h-16[^"]*)"', html)
+        zones = re.findall(r'<div class="mt-auto pt-4">\s*<div class="(h-11[^"]*)"', html)
         self.assertEqual(len(zones), 6)
         self.assertEqual(len(set(zones)), 1)   # tinggi sama di semua kartu, jadi garis sejajar
 
@@ -416,6 +442,144 @@ class HeroMobileCssTests(unittest.TestCase):
     def test_media_query_sempit_memuat_aturan_yang_sama(self):
         m = re.search(r"@media \(max-width: 767px\) \{\s*\.home-hero \{[^}]*display: block[^}]*\}\s*\.home-orbit \{ display: none; \}", self.css)
         self.assertIsNotNone(m)
+
+
+class LauncherGridCssTests(unittest.TestCase):
+    """Grid kartu Beranda: 2 kolom di Mobile View dan layar sempit; grid lain tetap 1 kolom.
+
+    Pola ganda seperti hero (custom.css bagian 6): aturan html[data-view='mobile'] untuk Mobile View di
+    desktop dan @media (max-width: 767px) untuk layar sungguhan.
+    """
+    TWO_COLS = "grid-template-columns: repeat(2, minmax(0, 1fr))"
+
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(ROOT, "app", "static", "css", "custom.css"), encoding="utf-8") as f:
+            cls.css = f.read().replace("\r\n", "\n")
+
+    def _rule(self, selector):
+        m = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", self.css)
+        self.assertIsNotNone(m, f"aturan {selector} tidak ditemukan di custom.css")
+        return re.sub(r"\s+", " ", m.group(1))
+
+    def _media_bodies(self, header):
+        """Isi semua blok @media dengan header persis ini (kurung kurawal diseimbangkan)."""
+        bodies, pos = [], 0
+        while True:
+            i = self.css.find(header, pos)
+            if i < 0:
+                return bodies
+            j = self.css.index("{", i)
+            depth = 0
+            for k in range(j, len(self.css)):
+                depth += {"{": 1, "}": -1}.get(self.css[k], 0)
+                if depth == 0:
+                    bodies.append(self.css[j + 1:k])
+                    break
+            pos = j + 1
+
+    def test_mobile_view_launcher_grid_dua_kolom(self):
+        self.assertIn(self.TWO_COLS, self._rule("html[data-view='mobile'] .launcher-grid"))
+
+    def test_media_query_sempit_launcher_grid_dua_kolom(self):
+        bodies = [b for b in self._media_bodies("@media (max-width: 767px)") if re.search(r"(^|\s)\.launcher-grid\s*\{", b)]
+        self.assertEqual(len(bodies), 1)
+        m = re.search(r"(?:^|\s)\.launcher-grid\s*\{([^}]*)\}", bodies[0])
+        self.assertIn(self.TWO_COLS, re.sub(r"\s+", " ", m.group(1)))
+
+    def test_product_grid_dan_card_grid_tetap_satu_kolom(self):
+        mv = re.search(r"html\[data-view='mobile'\] \.product-grid,\s*html\[data-view='mobile'\] \.card-grid\s*\{([^}]*)\}", self.css)
+        self.assertIsNotNone(mv)
+        self.assertIn("grid-template-columns: 1fr", mv.group(1))
+        narrow = [b for b in self._media_bodies("@media (max-width: 767px)") if ".product-grid, .card-grid" in b]
+        self.assertEqual(len(narrow), 1)
+        self.assertRegex(narrow[0], r"\.product-grid, \.card-grid \{ grid-template-columns: 1fr; \}")
+        # .launcher-grid tidak boleh ikut aturan satu kolom di mana pun
+        self.assertNotRegex(self.css, r"\.launcher-grid[^{}]*\{[^}]*grid-template-columns: 1fr\b")
+
+    def test_animasi_masuk_bertahap_tidak_berubah(self):
+        for n, delay in ((2, 50), (3, 100), (6, 250)):
+            self.assertIn(f"animation-delay: {delay}ms", self._rule(
+                f".launcher-grid > :nth-child({n}), .card-grid > :nth-child({n}), .product-grid > :nth-child({n}), .fm-row:nth-child({n})"))
+
+    def test_hover_lift_hanya_untuk_hover_sungguhan_dan_tanpa_reduced_motion(self):
+        self.assertEqual(self.css.count(".launcher-card:hover"), 1)
+        bodies = self._media_bodies("@media (hover: hover) and (prefers-reduced-motion: no-preference)")
+        self.assertTrue(any(".launcher-card:hover" in b and "translateY(-4px)" in b for b in bodies))
+        # umpan tekan juga dimatikan saat gerak dikurangi
+        active = self._media_bodies("@media (prefers-reduced-motion: no-preference)")
+        self.assertTrue(any(".launcher-card:active" in b for b in active))
+
+    def test_gradien_dan_ikon_memakai_token_bukan_warna_tetap(self):
+        for selector in (".module-card-visual", ".module-card-icon", ".module-card-title"):
+            body = self._rule(selector)
+            self.assertNotRegex(body, r"#[0-9a-fA-F]{3,8}\b", selector)
+        self.assertIn("var(--card-accent)", self._rule(".module-card-visual"))
+        self.assertIn("rgb(var(--c-surface))", self._rule(".module-card-visual"))
+        self.assertIn("rgb(var(--c-ink))", self._rule(".module-card-icon"))
+        self.assertIn("rgb(var(--c-ink))", self._rule(".module-card-title"))
+
+    def test_ikon_berkontras_di_atas_3_banding_1_pada_terang_dan_gelap(self):
+        """Mereplikasi color-mix(in srgb) di CSS: ikon = 58% aksen + 42% ink; latar = 9-26% aksen + surface."""
+        def token(scope, name):
+            m = re.search(scope + r"\s*\{[^}]*?--" + name + r":\s*(\d+) (\d+) (\d+)", self.css)
+            return tuple(int(v) for v in m.groups())
+
+        def lum(c):
+            lin = lambda v: v / 255 / 12.92 if v / 255 <= .03928 else ((v / 255 + .055) / 1.055) ** 2.4
+            r, g, b = (lin(v) for v in c)
+            return .2126 * r + .7152 * g + .0722 * b
+
+        def contrast(a, b):
+            return (max(lum(a), lum(b)) + .05) / (min(lum(a), lum(b)) + .05)
+
+        mix = lambda a, b, p: tuple(a[i] * p + b[i] * (1 - p) for i in range(3))
+        self.assertIn("color-mix(in srgb, var(--card-accent) 58%, rgb(var(--c-ink)))", self._rule(".module-card-icon"))
+        for mode, scope in (("terang", r":root"), ("gelap", r"html\.dark")):
+            surface, ink = token(scope, "c-surface"), token(scope, "c-ink")
+            for m in MODULES:
+                accent = tuple(int(m["accent"][i:i + 2], 16) for i in (1, 3, 5))
+                icon = mix(accent, ink, .58)
+                for share in (.26, .09):      # kedua ujung gradien area visual
+                    self.assertGreaterEqual(contrast(icon, mix(accent, surface, share)), 3.0, (mode, m["key"], share))
+
+
+class KartuAplikasiTemplatTests(LauncherTestCase):
+    """Kartu dipakai di Beranda dan halaman uji; keduanya harus memakai grid dan struktur yang sama."""
+
+    def test_halaman_uji_memakai_grid_dan_kartu_yang_sama(self):
+        self.login()
+        html = self.html("/dev/ui-test")
+        grid = re.search(r'<div class="([^"]*launcher-grid[^"]*)"', html).group(1).split()
+        self.assertIn("grid-cols-2", grid)
+        self.assertIn("lg:grid-cols-3", grid)
+        self.assertNotIn("grid-cols-1", grid)
+        self.assertEqual(len(re.findall(r'class="launcher-card ', html)), 6)
+        self.assertEqual(len(re.findall(r'class="module-card-visual"', html)), 6)
+
+    def test_struktur_kartu_visual_judul_metrik(self):
+        html = self.html("/")
+        for m in MODULES:
+            card = re.search(rf'<a [^>]*data-module="{m["key"]}".*?</a>', html, re.S).group(0)
+            self.assertEqual(card.count('class="module-card-visual"'), 1)
+            self.assertEqual(card.count("<svg"), 1)                 # satu ikon besar, dekoratif
+            self.assertRegex(card, rf'<h3 class="module-card-title">{re.escape(m["name"])}</h3>')
+            self.assertIn(f"--card-accent: {m['accent']}", card)
+            self.assertLess(card.index("module-card-visual"), card.index("module-card-title"))
+            self.assertLess(card.index("module-card-title"), card.index("data-widget"))
+
+    def test_progress_bar_elearning_dan_empty_state_tetap_tampil(self):
+        self.seed_content()
+        self.login()
+        self.sql("INSERT INTO enrollments (user_id, course_id) VALUES (1, 1)")
+        self.sql("INSERT INTO lesson_progress (user_id, lesson_id) VALUES (1, 1)")
+        html = self.html("/")
+        card = re.search(r'<a [^>]*data-module="elearning".*?</a>', html, re.S).group(0)
+        self.assertIn('role="progressbar"', card)
+        self.assertIn('aria-valuenow="20"', card)
+        self.assertIn("20%", card)
+        self.assertIn("data-widget-empty", re.search(r'<a [^>]*data-module="infosys".*?</a>', html, re.S).group(0))
+        self.assertIn("text-muted", re.search(r'<a [^>]*data-module="infosys".*?</a>', html, re.S).group(0))
 
 
 if __name__ == "__main__":
