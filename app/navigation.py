@@ -100,6 +100,10 @@ def _member_name(args):
 # --------------------------------------------------------------------------
 # Tabel hierarki
 # --------------------------------------------------------------------------
+# Beranda dan Pencarian: Beranda > Pencarian (Beranda bukan modul, jadi perlu node sendiri sebagai akar).
+node("main.index", "Beranda")
+node("main.search", "Pencarian", parent="main.index")
+
 # Halaman yang sudah ada.
 node("infosys.profile", "Profil & Pengaturan", parent="infosys.index")
 node("infosys.activity", "Log Aktivitas", parent="infosys.index")

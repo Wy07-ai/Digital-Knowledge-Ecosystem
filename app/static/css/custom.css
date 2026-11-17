@@ -344,7 +344,8 @@ html[data-theme-animating] [data-theme-option] { pointer-events: none; }
    Breakpoint Tailwind mengikuti lebar jendela sungguhan, jadi Mobile View
    di desktop membutuhkan aturan eksplisit. Beri kelas penanda pada setiap
    grid (launcher-grid: 2 kolom; product-grid, card-grid: 1 kolom) dan tumpukan flex (stack-mobile).
-   Kelas .dke-hide-mobile menyembunyikan elemen di Mobile View dan layar sempit. */
+   Kelas .dke-hide-mobile menyembunyikan elemen di Mobile View dan layar sempit.
+   Kelas .dke-show-mobile kebalikannya: tersembunyi di desktop, tampil (inline-flex) di Mobile View dan layar sempit. */
 html[data-view='mobile'] { background-color: rgb(var(--c-outer)); }
 html[data-view='mobile'] body {
   max-width: 430px; margin-inline: auto;
@@ -355,6 +356,8 @@ html[data-view='mobile'] .launcher-grid { grid-template-columns: repeat(2, minma
 html[data-view='mobile'] .product-grid,
 html[data-view='mobile'] .card-grid { grid-template-columns: 1fr; }
 html[data-view='mobile'] .stack-mobile { flex-direction: column; }
+html .dke-show-mobile { display: none !important; }
+html[data-view='mobile'] .dke-show-mobile { display: inline-flex !important; }
 html[data-view='mobile'] .dke-hide-mobile { display: none !important; }
 html[data-view='mobile'] .bc-mid { display: none; }
 html[data-view='mobile'] .bc-ellipsis { display: inline-flex; }
@@ -369,11 +372,43 @@ html[data-view='mobile'] #toast-root {
   .product-grid, .card-grid { grid-template-columns: 1fr; }
   .stack-mobile { flex-direction: column; }
   .dke-hide-mobile { display: none !important; }
+  html .dke-show-mobile { display: inline-flex !important; }
   .bc-mid { display: none; }
   .bc-ellipsis { display: inline-flex; }
   #toast-root { left: 1rem; right: 1rem; width: auto; }
   /* Pengalih tampilan tidak berguna di ponsel sungguhan kecuali sedang aktif */
   html:not([data-view='mobile']) .view-toggle { display: none; }
+}
+
+/* ---------- 6a. Pencarian ---------- */
+/* Kolom pencarian di Top-Bar (desktop): pil translusen yang melebar saat fokus. Di mobile dan
+   Mobile View diganti tombol ikon (.dke-show-mobile). Cincin fokus putih lewat :focus-within. */
+.search-trigger {
+  position: relative; display: flex; align-items: center; flex: 0 1 auto;
+  width: clamp(11rem, 24vw, 18rem); min-width: 9rem; min-height: 44px;
+  margin-left: auto; margin-right: .5rem;
+  border: 1px solid rgb(255 255 255 / .4); border-radius: 9999px;
+  background: rgb(255 255 255 / .12); color: #fff;
+  transition: width var(--dur-base) var(--ease-out), background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.search-trigger:hover { background: rgb(255 255 255 / .2); }
+.search-trigger:focus-within {
+  width: clamp(14rem, 36vw, 28rem); background: #fff; border-color: #fff;
+  color: rgb(15 23 42); outline: 2px solid #fff; outline-offset: 2px;
+}
+.search-trigger-icon { position: absolute; left: .875rem; display: flex; pointer-events: none; }
+.search-trigger input {
+  width: 100%; min-height: 42px; padding: 0 1rem 0 2.5rem; border: 0; border-radius: inherit;
+  background: transparent; color: inherit; font: inherit; font-size: .875rem; outline: none;
+}
+.search-trigger input::placeholder { color: rgb(255 255 255 / .85); opacity: 1; }
+.search-trigger:focus-within input::placeholder { color: rgb(71 85 105); }
+/* Tombol ikon di mobile: dorong ke kanan seperti kolom di desktop */
+.search-trigger-icon-btn { margin-left: auto; }
+/* Potongan hasil yang cocok dengan kata kunci (<mark> dari halaman /cari) */
+.search-hit {
+  border-radius: .25rem; padding: 0 .125rem;
+  background: color-mix(in srgb, var(--accent) 22%, transparent); color: inherit; font-weight: 700;
 }
 
 /* ---------- 7. Kurangi gerak ---------- */
