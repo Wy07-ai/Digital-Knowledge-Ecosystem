@@ -135,7 +135,8 @@ Panduan uji manual: [Auth](docs/UJI_MANUAL_AUTH.md) ·
 [E-Tutorial](docs/UJI_MANUAL_ETUTORIAL.md) · [Portal](docs/UJI_MANUAL_PORTAL.md) ·
 [Forum](docs/UJI_MANUAL_FORUM.md) · [Integrasi](docs/UJI_MANUAL_INTEGRASI.md) ·
 [Tema](docs/UJI_MANUAL_TEMA.md) · [Offline](docs/UJI_MANUAL_OFFLINE.md) ·
-[Pencarian](docs/UJI_MANUAL_PENCARIAN.md)
+[Pencarian](docs/UJI_MANUAL_PENCARIAN.md) ·
+[Navigasi mobile](docs/UJI_MANUAL_NAV_MOBILE.md)
 
 Untuk meninjau semua teks tampilan: `python scripts/inventaris_teks.py --cari "kata"` atau
 `python scripts/inventaris_teks.py --csv docs/INVENTARIS_TEKS.csv`.

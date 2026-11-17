@@ -5,6 +5,11 @@ app/templates/_components/app_switcher.html,8,html-atribut,Pindah aplikasi
 app/templates/_components/app_switcher.html,16,html-teks,Pindah aplikasi
 app/templates/_components/app_switcher.html,30,html-teks,Aktif
 app/templates/_components/app_switcher.html,39,html-teks,Semua aplikasi (Beranda)
+app/templates/_components/bottom_nav.html,12,html-atribut,Navigasi bawah
+app/templates/_components/bottom_nav.html,17,html-teks,Beranda
+app/templates/_components/bottom_nav.html,24,html-teks,Aplikasi
+app/templates/_components/bottom_nav.html,30,html-teks,Cari
+app/templates/_components/bottom_nav.html,37,html-teks,Akun
 app/templates/_components/breadcrumb.html,20,html-atribut,Jejak halaman
 app/templates/_components/breadcrumb.html,24,html-atribut,Tampilkan jenjang sebelumnya
 app/templates/_components/breadcrumb.html,52,html-atribut,Kembali
@@ -1415,9 +1420,9 @@ app/static/js/quiz.js,92,js,Soal
 app/static/js/quiz.js,95,js,Soal
 app/static/js/quiz.js,125,js,Soal nomor
 app/static/js/quiz.js,131,js,Soal kosong dihitung salah. Kumpulkan sekarang?
-app/static/js/switcher.js,80,js,Escape
-app/static/js/switcher.js,101,js,Home
-app/static/js/switcher.js,102,js,End
+app/static/js/switcher.js,107,js,Escape
+app/static/js/switcher.js,128,js,Home
+app/static/js/switcher.js,129,js,End
 app/static/js/theme.js,56,js,Accept
 app/static/js/theme.js,65,js,Sesi Anda berakhir. Masuk lagi untuk menyimpan pengaturan.
 app/static/js/theme.js,66,js,Pengaturan belum tersimpan ke akun Anda. Periksa koneksi lalu coba lagi.

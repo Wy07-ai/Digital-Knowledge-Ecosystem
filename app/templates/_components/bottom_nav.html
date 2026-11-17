@@ -1,0 +1,41 @@
+{# Bilah navigasi bawah: hanya tampil di layar sempit (< 768 px) dan Mobile View (aturan di custom.css bagian 16).
+   Di-include SATU kali dari base.html, di dalam {% block bottom_nav %}; halaman yang perlu menyembunyikannya
+   cukup mengosongkan blok itu. Empat menu: Beranda, Aplikasi, Cari, Akun.
+
+   Aplikasi adalah tombol, bukan tautan: ia membuka panel App Switcher yang sudah ada di bilah atas
+   (app_switcher.html, daftar enam aplikasi dari MODULES), jadi daftar aplikasi TIDAK digandakan di sini.
+   Perilakunya ada di static/js/switcher.js lewat atribut data-popover-open dan aria-controls.
+
+   Menu aktif bertanda aria-current="page" dan, selain warna, garis tebal di atas ikon (lihat CSS). #}
+{% from '_components/_icons.html' import icon %}
+{% set bn_apps_active = current_module and current_module.key != 'infosys' %}
+<nav class="bottom-nav" aria-label="Navigasi bawah">
+  <ul class="bottom-nav-list">
+    <li>
+      <a href="{{ url_for('main.index') }}" class="bottom-nav-item"
+         {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
+        {{ icon('home', 'h-6 w-6') }}<span class="bottom-nav-label">Beranda</span>
+      </a>
+    </li>
+    <li>
+      <button type="button" class="bottom-nav-item" data-popover-open
+              aria-haspopup="true" aria-expanded="false" aria-controls="app-switcher-panel"
+              {% if bn_apps_active %}aria-current="page"{% endif %}>
+        {{ icon('grid', 'h-6 w-6') }}<span class="bottom-nav-label">Aplikasi</span>
+      </button>
+    </li>
+    <li>
+      <a href="{{ url_for('main.search') }}" class="bottom-nav-item"
+         {% if request.endpoint == 'main.search' %}aria-current="page"{% endif %}>
+        {{ icon('search', 'h-6 w-6') }}<span class="bottom-nav-label">Cari</span>
+      </a>
+    </li>
+    <li>
+      {# Member ke Information System; Guest ke halaman masuk (membawa ?next= halaman sekarang, sama seperti tombol Masuk). #}
+      <a href="{{ url_for('infosys.index') if current_user else login_url() }}" class="bottom-nav-item"
+         {% if request.blueprint == 'infosys' %}aria-current="page"{% endif %}>
+        {{ icon('user', 'h-6 w-6') }}<span class="bottom-nav-label">Akun</span>
+      </a>
+    </li>
+  </ul>
+</nav>
