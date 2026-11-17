@@ -1,6 +1,6 @@
 berkas,baris,jenis,teks
 app/templates/base.html,24,html-teks,Beranda · DKE
-app/templates/base.html,64,html-teks,Lewati ke konten utama
+app/templates/base.html,65,html-teks,Lewati ke konten utama
 app/templates/_components/app_switcher.html,8,html-atribut,Pindah aplikasi
 app/templates/_components/app_switcher.html,16,html-teks,Pindah aplikasi
 app/templates/_components/app_switcher.html,30,html-teks,Aktif
@@ -17,28 +17,32 @@ app/templates/_components/hero_carousel.html,45,html-atribut,Jeda geser otomatis
 app/templates/_components/hero_carousel.html,50,html-atribut,Sebelumnya
 app/templates/_components/hero_carousel.html,52,html-atribut,Berikutnya
 app/templates/_components/module_card.html,46,html-atribut,Progres
+app/templates/_components/search_trigger.html,11,html-atribut,Cari di DKE
+app/templates/_components/search_trigger.html,15,html-atribut,"Cari kelas, produk, tutorial..."
+app/templates/_components/search_trigger.html,19,html-atribut,Cari
+app/templates/_components/search_trigger.html,13,html-teks,"Cari kelas, produk, tutorial, artikel, atau topik"
 app/templates/_components/topbar.html,5,jinja,Beranda
 app/templates/_components/topbar.html,11,html-atribut,Beranda DKE
 app/templates/_components/topbar.html,26,html-atribut,"Keranjang belanja, item"
-app/templates/_components/topbar.html,40,html-atribut,Pilih tema
-app/templates/_components/topbar.html,49,html-atribut,Tema tampilan
-app/templates/_components/topbar.html,64,html-atribut,Tampilan Mobile
-app/templates/_components/topbar.html,64,html-atribut,Tampilan Mobile (aktif/nonaktif)
-app/templates/_components/topbar.html,73,html-atribut,"Notifikasi , belum dibaca"
-app/templates/_components/topbar.html,118,html-atribut,Menu profil
+app/templates/_components/topbar.html,43,html-atribut,Pilih tema
+app/templates/_components/topbar.html,52,html-atribut,Tema tampilan
+app/templates/_components/topbar.html,67,html-atribut,Tampilan Mobile
+app/templates/_components/topbar.html,67,html-atribut,Tampilan Mobile (aktif/nonaktif)
+app/templates/_components/topbar.html,76,html-atribut,"Notifikasi , belum dibaca"
+app/templates/_components/topbar.html,121,html-atribut,Menu profil
 app/templates/_components/topbar.html,15,html-teks,DKE
 app/templates/_components/topbar.html,31,html-teks,Keranjang
-app/templates/_components/topbar.html,52,html-teks,Terang
-app/templates/_components/topbar.html,55,html-teks,Gelap
-app/templates/_components/topbar.html,58,html-teks,Sistem
-app/templates/_components/topbar.html,66,html-teks,Mobile
-app/templates/_components/topbar.html,86,html-teks,Notifikasi
-app/templates/_components/topbar.html,88,html-teks,Tandai semua dibaca
-app/templates/_components/topbar.html,111,html-teks,Belum ada notifikasi.
-app/templates/_components/topbar.html,131,html-teks,Profil Pengaturan
-app/templates/_components/topbar.html,135,html-teks,Keluar
-app/templates/_components/topbar.html,140,html-teks,Masuk
-app/templates/_components/topbar.html,141,html-teks,Daftar
+app/templates/_components/topbar.html,55,html-teks,Terang
+app/templates/_components/topbar.html,58,html-teks,Gelap
+app/templates/_components/topbar.html,61,html-teks,Sistem
+app/templates/_components/topbar.html,69,html-teks,Mobile
+app/templates/_components/topbar.html,89,html-teks,Notifikasi
+app/templates/_components/topbar.html,91,html-teks,Tandai semua dibaca
+app/templates/_components/topbar.html,114,html-teks,Belum ada notifikasi.
+app/templates/_components/topbar.html,134,html-teks,Profil Pengaturan
+app/templates/_components/topbar.html,138,html-teks,Keluar
+app/templates/_components/topbar.html,143,html-teks,Masuk
+app/templates/_components/topbar.html,144,html-teks,Daftar
 app/templates/ecommerce/cart.html,13,jinja,Keranjang masih kosong
 app/templates/ecommerce/cart.html,13,jinja,Produk yang Anda tambahkan akan muncul di sini.
 app/templates/ecommerce/cart.html,13,jinja,Jelajahi katalog
@@ -742,6 +746,31 @@ app/templates/main/nav_demo.html,37,html-teks,Dua baris di
 app/templates/main/nav_demo.html,37,html-teks,app/navigation.py
 app/templates/main/nav_demo.html,37,html-teks,sudah cukup; template tidak perlu diubah.
 app/templates/main/nav_demo.html,38,html-teks,"node(""main.nav_demo_course"", _course_title, parent=""elearning.index"") node(""main.nav_demo_lesson"", _lesson_title, parent=""main.nav_demo_course"")"
+app/templates/main/search.html,36,jinja,Cari di seluruh DKE
+app/templates/main/search.html,36,jinja,"Ketik kata kunci di kolom pencarian untuk menemukan kelas, produk, tutorial, artikel, dan topik."
+app/templates/main/search.html,36,jinja,Jelajahi kelas
+app/templates/main/search.html,40,jinja,Kata kunci terlalu pendek
+app/templates/main/search.html,40,jinja,Ketik minimal 2 karakter agar pencarian bisa dimulai.
+app/templates/main/search.html,40,jinja,Cari lagi
+app/templates/main/search.html,44,jinja,Tidak ada hasil untuk “
+app/templates/main/search.html,44,jinja,Coba kata kunci lain atau kata yang lebih umum.
+app/templates/main/search.html,44,jinja,Buka Beranda
+app/templates/main/search.html,96,jinja,Tidak ada
+app/templates/main/search.html,96,jinja,Coba jenis lain atau lihat semua hasil untuk kata kunci ini.
+app/templates/main/search.html,96,jinja,Lihat semua hasil
+app/templates/main/search.html,21,html-atribut,Cari di halaman ini
+app/templates/main/search.html,23,html-atribut,"Cari kelas, produk, tutorial..."
+app/templates/main/search.html,23,html-atribut,Kata kunci
+app/templates/main/search.html,51,html-atribut,Filter jenis hasil
+app/templates/main/search.html,1,html-teks,Pencarian
+app/templates/main/search.html,16,html-teks,Pencarian
+app/templates/main/search.html,17,html-teks,"Temukan kelas, produk, tutorial, artikel, dan topik diskusi di satu tempat."
+app/templates/main/search.html,28,html-teks,Cari
+app/templates/main/search.html,32,html-teks,"Jenis hasil itu tidak dikenal, jadi semua jenis dicari."
+app/templates/main/search.html,48,html-teks,hasil untuk “ ”
+app/templates/main/search.html,54,html-teks,Semua
+app/templates/main/search.html,86,html-teks,Menampilkan dari hasil. Persempit kata kunci untuk hasil yang lebih tepat.
+app/templates/main/search.html,88,html-teks,Lihat semua hasil
 app/templates/main/ui_test.html,55,jinja,Kelas 1
 app/templates/main/ui_test.html,56,jinja,Kelas 1
 app/templates/main/ui_test.html,56,jinja,Materi 1
@@ -912,39 +941,56 @@ app/messages.py,57,py,Produk tidak ada di keranjang. Muat ulang halaman lalu cob
 app/messages.py,60,py,Progres belajar tersimpan otomatis.
 app/messages.py,61,py,Koneksi lambat. Perubahan akan disimpan saat tersambung kembali.
 app/module_settings.py,27,py,Pengaturan
-app/navigation.py,104,py,Profil & Pengaturan
-app/navigation.py,105,py,Log Aktivitas
-app/navigation.py,106,py,Statistik Semua Aplikasi
-app/navigation.py,107,py,Pengaturan Keamanan
-app/navigation.py,108,py,Admin
-app/navigation.py,109,py,Hapus Topik
-app/navigation.py,110,py,Hapus Balasan
-app/navigation.py,111,py,Nonaktifkan Akun
-app/navigation.py,112,py,Aktifkan Akun
-app/navigation.py,116,py,Keranjang
-app/navigation.py,117,py,Pembayaran
-app/navigation.py,118,py,Pesanan Saya
-app/navigation.py,120,py,Pengaturan
-app/navigation.py,126,py,Kuis
-app/navigation.py,127,py,Hasil Kuis
-app/navigation.py,128,py,Kelas Saya
-app/navigation.py,129,py,Pengaturan
-app/navigation.py,133,py,Tersimpan
-app/navigation.py,134,py,Pengaturan
+app/navigation.py,104,py,Beranda
+app/navigation.py,105,py,Pencarian
+app/navigation.py,108,py,Profil & Pengaturan
+app/navigation.py,109,py,Log Aktivitas
+app/navigation.py,110,py,Statistik Semua Aplikasi
+app/navigation.py,111,py,Pengaturan Keamanan
+app/navigation.py,112,py,Admin
+app/navigation.py,113,py,Hapus Topik
+app/navigation.py,114,py,Hapus Balasan
+app/navigation.py,115,py,Nonaktifkan Akun
+app/navigation.py,116,py,Aktifkan Akun
+app/navigation.py,120,py,Keranjang
+app/navigation.py,121,py,Pembayaran
+app/navigation.py,122,py,Pesanan Saya
+app/navigation.py,124,py,Pengaturan
+app/navigation.py,130,py,Kuis
+app/navigation.py,131,py,Hasil Kuis
+app/navigation.py,132,py,Kelas Saya
+app/navigation.py,133,py,Pengaturan
+app/navigation.py,137,py,Tersimpan
 app/navigation.py,138,py,Pengaturan
-app/navigation.py,142,py,Buat Topik
-app/navigation.py,143,py,Ubah Balasan
-app/navigation.py,144,py,Hapus Balasan
-app/navigation.py,145,py,Topik Saya
-app/navigation.py,146,py,Pengaturan
+app/navigation.py,142,py,Pengaturan
+app/navigation.py,146,py,Buat Topik
+app/navigation.py,147,py,Ubah Balasan
+app/navigation.py,148,py,Hapus Balasan
+app/navigation.py,149,py,Topik Saya
+app/navigation.py,150,py,Pengaturan
 app/navigation.py,65,py,Materi
 app/navigation.py,71,py,Artikel
 app/navigation.py,76,py,Tutorial
 app/navigation.py,81,py,Produk
 app/navigation.py,86,py,Topik
 app/navigation.py,97,py,Anggota
-app/navigation.py,178,py,Halaman
+app/navigation.py,182,py,Halaman
 app/navigation.py,57,py,Kelas
+app/search.py,31,py,Kelas
+app/search.py,32,py,Produk
+app/search.py,33,py,Tutorial
+app/search.py,34,py,Artikel
+app/search.py,35,py,Topik
+app/search.py,96,py,LIKE ? ESCAPE '\'
+app/search.py,97,py,LIKE ? ESCAPE '\')
+app/search.py,120,py,", slug"
+app/search.py,127,py,", slug"
+app/search.py,134,py,", slug"
+app/search.py,103,py,"AS id,"
+app/search.py,103,py,"AS title,"
+app/search.py,103,py,AS text
+app/search.py,104,py,"THEN 0 ELSE 1 END,"
+app/search.py,104,py,LIMIT ?
 app/security.py,42,py,Lax
 app/security.py,71,py,default-src 'self'
 app/security.py,73,py,style-src 'self' 'unsafe-inline'
@@ -1271,11 +1317,12 @@ app/main/launcher.py,146,py,Belum ada tutorial
 app/main/launcher.py,168,py,Lihat diskusi
 app/main/launcher.py,168,py,Belum ada diskusi
 app/main/launcher.py,198,py,Ringkasan belum tersedia
-app/main/routes.py,66,py,Pesan tanpa kategori (bawaan Flask) tampil sebagai toast info.
-app/main/routes.py,35,py,Beranda
-app/main/routes.py,55,py,Uji Komponen
-app/main/routes.py,77,py,Contoh Navigasi
-app/main/routes.py,83,py,Contoh Navigasi
+app/main/routes.py,103,py,Pesan tanpa kategori (bawaan Flask) tampil sebagai toast info.
+app/main/routes.py,37,py,Beranda
+app/main/routes.py,67,py,Pencarian
+app/main/routes.py,92,py,Uji Komponen
+app/main/routes.py,114,py,Contoh Navigasi
+app/main/routes.py,120,py,Contoh Navigasi
 app/portal/routes.py,45,py,Redaksi DKE
 app/portal/routes.py,49,py,Jan
 app/portal/routes.py,49,py,Feb

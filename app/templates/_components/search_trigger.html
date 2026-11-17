@@ -1,0 +1,20 @@
+{# Pencarian di bilah atas (di-include dari topbar.html), tanpa JavaScript wajib.
+
+   Desktop : kolom dengan ikon kaca pembesar dan petunjuk; melebar saat fokus. Dikirim lewat GET ke /cari.
+             Memakai dke-hide-mobile, jadi tersembunyi di layar sempit dan Mobile View.
+   Mobile  : tombol ikon (tautan ke /cari, area sentuh 44 px). Memakai dke-show-mobile, yang berlaku di
+             layar sempit dan html[data-view='mobile'] (kelas md: Tailwind tidak mengikuti Mobile View).
+
+   Variabel opsional dari halaman: search_query (mengisi kolom) dan search_autofocus (true di /cari
+   saat kata kunci masih kosong). Pintasan tombol "/" ada di static/js/search.js. #}
+{% from '_components/_icons.html' import icon %}
+<form action="{{ url_for('main.search') }}" method="get" role="search" aria-label="Cari di DKE"
+      class="search-trigger dke-hide-mobile">
+  <label for="topbar-search" class="sr-only">Cari kelas, produk, tutorial, artikel, atau topik</label>
+  <span class="search-trigger-icon">{{ icon('search', 'h-4 w-4') }}</span>
+  <input id="topbar-search" type="search" name="q" value="{{ search_query or '' }}"
+         placeholder="Cari kelas, produk, tutorial..." maxlength="100" autocomplete="off"
+         enterkeyhint="search" aria-keyshortcuts="/"{% if search_autofocus %} autofocus{% endif %}>
+</form>
+<a href="{{ url_for('main.search') }}" class="tb-btn search-trigger-icon-btn dke-show-mobile" aria-label="Cari"
+   {% if request.endpoint == 'main.search' %}aria-current="page"{% endif %}>{{ icon('search') }}</a>

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% from "_components/_icons.html" import icon %}
+{% from "_components/empty_state.html" import empty_state %}
+{% block title %}Pencarian{% endblock %}
+{# Halaman hasil pencarian terpadu (GET /cari?q=&jenis=). Berfungsi tanpa JavaScript.
+   Semua teks dari pengguna dan database dicetak lewat autoescape Jinja (tanpa |safe). Potongan yang
+   cocok dengan kata kunci dipecah di Python (app/search.py) dan dibungkus <mark> di sini. #}
+{% block content %}
+  {% macro marked(parts) -%}
+    {%- for text, hit in parts -%}
+      {%- if hit %}<mark class="search-hit">{{ text }}</mark>{% else %}{{ text }}{% endif -%}
+    {%- endfor -%}
+  {%- endmacro %}
+
+  <header class="mb-5">
+    <h1 class="page-title font-bold tracking-tight">Pencarian</h1>
+    <p class="mt-1 text-muted">Temukan kelas, produk, tutorial, artikel, dan topik diskusi di satu tempat.</p>
+  </header>
+
+  {# Kolom pencarian untuk mobile dan Mobile View (di desktop sudah ada di bilah atas). #}
+  <form action="{{ url_for('main.search') }}" method="get" role="search" aria-label="Cari di halaman ini"
+        class="dke-show-mobile mb-5 w-full gap-2">
+    <input type="search" name="q" value="{{ q }}" maxlength="100" autocomplete="off" enterkeyhint="search"
+           placeholder="Cari kelas, produk, tutorial..." aria-label="Kata kunci"
+           class="field min-h-[44px] min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-ink"
+           {% if search_autofocus %}autofocus{% endif %}>
+    {% if kind %}<input type="hidden" name="jenis" value="{{ kind }}">{% endif %}
+    <button type="submit" class="btn btn-primary">{{ icon('search', 'h-5 w-5') }}<span>Cari</span></button>
+  </form>
+
+  {% if unknown_kind %}
+    <p class="mb-4 rounded-lg border border-line bg-surface px-4 py-3 text-sm" role="status" data-note="jenis">Jenis hasil itu tidak dikenal, jadi semua jenis dicari.</p>
+  {% endif %}
+
+  {% if state == 'kosong' %}
+    {{ empty_state('Cari di seluruh DKE',
+                   'Ketik kata kunci di kolom pencarian untuk menemukan kelas, produk, tutorial, artikel, dan topik.',
+                   'Jelajahi kelas', url_for('elearning.index'), 'search') }}
+  {% elif state == 'pendek' %}
+    {{ empty_state('Kata kunci terlalu pendek',
+                   'Ketik minimal 2 karakter agar pencarian bisa dimulai.',
+                   'Cari lagi', url_for('main.search'), 'search') }}
+  {% elif state == 'nihil' %}
+    {{ empty_state('Tidak ada hasil untuk “' ~ q ~ '”',
+                   'Coba kata kunci lain atau kata yang lebih umum.',
+                   'Buka Beranda', url_for('main.index'), 'search') }}
+  {% else %}
+    <p class="mb-3 text-sm text-muted" role="status">{{ total }} hasil untuk “{{ q }}”</p>
+
+    {# Filter jenis: tautan biasa (tanpa JS). Angka = jumlah kecocokan pada jenis itu. #}
+    <nav aria-label="Filter jenis hasil" class="mb-5">
+      <div class="flex flex-wrap gap-2">
+        <a href="{{ url_for('main.search', q=q) }}" class="chip {{ 'is-active' if not kind }}"
+           {% if not kind %}aria-current="true"{% endif %}>Semua <span class="chip-count">({{ total }})</span></a>
+        {% for grp in groups %}
+          <a href="{{ url_for('main.search', q=q, jenis=grp.key) }}" class="chip {{ 'is-active' if kind == grp.key }}"
+             {% if kind == grp.key %}aria-current="true"{% endif %}>{{ grp.label }} <span class="chip-count">({{ grp.total }})</span></a>
+        {% endfor %}
+      </div>
+    </nav>
+
+    {% set shown = groups|selectattr('results')|list %}
+    {% if shown %}
+      {% for grp in shown %}
+        <section class="card card--accent mb-5 overflow-hidden" style="--accent: {{ grp.app.accent }}"
+                 aria-labelledby="hasil-{{ grp.key }}" data-search-group="{{ grp.key }}">
+          <header class="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
+            <h2 id="hasil-{{ grp.key }}" class="flex items-center gap-2 text-lg font-semibold">
+              <span class="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-white" style="background: {{ grp.app.accent }}" aria-hidden="true">{{ icon(grp.app.key, 'h-4 w-4') }}</span>
+              <span>{{ grp.label }}</span>
+              <span class="text-sm font-normal text-muted">({{ grp.total }})</span>
+            </h2>
+            <a href="{{ url_for(grp.app.key ~ '.index') }}" class="badge badge--accent min-h-[28px]">{{ grp.app.name }}</a>
+          </header>
+          <ul class="divide-y divide-line">
+            {% for item in grp.results %}
+              <li class="card--clickable px-4 py-3" data-search-result>
+                <a href="{{ item.url }}" class="card-link font-semibold text-ink">{{ marked(item.title_parts) }}</a>
+                {% if item.snippet_parts %}<p class="mt-0.5 text-sm text-muted">{{ marked(item.snippet_parts) }}</p>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+          {% if grp.total > grp.results|length %}
+            <footer class="border-t border-line px-4 py-2 text-sm">
+              {% if kind %}
+                <p class="text-muted">Menampilkan {{ grp.results|length }} dari {{ grp.total }} hasil. Persempit kata kunci untuk hasil yang lebih tepat.</p>
+              {% else %}
+                <a href="{{ url_for('main.search', q=q, jenis=grp.key) }}" class="inline-flex min-h-[44px] items-center font-semibold text-primary underline underline-offset-2">Lihat semua {{ grp.total }} hasil {{ grp.label|lower }}</a>
+              {% endif %}
+            </footer>
+          {% endif %}
+        </section>
+      {% endfor %}
+    {% else %}
+      {# Jenis yang dipilih tidak punya kecocokan, tetapi jenis lain punya. #}
+      {{ empty_state('Tidak ada ' ~ kind_label|lower ~ ' yang cocok',
+                     'Coba jenis lain atau lihat semua hasil untuk kata kunci ini.',
+                     'Lihat semua hasil', url_for('main.search', q=q), 'search') }}
+    {% endif %}
+  {% endif %}
+{% endblock %}

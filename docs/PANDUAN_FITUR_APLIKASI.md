@@ -17,6 +17,7 @@ arsitektur dan keamanan ada di [`ARSITEKTUR_DAN_KEAMANAN.md`](ARSITEKTUR_DAN_KEA
 - [Portal](#portal-aksen-rose-e11d48)
 - [Forum](#forum-aksen-teal-0d9488)
 - [Beranda dan navigasi 3 level](#beranda-dan-navigasi-3-level-fase-1-prompt-6)
+- [Pencarian terpadu (/cari)](#pencarian-terpadu-cari)
 - [Integrasi lintas modul](#integrasi-lintas-modul-notifikasi-smart-landing-statistik-pengaturan)
 - [Database dan data contoh](#database-dan-data-contoh)
 
@@ -24,7 +25,7 @@ arsitektur dan keamanan ada di [`ARSITEKTUR_DAN_KEAMANAN.md`](ARSITEKTUR_DAN_KEA
 
 | Blueprint   | URL          | Aksen     |
 |-------------|--------------|-----------|
-| main        | `/`          | -         |
+| main        | `/`, `/cari` | -         |
 | infosys     | `/infosys/`  | `#4F46E5` |
 | ecommerce   | `/ecommerce/`| `#F59E0B` |
 | elearning   | `/elearning/`| `#2563EB` |
@@ -241,6 +242,41 @@ Uji: `python -m unittest tests.test_forum`; panduan manual: [`UJI_MANUAL_FORUM.m
   bisa membuka Beranda. Login dan logout memanggil `session.clear()`, jadi login baru dialihkan lagi.
   Member mengubahnya lewat tombol "Saat membuka DKE" di Beranda (`static/js/launcher.js`, memakai
   `POST /api/settings/global`).
+
+**Pencarian terpadu (`/cari`)**
+
+Satu halaman hasil untuk semua aplikasi, bisa dibuka Guest dan Member. Berfungsi tanpa JavaScript (formulir GET), mudah diuji,
+dan cocok untuk mobile. Modal pencarian cepat bisa menjadi issue lanjutan.
+
+| URL | Metode | Fungsi |
+|-----|--------|--------|
+| `/cari?q=&jenis=` | GET | Mencari kelas, produk, tutorial, artikel, dan topik Forum. `jenis` = `kelas`, `produk`, `tutorial`, `artikel`, atau `topik` (opsional) |
+
+- **Kode:** rute `main.search` di `app/main/routes.py`; kueri per aplikasi di `app/search.py` (`search_courses`, `search_products`,
+  `search_tutorials`, `search_articles`, `search_threads`); templat `main/search.html`; pemicu di bilah atas
+  `_components/search_trigger.html` (di-include dari `topbar.html`); pintasan keyboard `static/js/search.js`.
+- **Sumber data:** kelas (`title`, `description`, hanya `is_published = 1`), produk (`name`, `description`, hanya `is_active = 1`),
+  tutorial (`title`, `summary`), artikel (`title`, `excerpt`), topik Forum (`title`, `body`). Tabel `tutorials`, `articles`, dan
+  `threads` belum punya kolom status terbit, jadi semua barisnya publik. Hanya data publik yang dicari; tidak ada email atau data akun.
+- **Kata kunci:** `strip`, maksimal 100 karakter, minimal 2 karakter. Kosong, hanya spasi, atau terlalu pendek menampilkan
+  `empty_state()` tanpa mencari.
+- **Keamanan:** kueri berparameter (`LIKE ? ESCAPE '\'`); karakter `%`, `_`, dan `\` di-escape sehingga dicari sebagai teks biasa
+  (pola yang sama dengan `?q=` di katalog E-Commerce). Tidak ada `|safe`: judul dan cuplikan dipecah di Python menjadi potongan teks
+  biasa (`highlight_parts`), lalu dicetak lewat autoescape Jinja dengan `<mark>` hanya untuk potongan yang cocok.
+- **Hasil:** dikelompokkan per aplikasi dengan label dan aksen aplikasi (Kelas, Produk, Tutorial, Artikel, dan **Topik** untuk Forum),
+  judul cocok diurutkan lebih dulu, lalu yang terbaru. Maksimal 5 hasil per jenis; ada tautan "Lihat semua N hasil" yang membuka
+  `?jenis=` (maksimal 20 hasil). Jumlah di chip filter selalu jumlah sebenarnya. `jenis` tak dikenal diabaikan dengan catatan
+  "Jenis hasil itu tidak dikenal, jadi semua jenis dicari." (pola yang sama dengan filter di aplikasi lain). Tiap hasil menaut ke
+  halaman detail yang sudah ada.
+- **Navigasi:** `node("main.search", "Pencarian", parent="main.index")` di `app/navigation.py`, ditambah `node("main.index", "Beranda")`
+  karena Beranda bukan modul dan tidak otomatis menjadi akar. Hasilnya jejak halaman Beranda > Pencarian dan tombol Kembali ke Beranda.
+- **Bilah atas:** di desktop, kolom `<form role="search" action="/cari">` dengan ikon kaca pembesar dan petunjuk "Cari kelas, produk,
+  tutorial...", melebar saat fokus (kelas `dke-hide-mobile`). Di layar sempit dan Mobile View diganti tombol ikon (tautan ke `/cari`,
+  `aria-label="Cari"`, minimal 44 px) dengan kelas `dke-show-mobile`, kebalikan `dke-hide-mobile` di `custom.css` bagian 6 (berlaku di
+  media query dan `html[data-view='mobile']`, karena kelas `md:` Tailwind tidak mengikuti Mobile View). Halaman `/cari` juga punya kolom
+  sendiri untuk mobile. Saat kata kunci kosong, kolom mendapat `autofocus`. Tombol `/` memindahkan fokus ke kolom desktop
+  (`search.js`, tidak wajib).
+- Uji: `python -m unittest tests.test_search`; uji manual: [`UJI_MANUAL_PENCARIAN.md`](UJI_MANUAL_PENCARIAN.md).
 
 **Navigasi 3 level** (Blueprint 5.2)
 

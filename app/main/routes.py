@@ -1,6 +1,8 @@
-from flask import abort, current_app, flash, g, redirect, render_template, session, url_for
+from flask import abort, current_app, flash, g, redirect, render_template, request, session, url_for
 
 from .. import LANDED_KEY, MODULES
+from ..db import get_db
+from ..search import KIND_BY_KEY, KINDS, MIN_QUERY_CHARS, normalize_query, search_all
 from . import bp
 from .launcher import HERO_INTERVAL_MS, build_widgets, hero_slides, resume_target
 
@@ -38,6 +40,41 @@ def index():
         hero_interval=HERO_INTERVAL_MS,
         resume=resume,
         first_name=user["full_name"].split()[0] if user else None,
+    )
+
+
+# --------------------------------------------------------------------------
+# Pencarian terpadu: GET /cari?q=&jenis= (logika kueri ada di app/search.py)
+# --------------------------------------------------------------------------
+@bp.route("/cari")
+def search():
+    q = normalize_query(request.args.get("q"))
+    requested = (request.args.get("jenis") or "").strip().lower()
+    kind = requested if requested in KIND_BY_KEY else None
+    unknown_kind = bool(requested) and kind is None
+
+    state, groups, total = "kosong", [], 0
+    if q:
+        state = "hasil" if len(q) >= MIN_QUERY_CHARS else "pendek"
+    if state == "hasil":
+        groups = search_all(get_db(), q, kind)
+        total = sum(group["total"] for group in groups)
+        if total == 0:
+            state = "nihil"
+
+    return render_template(
+        "main/search.html",
+        page_title="Pencarian",
+        q=q,
+        kind=kind,
+        kind_label=KIND_BY_KEY[kind]["label"] if kind else None,
+        unknown_kind=unknown_kind,
+        kinds=KINDS,
+        state=state,
+        groups=groups,
+        total=total,
+        search_query=q,                    # mengisi kolom pencarian di bilah atas
+        search_autofocus=(state == "kosong"),
     )
 
 

@@ -1,6 +1,6 @@
 {# Global Top-Bar (sticky). Urutan sesuai wireframe Blueprint 5.4:
-   [App Switcher] [Home DKE] Judul modul ............ [Tema] [Mobile] [Bell] [Profil]
-   Guest: [Tema] [Mobile] [Masuk] [Daftar]. #}
+   [App Switcher] [Home DKE] Judul modul ...... [Cari] [Tema] [Mobile] [Bell] [Profil]
+   Guest: [Cari] [Tema] [Mobile] [Masuk] [Daftar]. #}
 {% from '_components/_icons.html' import icon %}
 {% set page_heading = current_module.name if current_module else (page_title or 'Beranda') %}
 <header class="topbar sticky top-0 z-40 text-white" style="border-bottom: 3px solid var(--accent)">
@@ -33,7 +33,10 @@
       </a>
     {% endif %}
 
-    <div class="ml-auto flex flex-none items-center">
+    {# Pencarian: kolom di desktop, tombol ikon di mobile dan Mobile View (lihat search_trigger.html). #}
+    {% include '_components/search_trigger.html' %}
+
+    <div class="ml-1 flex flex-none items-center">
 
       {# --- Sakelar tema: Terang / Gelap / Sistem --- #}
       <div class="relative" data-popover>
