@@ -1,6 +1,6 @@
 # Panduan Kontribusi
 
-Terima kasih sudah tertarik berkontribusi pada Digital Knowledge Ecosystem (DKE). Panduan ini menjelaskan alur kerja
+Terima kasih sudah tertarik dengan berkontribusi pada Digital Knowledge Ecosystem (DKE). Panduan ini menjelaskan alur kerja
 dan aturan khusus proyek ini. Dengan berkontribusi, Anda setuju mematuhi [Kode Etik](CODE_OF_CONDUCT.md), dan
 kontribusi Anda dilisensikan di bawah [Lisensi MIT](LICENSE).
 
