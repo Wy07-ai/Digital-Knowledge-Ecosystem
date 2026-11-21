@@ -67,6 +67,8 @@ Buka http://127.0.0.1:5000.
   `DKE_ADMIN_PASSWORD` atau acak dan dicetak sekali oleh `seed.py`. Rincian:
   [Database dan akun seed](docs/PANDUAN_FITUR_APLIKASI.md#database-dan-data-contoh).
 - Reset database dari nol: `python seed.py --reset` (data lama hilang).
+- Setelah `schema.sql` berubah (mis. menambah `CHECK`), database lama **wajib** di-`--reset`: SQLite tidak bisa
+  `ALTER TABLE ... ADD CHECK`, dan `CREATE TABLE IF NOT EXISTS` tidak mengubah tabel yang sudah ada.
 
 ## Environment variables
 

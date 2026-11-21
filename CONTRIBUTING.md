@@ -27,6 +27,8 @@ python seed.py
 FLASK_DEBUG=1 python run.py      # debug hanya untuk komputer sendiri
 ```
 
+Bila `schema.sql` berubah (termasuk menambah `CHECK`), jalankan `python seed.py --reset` pada database lokal Anda. SQLite tidak bisa `ALTER TABLE ... ADD CHECK`, dan `CREATE TABLE IF NOT EXISTS` tidak mengubah tabel yang sudah ada. Nilai enum di `CHECK` harus sama dengan konstanta/validasi di kode aplikasi, dan `tests/test_schema_constraints.py` harus ikut diperbarui.
+
 Node.js hanya dibutuhkan bila Anda mengubah kelas Tailwind (lihat bagian build CSS di bawah).
 Detail arsitektur ada di [`docs/ARSITEKTUR_DAN_KEAMANAN.md`](docs/ARSITEKTUR_DAN_KEAMANAN.md) dan rincian fitur di
 [`docs/PANDUAN_FITUR_APLIKASI.md`](docs/PANDUAN_FITUR_APLIKASI.md).
