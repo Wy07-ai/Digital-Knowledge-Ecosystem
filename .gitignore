@@ -12,6 +12,9 @@ env/
 instance/*
 !instance/.gitkeep
 *.db
+*.db-wal
+*.db-shm
+*.db-journal
 *.sqlite3
 
 # Rahasia dan konfigurasi lokal

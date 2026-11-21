@@ -3,7 +3,7 @@ import os
 import sqlite3
 from importlib import import_module
 
-from flask import Flask, g, request, session
+from flask import Flask, abort, g, request, session
 
 from . import db
 from .errors import register_error_handlers
@@ -56,6 +56,9 @@ DEFAULT_SETTINGS = {
 # Penanda sesi: Member sudah "mendarat" (sudah membuka halaman apa pun) di sesi ini. Dipakai Beranda
 # agar landing_mode = last_module hanya mengalihkan pada kedatangan pertama (lihat main/routes.py).
 LANDED_KEY = "dke_landed"
+
+# Pelacakan halaman terakhir bersifat best-effort: UPDATE-nya hanya menunggu kunci sebentar (ms), lalu dilewati.
+LAST_PAGE_BUSY_TIMEOUT_MS = 100
 
 # Halaman yang tidak boleh dicatat sebagai "halaman terakhir".
 NO_TRACK_ENDPOINTS = {"infosys.login", "infosys.register", "infosys.logout"}
@@ -141,9 +144,15 @@ def _register_hooks(app):
             ).fetchone()
             if row is not None:
                 g.settings.update({k: row[k] for k in row.keys() if row[k] is not None})
-        except sqlite3.OperationalError:
-            # Tabel belum ada (database belum di-seed): perlakukan sebagai Guest.
+        except sqlite3.OperationalError as exc:
+            if "no such table" in str(exc).lower():
+                # Tabel belum ada (database belum di-seed): perlakukan sebagai Guest.
+                g.user = None
+                return
+            # "database is locked" dan galat lain: BUKAN Guest. Sesi dibiarkan utuh, minta coba lagi.
+            app.logger.warning("Database tidak bisa dibaca saat memuat pengguna", exc_info=True)
             g.user = None
+            abort(503)
 
     @app.after_request
     def remember_last_page(response):
@@ -161,8 +170,10 @@ def _register_hooks(app):
         path = request.full_path.rstrip("?")
         if g.settings.get("last_module") == module_key and g.settings.get("last_path") == path:
             return response  # tidak berubah, hemat satu UPDATE
+        conn = None
         try:
             conn = db.get_db()
+            db.set_busy_timeout(LAST_PAGE_BUSY_TIMEOUT_MS)  # best-effort: jangan menahan respons
             conn.execute(
                 "UPDATE user_settings SET last_module = ?, last_path = ? WHERE user_id = ?",
                 (module_key, path, g.user["id"]),
@@ -170,6 +181,10 @@ def _register_hooks(app):
             conn.commit()
         except sqlite3.Error:
             app.logger.warning("Gagal menyimpan last_module/last_path", exc_info=True)
+            try:
+                conn.rollback()
+            except (sqlite3.Error, AttributeError):
+                pass
         return response
 
     @app.context_processor

@@ -121,6 +121,11 @@ def apply_schema(conn):
     """Jalankan schema.sql, lalu pastikan tabel yang sudah ada cocok dengan skema (anti-drift)."""
     with open(SCHEMA_PATH, encoding="utf-8") as f:
         sql = f.read()
+    try:
+        conn.commit()  # PRAGMA journal_mode tidak boleh dijalankan di dalam transaksi
+        conn.execute("PRAGMA journal_mode = WAL")  # tersimpan di berkas database; sama dengan app/db.py
+    except sqlite3.OperationalError:
+        pass  # database sedang dikunci: app/db.py mencoba lagi saat koneksi berikutnya
     conn.executescript(sql)
     conn.execute("PRAGMA foreign_keys = ON")
 

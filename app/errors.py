@@ -4,6 +4,7 @@
                         dengan teks Bahasa Indonesia dan tombol "Kembali ke Beranda".
   * Permintaan API   -> JSON {"ok": false, "error": "...", "status": <kode>} (bentuk sama dengan
                         respons galat endpoint JSON lain). API = jalur /api/... atau /<modul>/api/...
+  * 503              -> "Server sedang sibuk, coba lagi" (database terkunci); sesi login tidak disentuh.
   * 500              -> pesan umum saja. Detail galat TIDAK PERNAH dikirim ke pengguna; jejaknya
                         tetap dicatat di log server oleh Flask.
 
@@ -23,12 +24,15 @@ ERROR_TEXT = {
           "Kembali ke halaman sebelumnya, lalu gunakan tombol atau tautan yang tersedia."),
     500: ("Ada gangguan di sisi kami",
           "Ini bukan salah Anda. Coba lagi sebentar lagi."),
+    503: ("Server sedang sibuk, coba lagi",
+          "Data sedang dipakai proses lain. Anda tidak keluar dari akun. Muat ulang halaman beberapa saat lagi."),
 }
 API_TEXT = {
     403: "Akun Anda tidak punya izin untuk tindakan ini.",
     404: "Data yang diminta tidak ditemukan.",
     405: "Tindakan ini tidak tersedia untuk alamat tersebut.",
     500: "Ada gangguan di sisi kami. Coba lagi sebentar lagi.",
+    503: "Server sedang sibuk, coba lagi.",
 }
 GENERIC_TITLE = "Permintaan belum bisa diproses"
 GENERIC_MESSAGE = "Muat ulang halaman lalu coba lagi."
@@ -71,6 +75,8 @@ def _json_response(status, error):
     for key, value in _extra_headers(error):
         resp.headers[key] = value
     resp.headers["Cache-Control"] = "no-store"
+    if status == 503:
+        resp.headers["Retry-After"] = "2"
     return resp
 
 
@@ -82,7 +88,10 @@ def _html_response(status, error):
     except Exception:  # noqa: BLE001 - halaman galat tidak boleh ikut galat
         current_app.logger.warning("Template galat gagal dirender; memakai halaman cadangan", exc_info=True)
         body = _FALLBACK_HTML.format(title=title, message=message)
-    return body, status, _extra_headers(error)
+    headers = _extra_headers(error)
+    if status == 503:
+        headers.append(("Retry-After", "2"))
+    return body, status, headers
 
 
 def handle_error(error):
