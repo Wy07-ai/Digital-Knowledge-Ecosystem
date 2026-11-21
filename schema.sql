@@ -22,9 +22,9 @@ CREATE TABLE IF NOT EXISTS users (
   full_name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'member',        -- member | admin
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('member', 'admin')),
   avatar_url TEXT, bio TEXT,
-  is_active INTEGER NOT NULL DEFAULT 1,
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at TEXT
 );
@@ -74,7 +74,8 @@ CREATE TABLE IF NOT EXISTS courses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   category_id INTEGER REFERENCES categories(id),
   title TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, description TEXT,
-  level TEXT NOT NULL DEFAULT 'pemula',         -- pemula | menengah | lanjut
+  level TEXT NOT NULL DEFAULT 'pemula'         -- pemula | menengah | lanjut
+    CHECK (level IN ('pemula', 'menengah', 'lanjut')),
   thumbnail_url TEXT, instructor_name TEXT, est_hours REAL,
   is_published INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -84,8 +85,10 @@ CREATE TABLE IF NOT EXISTS lessons (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
   order_no INTEGER NOT NULL, title TEXT NOT NULL,
-  content_type TEXT NOT NULL DEFAULT 'text',    -- text | video
-  content_body TEXT, video_url TEXT, duration_min INTEGER,
+  content_type TEXT NOT NULL DEFAULT 'text'    -- text | video
+    CHECK (content_type IN ('text', 'video')),
+  content_body TEXT, video_url TEXT,
+  duration_min INTEGER CHECK (duration_min IS NULL OR duration_min >= 0),
   UNIQUE (course_id, order_no)
 );
 
@@ -95,9 +98,10 @@ CREATE TABLE IF NOT EXISTS products (
   category_id INTEGER REFERENCES categories(id),
   course_id INTEGER REFERENCES courses(id),     -- NULL jika bukan kursus
   name TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, description TEXT,
-  price INTEGER NOT NULL DEFAULT 0,
+  price INTEGER NOT NULL DEFAULT 0 CHECK (price >= 0),
   image_url TEXT,
-  product_type TEXT NOT NULL DEFAULT 'course',  -- course | ebook | template
+  product_type TEXT NOT NULL DEFAULT 'course'  -- course | ebook | template
+    CHECK (product_type IN ('course', 'ebook', 'template')),
   is_active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -106,7 +110,7 @@ CREATE TABLE IF NOT EXISTS cart_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   product_id INTEGER NOT NULL REFERENCES products(id),
-  qty INTEGER NOT NULL DEFAULT 1,
+  qty INTEGER NOT NULL DEFAULT 1 CHECK (qty BETWEEN 1 AND 99),  -- batas sama dengan MAX_CART_QTY
   added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (user_id, product_id)
 );
@@ -115,9 +119,11 @@ CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   order_code TEXT NOT NULL UNIQUE,              -- mis. DKE-20261112-0001
   user_id INTEGER NOT NULL REFERENCES users(id),
-  total INTEGER NOT NULL,
-  status TEXT NOT NULL DEFAULT 'paid',          -- pending | paid | cancelled (simulasi)
-  payment_method TEXT,                          -- simulasi: transfer | e-wallet | kartu
+  total INTEGER NOT NULL CHECK (total >= 0),
+  status TEXT NOT NULL DEFAULT 'paid'           -- pending | paid | cancelled (simulasi)
+    CHECK (status IN ('pending', 'paid', 'cancelled')),
+  payment_method TEXT                           -- simulasi: transfer | e-wallet | kartu (boleh NULL)
+    CHECK (payment_method IS NULL OR payment_method IN ('transfer', 'e-wallet', 'kartu')),
   recipient_name TEXT, address TEXT,            -- salinan alamat saat checkout
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -126,7 +132,8 @@ CREATE TABLE IF NOT EXISTS order_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   product_id INTEGER NOT NULL REFERENCES products(id),
-  unit_price INTEGER NOT NULL, qty INTEGER NOT NULL DEFAULT 1
+  unit_price INTEGER NOT NULL CHECK (unit_price >= 0),
+  qty INTEGER NOT NULL DEFAULT 1 CHECK (qty >= 1)
 );
 
 -- ===== E-LEARNING (lanjutan) =====
@@ -152,7 +159,7 @@ CREATE TABLE IF NOT EXISTS lesson_progress (
 CREATE TABLE IF NOT EXISTS quizzes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-  title TEXT NOT NULL, pass_score INTEGER NOT NULL DEFAULT 70
+  title TEXT NOT NULL, pass_score INTEGER NOT NULL DEFAULT 70 CHECK (pass_score BETWEEN 0 AND 100)
 );
 
 CREATE TABLE IF NOT EXISTS quiz_questions (
@@ -160,15 +167,21 @@ CREATE TABLE IF NOT EXISTS quiz_questions (
   quiz_id INTEGER NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   option_a TEXT NOT NULL, option_b TEXT NOT NULL, option_c TEXT, option_d TEXT,
-  correct_option TEXT NOT NULL,                 -- 'a' | 'b' | 'c' | 'd'
-  explanation TEXT
+  correct_option TEXT NOT NULL                  -- 'a' | 'b' | 'c' | 'd'
+    CHECK (correct_option IN ('a', 'b', 'c', 'd')),
+  explanation TEXT,
+  -- kunci c/d hanya sah bila opsinya terisi
+  CHECK (correct_option NOT IN ('c', 'd')
+         OR (correct_option = 'c' AND option_c IS NOT NULL)
+         OR (correct_option = 'd' AND option_d IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS quiz_attempts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   quiz_id INTEGER NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
-  score INTEGER NOT NULL, passed INTEGER NOT NULL,
+  score INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+  passed INTEGER NOT NULL CHECK (passed IN (0, 1)),
   answers_json TEXT,
   taken_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
