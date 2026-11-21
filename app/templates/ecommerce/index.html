@@ -95,11 +95,15 @@
             <p class="mt-2 line-clamp-3 text-sm text-muted">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajar Anda.' }}</p>
             <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
               <p class="ecommerce-price text-lg font-bold">{{ product.price|rupiah }}</p>
-              <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
-                <button type="submit" class="btn btn--primary">Tambah ke keranjang</button>
-              </form>
+              {% if product.id in owned_product_ids %}
+                <span class="badge badge--accent" data-owned>Sudah dimiliki</span>
+              {% else %}
+                <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+                  <button type="submit" class="btn btn--primary">Tambah ke keranjang</button>
+                </form>
+              {% endif %}
             </div>
           </div>
         </article>

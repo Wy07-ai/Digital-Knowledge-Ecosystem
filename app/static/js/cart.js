@@ -82,8 +82,10 @@
         notify('Jumlah produk diperbarui.', 'success');
       } else {
         var item = form.closest('[data-cart-item]');
+        var wasOwned = !!(item && item.querySelector('[data-owned]'));
         if (item) item.remove();
         if (data.cart_count === 0) showEmptyCart();
+        else if (wasOwned) window.location.reload();
         notify('Produk dihapus dari keranjang.', 'success');
       }
     }).catch(function (error) {

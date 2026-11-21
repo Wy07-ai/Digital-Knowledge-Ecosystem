@@ -26,11 +26,15 @@
         <p class="mt-2 whitespace-pre-line">{{ product.description or 'Produk digital pilihan untuk mendukung proses belajar Anda.' }}</p>
       </div>
       <div class="mt-auto pt-8">
-        <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
-          <button type="submit" class="btn btn--primary w-full">Tambah ke keranjang</button>
-        </form>
+        {% if owned %}
+          <p class="rounded-lg border border-line bg-page px-4 py-3 text-center font-semibold" data-owned>Sudah dimiliki</p>
+        {% else %}
+          <form method="post" action="{{ url_for('ecommerce.add_to_cart', product_id=product.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+            <button type="submit" class="btn btn--primary w-full">Tambah ke keranjang</button>
+          </form>
+        {% endif %}
       </div>
     </div>
   </article>
