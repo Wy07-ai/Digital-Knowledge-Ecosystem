@@ -1,0 +1,74 @@
+# CI untuk DKE. Dua job berjalan paralel pada pull request dan push ke cabang utama:
+#   tes : unit test (python -m unittest discover -s tests) pada matriks versi Python
+#   css : memastikan app/static/css/tailwind.css yang di-commit sama dengan hasil `npm run build:css`
+# Tanpa secret: tes membuat SECRET_KEY sendiri lewat create_app(test_config).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Batalkan run lama pada PR/cabang yang sama saat ada commit baru.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  tes:
+    name: Tes (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.10 = batas minimal yang dinyatakan README; 3.13 = versi terbaru yang dipakai.
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Pasang dependensi
+        run: python -m pip install -r requirements.txt
+
+      - name: Jalankan unit test
+        run: python -m unittest discover -s tests
+
+  css:
+    name: CSS (tailwind.css mutakhir)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Pasang dependensi Node
+        run: npm ci
+
+      - name: Bangun ulang CSS
+        run: npm run build:css
+
+      - name: Pastikan tailwind.css yang di-commit mutakhir
+        run: |
+          # --ignore-cr-at-eol: perbedaan CRLF/LF saja (mis. berkas dibuat di Windows) tidak dianggap perubahan.
+          if ! git diff --exit-code --ignore-cr-at-eol --stat -- app/static/css/tailwind.css; then
+            echo "::error file=app/static/css/tailwind.css,title=tailwind.css belum mutakhir::Kelas Tailwind di templat/JS/Python berubah tetapi app/static/css/tailwind.css belum di-commit. Jalankan 'npm run build:css' lalu commit app/static/css/tailwind.css (lihat CONTRIBUTING.md)."
+            exit 1
+          fi
