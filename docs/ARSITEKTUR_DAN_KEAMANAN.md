@@ -156,7 +156,7 @@ Kegagalan login dicatat sebagai baris `activity_logs` dengan `action = 'login_fa
   login (jalan tengah yang umum untuk pembatas per akun). Untuk produksi, tambahkan rate-limit di tingkat server
   (reverse proxy) sebagai lapisan kedua.
 - Indeks `idx_activity_logs_action` (bukan tabel) ditambahkan ke `schema.sql` agar penghitungan tetap cepat. Pada
-  database lama, jalankan `python seed.py` (aman diulang) atau `python seed.py --reset`.
+  database lama, jalankan `python seed.py --migrate` (data dipertahankan) atau `python seed.py --reset` (data hilang).
 - Tes: `python -m unittest tests.test_login_throttle`.
 
 Rute autentikasi dan aturan validasinya ada di

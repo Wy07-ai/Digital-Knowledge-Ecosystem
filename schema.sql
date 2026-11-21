@@ -258,3 +258,8 @@ CREATE INDEX IF NOT EXISTS idx_tutorials_category      ON tutorials(category_id)
 CREATE INDEX IF NOT EXISTS idx_articles_category       ON articles(category_id, published_at);
 CREATE INDEX IF NOT EXISTS idx_threads_category        ON threads(category_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_posts_thread            ON posts(thread_id, created_at);
+
+-- ===== VERSI SKEMA =====
+-- Harus sama dengan nomor migrasi terbaru di migrations/ (dijaga tests/test_migrations.py).
+-- schema.sql hanya dipakai untuk database KOSONG; database yang sudah ada dinaikkan lewat `python seed.py --migrate`.
+PRAGMA user_version = 1;

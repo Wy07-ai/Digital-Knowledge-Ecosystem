@@ -67,8 +67,12 @@ Buka http://127.0.0.1:5000.
   `DKE_ADMIN_PASSWORD` atau acak dan dicetak sekali oleh `seed.py`. Rincian:
   [Database dan akun seed](docs/PANDUAN_FITUR_APLIKASI.md#database-dan-data-contoh).
 - Reset database dari nol: `python seed.py --reset` (data lama hilang).
-- Setelah `schema.sql` berubah (mis. menambah `CHECK`), database lama **wajib** di-`--reset`: SQLite tidak bisa
-  `ALTER TABLE ... ADD CHECK`, dan `CREATE TABLE IF NOT EXISTS` tidak mengubah tabel yang sudah ada.
+- Memperbarui database lama tanpa kehilangan data: `python seed.py --migrate`. Versi skema disimpan di
+  `PRAGMA user_version`, dan langkah migrasinya ada di folder `migrations/`. Bila `seed.py` berhenti dengan pesan
+  "versi skema tertinggal", jalankan perintah itu (salin berkas database lebih dulu sebagai cadangan). Menjalankannya
+  berulang aman. Database lama tanpa nomor versi yang bentuknya cocok hanya ditandai versi 1, datanya tidak diubah.
+  `--reset` hanya diperlukan bila datanya memang boleh hilang. Cara menambah migrasi: lihat
+  [`CONTRIBUTING.md`](CONTRIBUTING.md#mengubah-skema-database-migrasi).
 
 ## Environment variables
 
