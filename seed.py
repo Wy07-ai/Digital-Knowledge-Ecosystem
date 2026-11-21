@@ -5,6 +5,7 @@ Pemakaian (dari folder proyek, sejajar dengan run.py):
 
     python seed.py                 # buat instance/dke.db bila belum ada, lalu isi data contoh
     python seed.py --reset         # hapus SEMUA tabel lalu bangun ulang dari nol
+    python seed.py --migrate       # naikkan skema database lama ke versi terbaru (data dipertahankan)
     python seed.py --db jalur.db   # pakai berkas database lain
 
 Sifat penting:
@@ -35,6 +36,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 from werkzeug.security import generate_password_hash
+
+import migrate
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCHEMA_PATH = os.path.join(BASE_DIR, "schema.sql")
@@ -114,33 +117,77 @@ def drop_all_tables(conn):
     for name in names:
         conn.execute(f"DROP TABLE IF EXISTS {name}")
     conn.commit()
+    conn.execute("PRAGMA user_version = 0")  # versi skema ikut dikosongkan: DB kosong = versi 0
     conn.execute("PRAGMA foreign_keys = ON")
 
 
-def apply_schema(conn):
-    """Jalankan schema.sql, lalu pastikan tabel yang sudah ada cocok dengan skema (anti-drift)."""
-    with open(SCHEMA_PATH, encoding="utf-8") as f:
-        sql = f.read()
+def enable_wal(conn):
     try:
         conn.commit()  # PRAGMA journal_mode tidak boleh dijalankan di dalam transaksi
         conn.execute("PRAGMA journal_mode = WAL")  # tersimpan di berkas database; sama dengan app/db.py
     except sqlite3.OperationalError:
         pass  # database sedang dikunci: app/db.py mencoba lagi saat koneksi berikutnya
+
+
+def apply_schema(conn):
+    """Siapkan skema untuk seeding. Tidak pernah mengubah skema database yang sudah berisi tabel.
+
+    * DB kosong        : jalankan schema.sql (sudah memuat PRAGMA user_version = versi terbaru).
+    * versi == terbaru : jalankan schema.sql (idempoten; melengkapi tabel/indeks yang hilang), lalu
+                         periksa bentuknya terhadap schema.sql (anti-drift, termasuk CHECK/UNIQUE/FK).
+    * versi tertinggal : berhenti dan arahkan ke `python seed.py --migrate` (data tidak dihapus).
+    * versi lebih baru : berhenti (kode aplikasi lebih tua daripada database).
+    """
+    with open(SCHEMA_PATH, encoding="utf-8") as f:
+        sql = f.read()
+    enable_wal(conn)
+    latest = migrate.latest_version()
+    version = migrate.get_version(conn)
+    has_tables = bool(migrate.user_tables(conn))
+
+    if has_tables and version < latest:
+        kind = "belum memiliki nomor versi skema" if version == 0 else f"berversi {version}"
+        raise SystemExit(
+            f"Skema database {kind}; versi terbaru adalah {latest}.\n"
+            "Jalankan:  python seed.py --migrate   (menaikkan skema, data lama dipertahankan)\n"
+            "Disarankan menyalin berkas database lebih dulu sebagai cadangan.")
+    if version > latest:
+        raise SystemExit(
+            f"Database berversi {version}, lebih baru dari kode ini (versi skema terbaru {latest}).\n"
+            "Perbarui kode aplikasi ke versi yang sesuai; jangan menurunkan versi database.")
+
     conn.executescript(sql)
     conn.execute("PRAGMA foreign_keys = ON")
 
     ref = sqlite3.connect(":memory:")
     ref.executescript(sql)
-    problems = []
-    for table in EXPECTED_TABLES:
-        want, have = table_columns(ref, table), table_columns(conn, table)
-        if want != have:
-            problems.append(f"  - {table}: kolom di database {have} != skema {want}")
+    problems = migrate.schema_differences(migrate.schema_signature(conn), migrate.schema_signature(ref))
     ref.close()
     if problems:
         raise SystemExit(
-            "Skema database lama tidak cocok dengan schema.sql:\n" + "\n".join(problems) +
-            "\nJalankan:  python seed.py --reset   (menghapus data lama lalu membangun ulang)")
+            f"Skema database (versi {version}) berbeda dari schema.sql padahal nomor versinya sama:\n  - "
+            + "\n  - ".join(problems)
+            + "\nPerubahan skema harus lewat migrasi di migrations/. Pulihkan dari cadangan, atau jalankan:"
+              "  python seed.py --reset   (menghapus data lama lalu membangun ulang)")
+
+
+def run_migrate(conn, out=None):
+    """Perintah --migrate: naikkan skema ke versi terbaru. Mengembalikan kode keluar (0 = berhasil)."""
+    out = sys.stdout if out is None else out
+    enable_wal(conn)
+    latest = migrate.latest_version()
+    before = migrate.get_version(conn)
+    try:
+        applied = migrate.migrate(conn, log=lambda msg: print(msg, file=out))
+    except migrate.MigrationError as exc:
+        print(f"Migrasi GAGAL: {exc}", file=sys.stderr)
+        print(f"Versi skema tetap {migrate.get_version(conn)}; langkah yang gagal dibatalkan.", file=sys.stderr)
+        return 1
+    if applied:
+        print(f"Migrasi selesai: versi skema {before} -> {migrate.get_version(conn)} (terbaru: {latest}).", file=out)
+    else:
+        print(f"Skema sudah versi terbaru ({latest}); tidak ada yang dijalankan.", file=out)
+    return 0
 
 
 # ---------------------------------------------------------------------------
@@ -1361,14 +1408,22 @@ def print_account_report(passwords, created, out=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Buat dan isi database DKE (aman dijalankan ulang).")
     parser.add_argument("--db", default=DEFAULT_DB, help="jalur berkas SQLite (bawaan: instance/dke.db)")
-    parser.add_argument("--reset", action="store_true",
-                        help="hapus semua tabel lalu bangun ulang dari nol (SEMUA DATA LAMA HILANG)")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--reset", action="store_true",
+                      help="hapus semua tabel lalu bangun ulang dari nol (SEMUA DATA LAMA HILANG)")
+    mode.add_argument("--migrate", action="store_true",
+                      help="naikkan skema database ke versi terbaru tanpa menghapus data, lalu selesai (tanpa seed)")
     args = parser.parse_args(argv)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.db)), exist_ok=True)
     existed = os.path.exists(args.db)
     conn = sqlite3.connect(args.db)
     conn.execute("PRAGMA foreign_keys = ON")
+    if args.migrate:
+        try:
+            return run_migrate(conn)
+        finally:
+            conn.close()
     try:
         if args.reset:
             print("Mode --reset: menghapus semua tabel lama ...")

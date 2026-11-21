@@ -332,11 +332,16 @@ Contoh langsung 3 jenjang (E-Learning > judul kelas > Materi N): http://127.0.0.
 
 - `schema.sql` : 23 tabel sesuai Blueprint 3.3 (dapat dijalankan sendiri di SQLite).
 - `seed.py`    : membuat database dari awal dan mengisi data contoh berbahasa Indonesia.
+- `migrate.py` + `migrations/` : versi skema dan langkah migrasi (`python seed.py --migrate`).
 
 ```bash
 python seed.py            # aman dijalankan ulang: tidak menggandakan data, tidak menimpa kata sandi
 python seed.py --reset    # hapus semua tabel lalu bangun ulang dari nol (data lama hilang)
+python seed.py --migrate  # naikkan skema database lama ke versi terbaru (data dipertahankan; tanpa seed)
 ```
+
+Versi skema ada di `PRAGMA user_version`; langkah migrasi di folder `migrations/` (`001_baseline.sql` = skema awal),
+dijalankan oleh `migrate.py`. Cara menambah migrasi: [`CONTRIBUTING.md`](../CONTRIBUTING.md#mengubah-skema-database-migrasi).
 
 Isi seed: kategori per modul, 6 produk (2 bertipe kursus, terhubung ke kursus lewat `course_id`),
 3 kursus (15 pelajaran, 3 kuis, 15 soal; 1 kursus gratis), 5 tutorial (22 langkah dengan snippet kode),

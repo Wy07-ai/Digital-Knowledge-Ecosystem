@@ -11,6 +11,7 @@ kontribusi Anda dilisensikan di bawah [Lisensi MIT](LICENSE).
 - [Penamaan istilah: "aplikasi" di antarmuka, `module_key` di kode](#penamaan-istilah-aplikasi-di-antarmuka-module_key-di-kode)
 - [Mengubah tampilan: wajib build `tailwind.css`](#mengubah-tampilan-wajib-build-tailwindcss)
 - [Keamanan: CSP `nonce` dan autoescape Jinja](#keamanan-csp-nonce-dan-autoescape-jinja)
+- [Mengubah skema database (migrasi)](#mengubah-skema-database-migrasi)
 - [Menjalankan tes sebelum PR atau merge](#menjalankan-tes-sebelum-pr-atau-merge)
 - [Checklist pull request](#checklist-pull-request)
 - [Melaporkan masalah keamanan](#melaporkan-masalah-keamanan)
@@ -27,7 +28,7 @@ python seed.py
 FLASK_DEBUG=1 python run.py      # debug hanya untuk komputer sendiri
 ```
 
-Bila `schema.sql` berubah (termasuk menambah `CHECK`), jalankan `python seed.py --reset` pada database lokal Anda. SQLite tidak bisa `ALTER TABLE ... ADD CHECK`, dan `CREATE TABLE IF NOT EXISTS` tidak mengubah tabel yang sudah ada. Nilai enum di `CHECK` harus sama dengan konstanta/validasi di kode aplikasi, dan `tests/test_schema_constraints.py` harus ikut diperbarui.
+Bila skema berubah (termasuk menambah `CHECK`), tulis sebagai migrasi (lihat [Mengubah skema database](#mengubah-skema-database-migrasi)), lalu jalankan `python seed.py --migrate` pada database lokal Anda; `--reset` hanya bila datanya boleh hilang. Nilai enum di `CHECK` harus sama dengan konstanta/validasi di kode aplikasi, dan `tests/test_schema_constraints.py` harus ikut diperbarui.
 
 Node.js hanya dibutuhkan bila Anda mengubah kelas Tailwind (lihat bagian build CSS di bawah).
 Detail arsitektur ada di [`docs/ARSITEKTUR_DAN_KEAMANAN.md`](docs/ARSITEKTUR_DAN_KEAMANAN.md) dan rincian fitur di
@@ -99,6 +100,10 @@ Rincian: [`docs/ARSITEKTUR_DAN_KEAMANAN.md`](docs/ARSITEKTUR_DAN_KEAMANAN.md#bui
 
 Rincian: [`docs/ARSITEKTUR_DAN_KEAMANAN.md`](docs/ARSITEKTUR_DAN_KEAMANAN.md#cookie-sesi-dan-header-keamanan-appsecuritypy).
 
+## Mengubah skema database (migrasi)
+
+Versi skema disimpan di `PRAGMA user_version`. Untuk mengubah skema, tambahkan satu berkas berurutan di `migrations/` (`002_nama_singkat.sql`, atau `.py` berisi `upgrade(conn)`; nomor berikutnya setelah yang terbaru, tanpa celah), **terapkan perubahan yang sama ke `schema.sql`**, dan naikkan baris `PRAGMA user_version` di akhir `schema.sql` ke nomor itu. Jangan mengubah migrasi yang sudah dirilis (termasuk `001_baseline.sql`). Tiap berkas berjalan dalam satu transaksi: gagal berarti dibatalkan seluruhnya dan versi tidak naik, jadi jangan menulis `BEGIN`/`COMMIT`/`PRAGMA` di dalamnya. Untuk perubahan yang tidak didukung `ALTER TABLE` (menambah `CHECK`, mengubah tipe atau FK), pakai pola membangun ulang tabel: buat tabel baru, salin data, `DROP` tabel lama, `RENAME`, lalu buat ulang indeksnya; runner mematikan `foreign_keys` selama langkah dan menjalankan `PRAGMA foreign_key_check` sebelum `COMMIT`, sehingga anak `ON DELETE CASCADE` tidak ikut terhapus. Uji dengan `python seed.py --migrate` pada salinan database lama; `tests/test_migrations.py` memastikan hasil "skema baru" sama dengan "skema lama + semua migrasi".
+
 ## Menjalankan tes sebelum PR atau merge
 
 Jalankan seluruh unit test dan pastikan **semuanya lulus** sebelum membuka pull request atau melakukan merge:
@@ -121,6 +126,7 @@ python -m unittest discover -s tests
 - [ ] Teks tampilan mengikuti [`docs/GLOSARIUM_TEKS.md`](docs/GLOSARIUM_TEKS.md) ("aplikasi", bukan "modul")
 - [ ] Bila kelas UI berubah: `npm run build:css` dijalankan dan `tailwind.css` ikut di-commit
 - [ ] Skrip inline memakai `nonce`, tidak ada `|safe`/`Markup` untuk masukan pengguna, POST memeriksa CSRF
+- [ ] Bila skema berubah: ada migrasi baru di `migrations/`, `schema.sql` ikut diubah (termasuk `user_version`), dan `tests.test_migrations` lulus
 - [ ] Dokumentasi di `docs/` dan `README.md` diperbarui bila perilaku atau konfigurasi berubah
 - [ ] Tidak ada rahasia, berkas `.env`, atau database lokal di dalam commit
 
