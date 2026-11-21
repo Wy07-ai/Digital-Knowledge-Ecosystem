@@ -127,7 +127,7 @@ class LegacyDbTests(TmpCase):
         self.assertEqual(code, 0, out + err)
 
         conn = sqlite3.connect(self.db)
-        self.assertEqual(migrate.get_version(conn), 1)
+        self.assertEqual(migrate.get_version(conn), migrate.latest_version())
         self.assertEqual(dump(conn), before)
         conn.close()
 

@@ -258,8 +258,13 @@ CREATE INDEX IF NOT EXISTS idx_tutorials_category      ON tutorials(category_id)
 CREATE INDEX IF NOT EXISTS idx_articles_category       ON articles(category_id, published_at);
 CREATE INDEX IF NOT EXISTS idx_threads_category        ON threads(category_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_posts_thread            ON posts(thread_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_quiz_questions_quiz     ON quiz_questions(quiz_id);
+CREATE INDEX IF NOT EXISTS idx_quizzes_course          ON quizzes(course_id);
+CREATE INDEX IF NOT EXISTS idx_posts_user              ON posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_posts_parent            ON posts(parent_post_id);
+CREATE INDEX IF NOT EXISTS idx_threads_user            ON threads(user_id, created_at);
 
 -- ===== VERSI SKEMA =====
 -- Harus sama dengan nomor migrasi terbaru di migrations/ (dijaga tests/test_migrations.py).
 -- schema.sql hanya dipakai untuk database KOSONG; database yang sudah ada dinaikkan lewat `python seed.py --migrate`.
-PRAGMA user_version = 1;
+PRAGMA user_version = 2;

@@ -155,6 +155,41 @@ def resume_lesson(lessons, done_ids):
     return lessons[0] if lessons else None
 
 
+def resume_lessons(user_id, course_ids):
+    """{course_id: baris materi untuk tombol Lanjutkan, atau None}, dihitung dengan SATU kueri.
+
+    Aturan sama dengan resume_lesson(): materi pertama (urutan order_no, id) yang belum selesai;
+    bila semua selesai -> materi pertama; kursus tanpa materi -> None. Jumlah kueri tidak
+    bergantung pada banyaknya kursus (menggantikan get_lessons + completed_lesson_ids per kursus).
+    """
+    ids = list(course_ids)
+    result = {cid: None for cid in ids}
+    if not ids:
+        return result
+    marks = ",".join("?" for _ in ids)
+    rows = get_db().execute(
+        f"""
+        SELECT l.course_id AS course_id, l.id AS id, l.order_no AS order_no,
+               MAX(CASE WHEN lp.id IS NOT NULL THEN 1 ELSE 0 END) AS done
+          FROM lessons l
+          LEFT JOIN lesson_progress lp ON lp.lesson_id = l.id AND lp.user_id = ?
+         WHERE l.course_id IN ({marks})
+         GROUP BY l.id
+         ORDER BY l.course_id ASC, l.order_no ASC, l.id ASC
+        """,
+        (user_id, *ids),
+    ).fetchall()
+    first, pending = {}, {}
+    for r in rows:
+        cid = r["course_id"]
+        first.setdefault(cid, r)
+        if not r["done"]:
+            pending.setdefault(cid, r)
+    for cid in first:
+        result[cid] = pending.get(cid, first[cid])
+    return result
+
+
 def minutes_studied_today(user_id):
     """Menit belajar hari ini (WIB) = total durasi materi yang ditandai selesai hari ini."""
     row = get_db().execute(
@@ -429,11 +464,8 @@ def my_courses():
     courses = [_course_view(r) for r in rows]
     progress = course_progress(user_id, [c["id"] for c in courses])
 
-    resume_urls = {}
-    for c in courses:
-        lessons = get_lessons(c["id"])
-        target = resume_lesson(lessons, completed_lesson_ids(user_id, c["id"]))
-        resume_urls[c["id"]] = _lesson_url(c["id"], target) if target else None
+    targets = resume_lessons(user_id, [c["id"] for c in courses])
+    resume_urls = {cid: (_lesson_url(cid, t) if t else None) for cid, t in targets.items()}
 
     settings = get_settings(user_id)
     studied = minutes_studied_today(user_id)
