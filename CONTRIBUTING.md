@@ -118,6 +118,8 @@ python -m unittest discover -s tests
 - Bila perubahan menyentuh antarmuka, jalankan juga skenario uji manual terkait di [`docs/`](docs/) (berkas
   `UJI_MANUAL_*.md`).
 - Jangan menonaktifkan atau menghapus tes agar PR lulus.
+- CI (`.github/workflows/ci.yml`) menjalankan tes pada Python 3.10 dan 3.13 serta memeriksa bahwa `tailwind.css`
+  sudah mutakhir; keduanya harus hijau sebelum merge.
 
 ## Checklist pull request
 

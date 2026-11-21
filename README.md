@@ -101,6 +101,18 @@ python -m unittest tests.test_security        # satu berkas tes
 Tes tidak membutuhkan `DKE_SECRET_KEY` karena tiap tes memberi `SECRET_KEY` sendiri lewat `create_app(test_config)`.
 Skenario uji manual ada di [`docs/`](docs/) (berkas `UJI_MANUAL_*.md`).
 
+### Integrasi berkelanjutan (CI)
+
+Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) berjalan pada setiap pull request dan push ke
+cabang utama, dengan dua job paralel:
+
+- **Tes**: `python -m unittest discover -s tests` pada Python 3.10 (batas minimal) dan 3.13.
+- **CSS**: menjalankan `npm ci` dan `npm run build:css`, lalu gagal bila `app/static/css/tailwind.css` yang
+  di-commit berbeda dari hasil build. Perbaikannya: jalankan `npm run build:css` dan commit hasilnya.
+
+Lencana status (ganti `OWNER/REPO` dengan milik repositori ini):
+`[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)`
+
 ## Struktur folder
 
 ```
