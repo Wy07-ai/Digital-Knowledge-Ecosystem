@@ -55,6 +55,8 @@ MSG_NOT_ENROLLED = "Anda belum terdaftar di kelas ini. Ikuti kelas lebih dulu."
 MSG_ADDED_TO_CART = "Produk ditambahkan ke keranjang."  # [JS]
 MSG_CART_EMPTY = "Keranjang masih kosong. Tambahkan produk dulu, lalu bayar."
 MSG_CART_ITEM_MISSING = "Produk tidak ada di keranjang. Muat ulang halaman lalu coba lagi."
+MSG_COURSE_OWNED = "Anda sudah memiliki kursus ini. Lanjutkan belajar dari menu E-Learning."
+MSG_CART_COURSE_OWNED = "Kursus berikut sudah Anda miliki: {names}. Hapus dari keranjang, lalu bayar lagi."
 
 # --- Pesan toast contoh di halaman Uji Komponen (diulang di app.js) ---------------------------
 MSG_PROGRESS_AUTOSAVED = "Progres belajar tersimpan otomatis."  # [JS]

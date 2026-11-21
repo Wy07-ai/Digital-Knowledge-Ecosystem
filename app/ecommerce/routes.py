@@ -6,7 +6,13 @@ from flask import abort, current_app, flash, g, jsonify, redirect, render_templa
 
 from ..db import get_db
 from ..module_settings import MSG_SAVE_FAILED, get_setting, msg_saved, set_setting
-from ..messages import MSG_ADDED_TO_CART, MSG_CART_EMPTY, MSG_CART_ITEM_MISSING
+from ..messages import (
+    MSG_ADDED_TO_CART,
+    MSG_CART_COURSE_OWNED,
+    MSG_CART_EMPTY,
+    MSG_CART_ITEM_MISSING,
+    MSG_COURSE_OWNED,
+)
 from ..utils import MSG_CSRF, csrf_valid, login_required, log_activity, now_iso, notify, safe_next
 from . import bp
 
@@ -64,9 +70,29 @@ def _price_value(raw):
 
 def _product(product_id):
     return get_db().execute(
-        "SELECT id, name, slug, is_active FROM products WHERE id = ?",
+        "SELECT id, name, slug, is_active, product_type, course_id FROM products WHERE id = ?",
         (product_id,),
     ).fetchone()
+
+
+def _owned_course_product_ids(db, user_id):
+    """Id produk bertipe course yang kursusnya sudah dimiliki pengguna.
+
+    Enrollment dari sumber apa pun (order maupun gratis) dihitung sebagai dimiliki.
+    """
+    if user_id is None:
+        return set()
+    rows = db.execute(
+        "SELECT p.id FROM products p "
+        "JOIN enrollments e ON e.course_id = p.course_id AND e.user_id = ? "
+        "WHERE p.product_type = 'course' AND p.course_id IS NOT NULL",
+        (user_id,),
+    ).fetchall()
+    return {row["id"] for row in rows}
+
+
+def _owned_course_names(items, owned_ids):
+    return [item["name"] for item in items if item["product_id"] in owned_ids]
 
 
 def _cart_totals(user_id):
@@ -184,6 +210,9 @@ def index():
         "ecommerce/index.html",
         page_title="Katalog",
         products=products,
+        owned_product_ids=_owned_course_product_ids(
+            db, g.user["id"] if g.get("user") is not None else None
+        ),
         categories=categories,
         product_types=PRODUCT_TYPES,
         sort_options=SORT_OPTIONS,
@@ -208,7 +237,15 @@ def product(slug):
     ).fetchone()
     if item is None:
         abort(404)
-    return render_template("ecommerce/product.html", page_title=item["name"], product=item)
+    owned_ids = _owned_course_product_ids(
+        get_db(), g.user["id"] if g.get("user") is not None else None
+    )
+    return render_template(
+        "ecommerce/product.html",
+        page_title=item["name"],
+        product=item,
+        owned=item["id"] in owned_ids,
+    )
 
 
 @bp.route("/keranjang")
@@ -223,10 +260,13 @@ def cart():
         (g.user["id"],),
     ).fetchall()
     subtotal, item_count = _cart_totals(g.user["id"])
+    owned_ids = _owned_course_product_ids(db, g.user["id"])
     return render_template(
         "ecommerce/cart.html",
         page_title="Keranjang",
         items=items,
+        owned_product_ids=owned_ids,
+        has_owned_items=any(item["product_id"] in owned_ids for item in items),
         subtotal=subtotal,
         total=subtotal,
         item_count=item_count,
@@ -246,6 +286,9 @@ def add_to_cart(product_id):
         return redirect(url_for("ecommerce.product", slug=product["slug"]))
 
     db = get_db()
+    if product["id"] in _owned_course_product_ids(db, g.user["id"]):
+        flash(MSG_COURSE_OWNED, "error")
+        return redirect(url_for("ecommerce.product", slug=product["slug"]))
     try:
         db.execute(
             "INSERT INTO cart_items (user_id, product_id, qty) VALUES (?, ?, 1) "
@@ -349,6 +392,11 @@ def checkout():
         flash(MSG_CART_EMPTY, "warning")
         return redirect(url_for("ecommerce.cart"))
 
+    owned_names = _owned_course_names(items, _owned_course_product_ids(db, user_id))
+    if owned_names:
+        flash(MSG_CART_COURSE_OWNED.format(names=", ".join(owned_names)), "error")
+        return redirect(url_for("ecommerce.cart"))
+
     subtotal = sum(item["price"] * item["qty"] for item in items)
     settings = _ecommerce_settings(user_id)
     address = request.form.get("address", settings["address"]).strip()
@@ -406,6 +454,13 @@ def checkout():
                     "Ada kursus di keranjang yang belum terhubung ke kelas. Hubungi admin.",
                     "error",
                 )
+                return redirect(url_for("ecommerce.cart"))
+            owned_names = _owned_course_names(
+                items, _owned_course_product_ids(db, user_id)
+            )
+            if owned_names:
+                db.rollback()
+                flash(MSG_CART_COURSE_OWNED.format(names=", ".join(owned_names)), "error")
                 return redirect(url_for("ecommerce.cart"))
             subtotal = sum(item["price"] * item["qty"] for item in items)
             order_date = datetime.now().strftime("%Y%m%d")

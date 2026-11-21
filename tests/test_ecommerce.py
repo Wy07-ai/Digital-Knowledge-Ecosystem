@@ -283,5 +283,113 @@ class EcommerceTests(unittest.TestCase):
         self.assertEqual(self.sql("SELECT product_id, qty FROM cart_items"), [(1, 2)])
 
 
+    # ---- Kursus yang sudah dimiliki ----
+    def own_course(self, source="order"):
+        self.sql(
+            "INSERT INTO enrollments (user_id, course_id, source) VALUES (1, 1, ?)",
+            (source,),
+        )
+
+    def add_post(self, product_id=1):
+        token = self.token()
+        return self.client.post(
+            f"/ecommerce/keranjang/tambah/{product_id}",
+            data={"csrf_token": token, "next": "/ecommerce/produk/kursus-python"},
+        )
+
+    def checkout_post(self):
+        self.save_ecommerce_settings()
+        token = self.token(path="/ecommerce/keranjang")
+        return self.client.post(
+            "/ecommerce/checkout",
+            data={
+                "csrf_token": token,
+                "address": "Jl. Melati No. 10, Bandung",
+                "payment_method": "transfer",
+            },
+        )
+
+    def test_owned_course_cannot_be_added_to_cart(self):
+        self.login()
+        self.own_course()
+        response = self.add_post(1)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(urlsplit(response.location).path, "/ecommerce/produk/kursus-python")
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 0)
+        page = self.client.get(response.location).get_data(as_text=True)
+        self.assertIn("Anda sudah memiliki kursus ini", page)
+
+    def test_course_from_free_enrollment_also_counts_as_owned(self):
+        self.login()
+        self.own_course(source="free")
+        self.add_post(1)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 0)
+
+    def test_owned_course_in_cart_blocks_checkout_without_order(self):
+        self.login()
+        self.add_course_to_cart()
+        self.own_course()
+        response = self.checkout_post()
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(urlsplit(response.location).path, "/ecommerce/keranjang")
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM order_items")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 1)
+        page = self.client.get(response.location).get_data(as_text=True)
+        self.assertIn("Kursus berikut sudah Anda miliki: Kursus Dasar Python", page)
+
+    def test_owned_check_runs_inside_checkout_transaction(self):
+        """Kursus didapat setelah halaman checkout dibuka: POST tetap ditolak."""
+        self.login()
+        self.add_course_to_cart()
+        self.save_ecommerce_settings()
+        token = self.token(path="/ecommerce/checkout")
+        self.own_course()
+        response = self.client.post(
+            "/ecommerce/checkout",
+            data={"csrf_token": token, "address": "Jl. Melati", "payment_method": "transfer"},
+        )
+        self.assertEqual(urlsplit(response.location).path, "/ecommerce/keranjang")
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 0)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 1)
+
+    def test_product_and_cart_pages_show_owned_label_instead_of_buy_button(self):
+        self.login()
+        self.add_course_to_cart()
+        self.own_course()
+        product = self.client.get("/ecommerce/produk/kursus-python").get_data(as_text=True)
+        self.assertIn("Sudah dimiliki", product)
+        self.assertNotIn("Tambah ke keranjang", product)
+        catalog = self.client.get("/ecommerce/?q=Python").get_data(as_text=True)
+        self.assertIn("Sudah dimiliki", catalog)
+        self.assertNotIn("Tambah ke keranjang", catalog)
+        cart = self.client.get("/ecommerce/keranjang").get_data(as_text=True)
+        self.assertIn("Sudah dimiliki", cart)
+        self.assertNotIn("Lanjut bayar</a>", cart)
+        other = self.client.get("/ecommerce/produk/kursus-sql").get_data(as_text=True)
+        self.assertIn("Tambah ke keranjang", other)
+
+    def test_non_course_products_can_still_be_bought_repeatedly(self):
+        self.login()
+        self.save_ecommerce_settings()
+        for _ in range(2):
+            self.add_post(3)
+            response = self.checkout_post()
+            self.assertRegex(urlsplit(response.location).path, r"/ecommerce/pesanan/DKE-")
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 2)
+        page = self.client.get("/ecommerce/produk/ebook-flask").get_data(as_text=True)
+        self.assertIn("Tambah ke keranjang", page)
+
+    def test_buying_unowned_course_creates_one_order_and_one_enrollment(self):
+        self.login()
+        self.add_post(1)
+        response = self.checkout_post()
+        self.assertRegex(urlsplit(response.location).path, r"/ecommerce/pesanan/DKE-")
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM orders")[0][0], 1)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM enrollments")[0][0], 1)
+        self.add_post(1)
+        self.assertEqual(self.sql("SELECT COUNT(*) FROM cart_items")[0][0], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

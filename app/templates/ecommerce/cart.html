@@ -20,6 +20,7 @@
   <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]" data-cart-content {% if not items %}hidden{% endif %}>
     <section class="space-y-4" aria-label="Produk di keranjang" data-cart-items>
       {% for item in items %}
+        {% set owned = item.product_id in owned_product_ids %}
         <article class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-4 shadow-sm sm:flex-row sm:items-center"
                  data-cart-item data-unit-price="{{ item.price }}">
           <a href="{{ url_for('ecommerce.product', slug=item.slug) }}"
@@ -41,15 +42,19 @@
               <p class="text-xs text-muted">Subtotal item</p>
               <p class="ecommerce-price font-bold" data-line-total>{{ (item.price * item.qty)|rupiah }}</p>
             </div>
-            <form method="post" action="{{ url_for('ecommerce.update_cart_quantity', item_id=item.cart_item_id) }}" data-cart-update>
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <label class="sr-only" for="qty-{{ item.cart_item_id }}">Jumlah {{ item.name }}</label>
-              <div class="flex items-center gap-2">
-                <input id="qty-{{ item.cart_item_id }}" name="qty" type="number" min="1" max="99" value="{{ item.qty }}"
-                       class="w-20 rounded-lg border border-line bg-page px-2 py-2 text-center text-ink">
-                <button type="submit" class="btn btn-secondary">Ubah</button>
-              </div>
-            </form>
+            {% if owned %}
+              <span class="badge badge--accent" data-owned>Sudah dimiliki</span>
+            {% else %}
+              <form method="post" action="{{ url_for('ecommerce.update_cart_quantity', item_id=item.cart_item_id) }}" data-cart-update>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label class="sr-only" for="qty-{{ item.cart_item_id }}">Jumlah {{ item.name }}</label>
+                <div class="flex items-center gap-2">
+                  <input id="qty-{{ item.cart_item_id }}" name="qty" type="number" min="1" max="99" value="{{ item.qty }}"
+                         class="w-20 rounded-lg border border-line bg-page px-2 py-2 text-center text-ink">
+                  <button type="submit" class="btn btn-secondary">Ubah</button>
+                </div>
+              </form>
+            {% endif %}
             <form method="post" action="{{ url_for('ecommerce.remove_cart_item', item_id=item.cart_item_id) }}" data-cart-remove>
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn btn-secondary text-red-700 dark:text-red-300">Hapus</button>
@@ -71,7 +76,10 @@
           <dd class="ecommerce-price font-bold" data-total>{{ total|rupiah }}</dd>
         </div>
       </dl>
-      {% if items %}
+      {% if items and has_owned_items %}
+        <button type="button" class="btn btn--primary mt-5 w-full" disabled aria-describedby="owned-cart-note">Lanjut bayar</button>
+        <p id="owned-cart-note" class="mt-2 text-sm text-muted">Hapus kursus yang sudah dimiliki, lalu bayar.</p>
+      {% elif items %}
         <a href="{{ url_for('ecommerce.checkout') }}" class="btn btn--primary mt-5 w-full">Lanjut bayar</a>
       {% endif %}
     </aside>
